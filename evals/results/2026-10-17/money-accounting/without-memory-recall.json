@@ -1,0 +1,17 @@
+{
+  "intent": "unknown",
+  "constraints": [
+    "Preserve public function signature: parse_cents(amount: str) -> int in money.py",
+    "Edit only existing project Python modules and recall.json",
+    "Do not install Remvu, create .remvu/, use another agent, change Git configuration, or commit",
+    "Use only files in the current project"
+  ],
+  "rejected_directions": [
+    "unknown"
+  ],
+  "next_step": "unknown: the user's outstanding task is not stated in the project; needs the user to specify the remaining step",
+  "known_failed_checks": [
+    "none run: no test suite or check command exists in the project and no task was identified"
+  ],
+  "needs_context": true
+}

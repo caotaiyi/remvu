@@ -121,20 +121,39 @@ class AdapterTest(unittest.TestCase):
 
     def test_path_quoting_and_exec_form(self):
         self.initialize()
+        core.apply_update(self.root, {'base_revision': 0, 'entries': [
+            {'kind': 'goal', 'text': '保留中文和 emoji ✅', 'basis': 'user_confirmed'}]})
+        core.write_document(self.root)
         claude = json.loads((self.root / '.claude/settings.local.json').read_text())['hooks']['Stop'][0]['hooks'][0]
         self.assertEqual(claude['command'], str(Path(sys.executable).resolve()))
         self.assertIn(str(self.root), claude['args'])
-        codex = json.loads((self.root / '.codex/hooks.json').read_text())['hooks']['Stop'][0]['hooks'][0]
+        codex = json.loads((self.root / '.codex/hooks.json').read_text())['hooks']['SessionStart'][0]['hooks'][0]
         self.assertEqual(shlex.split(codex['command'])[-1], str(self.root))
         encoded = codex['commandWindows'].split()[-1]
         windows = base64.b64decode(encoded).decode('utf-16le')
         self.assertIn(str(self.root).replace("'", "''"), windows)
+        self.assertIn('[Console]::OutputEncoding = $OutputEncoding', windows)
         self.assertNotIn('ExecutionPolicy', codex['commandWindows'])
         # Exercise the actual shell-form command from a path containing shell metacharacters.
-        result = subprocess.run(codex['command'], input=json.dumps(self.payload('Stop')),
-                                shell=True, text=True, capture_output=True)
+        command = codex['commandWindows'] if os.name == 'nt' else codex['command']
+        result = subprocess.run(command, input=json.dumps(self.payload('SessionStart'), ensure_ascii=False),
+                                shell=True, text=True, encoding='utf-8', capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIsInstance(json.loads(result.stdout), dict)
+        self.assertIn('保留中文和 emoji ✅', json.loads(result.stdout)['hookSpecificOutput']['additionalContext'])
+
+    def test_hook_stdio_remains_utf8_when_host_encoding_is_cp1252(self):
+        self.initialize(())
+        core.apply_update(self.root, {'base_revision': 0, 'entries': [
+            {'kind': 'constraint', 'text': '保留中文和 emoji ✅', 'basis': 'user_confirmed'}]})
+        core.write_document(self.root)
+        payload = self.payload('SessionStart', session_id='中文会话')
+        process = subprocess.run([sys.executable, str(SCRIPTS / 'remvu_hooks.py'), '--platform', 'codex',
+                                  '--event', 'SessionStart', '--repo', str(self.root)],
+                                 input=json.dumps(payload, ensure_ascii=False).encode('utf-8'), capture_output=True,
+                                 env={**os.environ, 'PYTHONIOENCODING': 'cp1252'})
+        self.assertEqual(process.returncode, 0, process.stderr.decode('utf-8'))
+        context = json.loads(process.stdout.decode('utf-8'))['hookSpecificOutput']['additionalContext']
+        self.assertIn('保留中文和 emoji ✅', context)
 
     def test_tool_dedup_and_bounded_stop(self):
         self.initialize(())
@@ -206,8 +225,14 @@ class AdapterTest(unittest.TestCase):
         for verb in ('events', 'show'):
             self.call('PreToolUse', tool_name='Bash', tool_input={
                 'command': shlex.join([sys.executable, str(SCRIPTS / 'remvu.py'), verb, 'e-example'])})
-        self.assertFalse(self.state()['pending_consolidation'])
-        self.assertEqual(self.state()['events'], [])
+        if os.name == 'nt':
+            # PowerShell text has different quoting/expansion rules. Unknown
+            # shell work must remain observable rather than being guessed safe.
+            self.assertTrue(self.state()['pending_consolidation'])
+            self.assertEqual(len(self.state()['events']), 3)
+        else:
+            self.assertFalse(self.state()['pending_consolidation'])
+            self.assertEqual(self.state()['events'], [])
         self.call('PostToolUse', tool_name='Bash', tool_input={
             'command': f'python {SCRIPTS}/remvu.py status; python real_work.py'})
         self.assertTrue(self.state()['pending_consolidation'])

@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -34,7 +35,8 @@ class ExportTest(unittest.TestCase):
         self.src.write_text(''.join(json.dumps(r) + '\n' for r in rows))
 
     def cli(self, *args, ok=True):
-        result = subprocess.run([sys.executable, str(SCRIPT), *map(str, args)], text=True, capture_output=True)
+        result = subprocess.run([sys.executable, str(SCRIPT), *map(str, args)], text=True,
+                                encoding='utf-8', capture_output=True)
         if ok:
             self.assertEqual(result.returncode, 0, result.stderr)
         else:
@@ -208,6 +210,16 @@ class ExportTest(unittest.TestCase):
         record = json.loads(self.cli('show', self.bundle, '--event', 'e000002').stdout)
         self.assertEqual(record['text'], '保留中文和 emoji ✅')
         self.assertEqual(self.read('coverage.json')['counts']['malformed_lines'], 0)
+
+    def test_unicode_output_is_utf8_even_when_host_pipes_use_cp1252(self):
+        self.source([message('assistant', '中文和 emoji ✅')])
+        self.export()
+        for script in (SCRIPT, SCRIPT.parents[2] / 'remvu/scripts/legacy_export.py'):
+            process = subprocess.run([sys.executable, str(script), 'show', str(self.bundle),
+                                      '--event', 'e000001'], capture_output=True,
+                                     env={**os.environ, 'PYTHONIOENCODING': 'cp1252'})
+            self.assertEqual(process.returncode, 0, process.stderr.decode('utf-8'))
+            self.assertEqual(json.loads(process.stdout.decode('utf-8'))['text'], '中文和 emoji ✅')
 
     def test_archive_refuses_destination_inside_bundle(self):
         self.source([message('user', 'hi')]); self.export()

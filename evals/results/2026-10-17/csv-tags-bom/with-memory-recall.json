@@ -1,0 +1,19 @@
+{
+  "intent": "Normalize CSV tags for import without changing their meaning.",
+  "constraints": [
+    "Preserve letter case, duplicate tags, and tag order.",
+    "Keep the public signature normalize_tags(value: str) -> list[str].",
+    "Use only the Python standard library.",
+    "Preserve CSV quoting, trim surrounding field whitespace, and remove empty fields.",
+    "Edit only existing project Python modules and recall.json; do not commit."
+  ],
+  "rejected_directions": [
+    "Do not use regular expressions to parse CSV.",
+    "Do not lowercase tags."
+  ],
+  "next_step": "Remove exactly one initial U+FEFF before CSV parsing, preserving quotes, case, duplicates, and order; rerun CSV_BOM regression.",
+  "known_failed_checks": [
+    "REMVU.md records CSV_BOM failing with AssertionError and exit code 1 because a leading U+FEFF is not handled."
+  ],
+  "needs_context": false
+}

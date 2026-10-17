@@ -47,3 +47,14 @@ Test the runner without model calls:
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_eval_runner.py -v
 ```
+
+## Recorded run: 17 October 2026
+
+The [curated result](results/live-2026-10-17.json) includes the actual project code, standalone memory and recall files, with no original private runtime directory or account data.
+
+| Direction | With memory: recall / behavior | Control: recall / behavior |
+| --- | --- | --- |
+| Claude Code → Codex | 11/11 groups; 4/4 checks | 1/11 groups; 3/4 checks; requested context |
+| Codex → Claude Code | 11/11 groups; 5/5 checks | 2/11 groups; 4/5 checks; requested context |
+
+Native versions were Claude Code 2.1.302 and Codex 0.163.0-alpha.10.2. Claude reported `claude-haiku-5-5`; Codex's native JSON did not report an execution model. One initial CSV attempt was blocked by the approval guard before the deliberate regression could run. The producer recorded unknown honestly; the harness then used the equivalent ASCII-only `chr(65279)` command and reran the complete direction in a fresh directory. The report discloses that attempt. These two completed examples do not establish general performance or token savings.

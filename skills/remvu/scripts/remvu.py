@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-VERSION = '0.2.0-rc.1'
+VERSION = '0.2.0'
 
 
 def emit(value):
@@ -45,7 +45,9 @@ def parser():
             sub.add_argument('event_id')
             sub.add_argument('--max-chars', type=int, default=4000)
         elif name == 'update':
-            sub.add_argument('--proposal', required=True, help='Proposal JSON file, or - for stdin')
+            proposal = sub.add_mutually_exclusive_group(required=True)
+            proposal.add_argument('--proposal', help='Proposal JSON file, or - for stdin')
+            proposal.add_argument('--proposal-json', help='Inline JSON proposal; avoids a separate proposal-file write')
         elif name in ('handoff', 'share'):
             sub.add_argument('--out', help='Output Markdown path')
             sub.add_argument('--include-patch', action='store_true', help='Explicitly include reviewable uncommitted changes')
@@ -111,6 +113,9 @@ def compact_state(state):
 
 
 def main(argv=None):
+    for stream in (sys.stdin, sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8')
     args = parser().parse_args(argv)
     if args.command == 'legacy':
         engine = Path(__file__).with_name('legacy_export.py')
@@ -164,7 +169,9 @@ def main(argv=None):
                 else:
                     result['preview'] = body[:args.max_chars]
             elif args.command == 'update':
-                if args.proposal == '-':
+                if args.proposal_json is not None:
+                    proposal = json.loads(args.proposal_json)
+                elif args.proposal == '-':
                     proposal = json.load(sys.stdin)
                 else:
                     proposal = json.loads(Path(args.proposal).read_text(encoding='utf-8'))

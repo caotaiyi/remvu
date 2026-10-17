@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "remvu",
-  "version": "0.2.0-rc.1",
+  "version": "0.2.0",
   "description": "Portable project memory and evidence-backed handoffs for coding agents.",
   "author": {"name": "caotaiyi"},
   "repository": "https://github.com/caotaiyi/remvu",

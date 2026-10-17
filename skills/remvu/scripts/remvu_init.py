@@ -87,7 +87,10 @@ def _read_config(path: Path) -> dict:
 
 def _powershell_command(argv: list[str]) -> str:
     # ASCII encoded PowerShell avoids cmd.exe / Bash / PowerShell re-parsing paths.
-    expression = '& ' + ' '.join("'" + part.replace("'", "''") + "'" for part in argv)
+    expression = ("$OutputEncoding = [System.Text.UTF8Encoding]::new($false); "
+                  "[Console]::InputEncoding = $OutputEncoding; "
+                  "[Console]::OutputEncoding = $OutputEncoding; & "
+                  + ' '.join("'" + part.replace("'", "''") + "'" for part in argv))
     encoded = base64.b64encode(expression.encode('utf-16le')).decode('ascii')
     return 'powershell.exe -NoProfile -NonInteractive -EncodedCommand ' + encoded
 

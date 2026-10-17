@@ -20,6 +20,8 @@ If another writer has advanced the revision, Remvu keeps a conflict proposal for
 
 Entries record one claim each. User statements use `user_confirmed`; visible outcomes use `observed`; interpretation uses `inferred`; remaining claims use `unverified`. A check's result must match its evidence. New entries and sources are private unless explicitly selected for sharing.
 
+`update --proposal FILE` and `update --proposal-json 'JSON'` accept the same typed proposal and are mutually exclusive. For hook-driven consolidation, use a standalone inline update rather than writing a new proposal file or combining it with other commands; those extra operations can legitimately create events beyond the reviewed watermark.
+
 ## Adding a client
 
 Use [adapter-template.md](adapter-template.md) for the contribution. Provide an event-to-recorder mapping, a configuration merge implementation, tests against synthetic client payloads and a live-client acceptance record. Until the last record exists, describe the adapter as generated or simulated, not supported in a live client.

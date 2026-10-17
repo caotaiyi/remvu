@@ -1,0 +1,9 @@
+{
+  "artifact": "docs/assets/remvu-live-replay.gif",
+  "source_report": "evals/results/live-2026-10-17.json",
+  "source_sha256": "64f4fac6dcad2ca5d38699af71fbca0815b28562c241de452e5db27cf4710948",
+  "sha256": "c49af9e98ee932ed4bf9b7d911ebd1af0ce9aa9b3a8859ef43ea2b7b58c1864f",
+  "frames": 6,
+  "duration_ms": 30000,
+  "presentation": "Labelled replay of real native evidence, not an original screen recording."
+}

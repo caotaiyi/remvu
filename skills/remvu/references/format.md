@@ -1,6 +1,6 @@
 # Memory updates and handoffs
 
-An update proposal is JSON with the current `base_revision`, a reviewed `base_event_count` watermark and an `entries` array. Get both counters with `status --repo PROJECT`; apply it with `update --repo PROJECT --proposal FILE`.
+An update proposal is JSON with the current `base_revision`, a reviewed `base_event_count` watermark and an `entries` array. Get both counters with `status --repo PROJECT`; apply it with `update --repo PROJECT --proposal FILE` or `update --repo PROJECT --proposal-json 'JSON'`. These two inputs are mutually exclusive and use the same schema. During a hook-driven update, prefer one standalone `--proposal-json` command: it avoids creating a proposal file that would itself become a new observed edit. Do not combine the memory command with other shell operations.
 
 ```json
 {

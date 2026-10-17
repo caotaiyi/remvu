@@ -1,0 +1,642 @@
+{
+  "format": "remvu-live-evaluation-report/1",
+  "execution_date": "2026-10-17",
+  "timezone": "Asia/Singapore",
+  "scope": "Two fixed functional handoffs with fresh receivers and honest no-memory controls.",
+  "clients": {
+    "claude": {
+      "version": "2.1.302",
+      "provenance": "native executable --version verified after the runs"
+    },
+    "codex": {
+      "version": "0.163.0-alpha.10.2",
+      "provenance": "native executable --version verified after the runs"
+    }
+  },
+  "input_boundary": {
+    "receiver_inputs": "Tracked Python project code, .gitignore and Git code history; with-memory arm additionally receives one standalone REMVU.md.",
+    "same_continuation_instruction": true,
+    "private_memory_copied": false,
+    "original_chat_copied": false,
+    "project_remvu_installation_copied": false,
+    "hidden_acceptance_tests_copied": false,
+    "client_isolation": {
+      "claude": "safe mode; no session persistence; empty setting sources; strict empty external MCP configuration; acceptEdits and bounded tool approvals",
+      "codex": "new ephemeral session; ignores user configuration; workspace-write sandbox; no bypass flags"
+    }
+  },
+  "directions": [
+    {
+      "direction": "claude-codex",
+      "scenario": "csv-tags-bom",
+      "acceptance_passed": true,
+      "producer": {
+        "platform": "claude",
+        "client_version": "2.1.302",
+        "reported_models": [
+          "claude-haiku-5-5"
+        ],
+        "model_provenance": "native modelUsage",
+        "returncode": 0,
+        "timed_out": false,
+        "elapsed_seconds": 52.734,
+        "reported_usage": [
+          {
+            "source": "result",
+            "counters": {
+              "input_tokens": 22,
+              "cache_creation_input_tokens": 16182,
+              "cache_read_input_tokens": 139367,
+              "output_tokens": 8942
+            }
+          },
+          {
+            "source": "modelUsage",
+            "model": "claude-haiku-5-5",
+            "counters": {
+              "inputTokens": 22,
+              "outputTokens": 8942,
+              "cacheReadInputTokens": 139367,
+              "cacheCreationInputTokens": 16182
+            }
+          }
+        ],
+        "prompt_chars": 2691,
+        "prompt_bytes": 2707,
+        "native_stdout_chars": 4523,
+        "native_stdout_bytes": 4531
+      },
+      "stage1_acceptance": {
+        "cases": [
+          {
+            "id": "quoted-comma",
+            "stage": "stage1",
+            "passed": true
+          },
+          {
+            "id": "case-duplicates",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "empty-fields",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "initial-bom",
+            "stage": "next_step",
+            "passed": false
+          }
+        ],
+        "passed": 3,
+        "total": 4,
+        "all_passed": false
+      },
+      "handoff": {
+        "source_code_commit": "ed234f6c96e914c3a5aadbae08e30054faf7e9cc",
+        "handoff_commit": "ed234f6c96e914c3a5aadbae08e30054faf7e9cc",
+        "memory_chars": 5664,
+        "memory_sha256": "a539e7060cba5b2210d80a33a671e7302ce2859c28204722dea52973898c8446",
+        "memory_revision": 2
+      },
+      "artifacts": {
+        "stage1_code": {
+          "path": "evals/results/2026-10-17/csv-tags-bom/stage1.py",
+          "sha256": "37e8b29bb9861aeafd88337de9fa7794a5e464b192af39c589295e0d04147ada"
+        },
+        "completed_code": {
+          "path": "evals/results/2026-10-17/csv-tags-bom/completed.py",
+          "sha256": "17fca81a76ffb0849553ed7128fbd4f46ad41da140625e1837d6ae7ab242cfed"
+        },
+        "standalone_memory": {
+          "path": "evals/results/2026-10-17/csv-tags-bom/REMVU.md",
+          "sha256": "a539e7060cba5b2210d80a33a671e7302ce2859c28204722dea52973898c8446"
+        },
+        "with_memory_recall": {
+          "path": "evals/results/2026-10-17/csv-tags-bom/with-memory-recall.json",
+          "sha256": "b9905ca21bf1f311699f889a277e0a1636c3526b8fd92319fad511851350b0ef"
+        },
+        "without_memory_recall": {
+          "path": "evals/results/2026-10-17/csv-tags-bom/without-memory-recall.json",
+          "sha256": "62c3bc4e200869ba5ab352e1a7479b075639581561dc682dfd1ef73294958c3a"
+        }
+      },
+      "arms": {
+        "with_memory": {
+          "process": {
+            "platform": "codex",
+            "client_version": "0.163.0-alpha.10.2",
+            "reported_models": [],
+            "model_provenance": "not reported by native JSON output",
+            "returncode": 0,
+            "timed_out": false,
+            "elapsed_seconds": 36.642,
+            "reported_usage": [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 128582,
+                  "cached_input_tokens": 98816,
+                  "output_tokens": 1078
+                }
+              }
+            ],
+            "prompt_chars": 1209,
+            "prompt_bytes": 1209,
+            "native_stdout_chars": 12103,
+            "native_stdout_bytes": 12109
+          },
+          "recall": {
+            "fields": {
+              "intent": {
+                "matched_groups": 2,
+                "total_groups": 2,
+                "all_matched": true
+              },
+              "constraints": {
+                "matched_groups": 5,
+                "total_groups": 5,
+                "all_matched": true
+              },
+              "rejected_directions": {
+                "matched_groups": 2,
+                "total_groups": 2,
+                "all_matched": true
+              },
+              "next_step": {
+                "matched_groups": 1,
+                "total_groups": 1,
+                "all_matched": true
+              },
+              "known_failed_checks": {
+                "matched_groups": 1,
+                "total_groups": 1,
+                "all_matched": true
+              }
+            },
+            "matched_groups": 11,
+            "total_groups": 11,
+            "needs_context": false,
+            "all_matched": true,
+            "scoring_note": "Fixed term-group recall check; reports lexical coverage, not semantic proof."
+          },
+          "code": {
+            "cases": [
+              {
+                "id": "quoted-comma",
+                "stage": "stage1",
+                "passed": true
+              },
+              {
+                "id": "case-duplicates",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "empty-fields",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "initial-bom",
+                "stage": "next_step",
+                "passed": true
+              }
+            ],
+            "passed": 4,
+            "total": 4,
+            "all_passed": true
+          },
+          "input_files": [
+            "tags.py",
+            ".gitignore",
+            "REMVU.md"
+          ],
+          "visible_final_excerpt": "Updated `tags.py` to remove exactly one initial U+FEFF before CSV parsing, preserving the public signature and recorded behavior. Wrote `recall.json` before editing code."
+        },
+        "without_memory": {
+          "process": {
+            "platform": "codex",
+            "client_version": "0.163.0-alpha.10.2",
+            "reported_models": [],
+            "model_provenance": "not reported by native JSON output",
+            "returncode": 0,
+            "timed_out": false,
+            "elapsed_seconds": 23.042,
+            "reported_usage": [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 97996,
+                  "cached_input_tokens": 72960,
+                  "output_tokens": 568
+                }
+              }
+            ],
+            "prompt_chars": 1209,
+            "prompt_bytes": 1209,
+            "native_stdout_chars": 3963,
+            "native_stdout_bytes": 3969
+          },
+          "recall": {
+            "fields": {
+              "intent": {
+                "matched_groups": 0,
+                "total_groups": 2,
+                "all_matched": false
+              },
+              "constraints": {
+                "matched_groups": 1,
+                "total_groups": 5,
+                "all_matched": false
+              },
+              "rejected_directions": {
+                "matched_groups": 0,
+                "total_groups": 2,
+                "all_matched": false
+              },
+              "next_step": {
+                "matched_groups": 0,
+                "total_groups": 1,
+                "all_matched": false
+              },
+              "known_failed_checks": {
+                "matched_groups": 0,
+                "total_groups": 1,
+                "all_matched": false
+              }
+            },
+            "matched_groups": 1,
+            "total_groups": 11,
+            "needs_context": true,
+            "all_matched": false,
+            "scoring_note": "Fixed term-group recall check; reports lexical coverage, not semantic proof."
+          },
+          "code": {
+            "cases": [
+              {
+                "id": "quoted-comma",
+                "stage": "stage1",
+                "passed": true
+              },
+              {
+                "id": "case-duplicates",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "empty-fields",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "initial-bom",
+                "stage": "next_step",
+                "passed": false
+              }
+            ],
+            "passed": 3,
+            "total": 4,
+            "all_passed": false
+          },
+          "input_files": [
+            "tags.py",
+            ".gitignore"
+          ],
+          "visible_final_excerpt": "Created `recall.json` with `\"needs_context\": true`; JSON validation passed."
+        }
+      }
+    },
+    {
+      "direction": "codex-claude",
+      "scenario": "money-accounting",
+      "acceptance_passed": true,
+      "producer": {
+        "platform": "codex",
+        "client_version": "0.163.0-alpha.10.2",
+        "reported_models": [],
+        "model_provenance": "not reported by native JSON output",
+        "returncode": 0,
+        "timed_out": false,
+        "elapsed_seconds": 59.362,
+        "reported_usage": [
+          {
+            "source": "turn.completed",
+            "counters": {
+              "input_tokens": 136439,
+              "cached_input_tokens": 118144,
+              "output_tokens": 1949
+            }
+          }
+        ],
+        "prompt_chars": 2742,
+        "prompt_bytes": 2758,
+        "native_stdout_chars": 29342,
+        "native_stdout_bytes": 29404
+      },
+      "stage1_acceptance": {
+        "cases": [
+          {
+            "id": "ordinary-amount",
+            "stage": "stage1",
+            "passed": true
+          },
+          {
+            "id": "half-up-positive",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "half-up-negative",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "integer-type",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "accounting-negative",
+            "stage": "next_step",
+            "passed": false,
+            "error_type": "InvalidOperation"
+          }
+        ],
+        "passed": 4,
+        "total": 5,
+        "all_passed": false
+      },
+      "handoff": {
+        "source_code_commit": "19eac4d7f56eeaa79ebb584ded6108e91cf44ac2",
+        "handoff_commit": "19eac4d7f56eeaa79ebb584ded6108e91cf44ac2",
+        "memory_chars": 8503,
+        "memory_sha256": "8a794909e3dee7246b6265acf8cdd6a790ed4acae053d35b9c01eb194a7728ee",
+        "memory_revision": 2
+      },
+      "artifacts": {
+        "stage1_code": {
+          "path": "evals/results/2026-10-17/money-accounting/stage1.py",
+          "sha256": "dc1653decc1ad52e8c4e3dc9b9c74190610e6cbe289fb30b3b9f004d3023b9af"
+        },
+        "completed_code": {
+          "path": "evals/results/2026-10-17/money-accounting/completed.py",
+          "sha256": "244140f3026704537651d3c78b072b4d62d02042b70ed2b5dae015ad88bc2802"
+        },
+        "standalone_memory": {
+          "path": "evals/results/2026-10-17/money-accounting/REMVU.md",
+          "sha256": "8a794909e3dee7246b6265acf8cdd6a790ed4acae053d35b9c01eb194a7728ee"
+        },
+        "with_memory_recall": {
+          "path": "evals/results/2026-10-17/money-accounting/with-memory-recall.json",
+          "sha256": "91c5ca9723cf1df28f0c18513583bb271f39314f0fdb5be421ea29faf94089c0"
+        },
+        "without_memory_recall": {
+          "path": "evals/results/2026-10-17/money-accounting/without-memory-recall.json",
+          "sha256": "c9b45205eecc229d7d75fcf2a0ec8c7d08a6cdf59960c7af50dd4c8b7309707c"
+        }
+      },
+      "arms": {
+        "with_memory": {
+          "process": {
+            "platform": "claude",
+            "client_version": "2.1.302",
+            "reported_models": [
+              "claude-haiku-5-5"
+            ],
+            "model_provenance": "native modelUsage",
+            "returncode": 0,
+            "timed_out": false,
+            "elapsed_seconds": 37.901,
+            "reported_usage": [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 18,
+                  "cache_creation_input_tokens": 11531,
+                  "cache_read_input_tokens": 103434,
+                  "output_tokens": 6239
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-haiku-5-5",
+                "counters": {
+                  "inputTokens": 18,
+                  "outputTokens": 6239,
+                  "cacheReadInputTokens": 103434,
+                  "cacheCreationInputTokens": 11531
+                }
+              }
+            ],
+            "prompt_chars": 1209,
+            "prompt_bytes": 1209,
+            "native_stdout_chars": 4609,
+            "native_stdout_bytes": 4629
+          },
+          "recall": {
+            "fields": {
+              "intent": {
+                "matched_groups": 2,
+                "total_groups": 2,
+                "all_matched": true
+              },
+              "constraints": {
+                "matched_groups": 5,
+                "total_groups": 5,
+                "all_matched": true
+              },
+              "rejected_directions": {
+                "matched_groups": 1,
+                "total_groups": 1,
+                "all_matched": true
+              },
+              "next_step": {
+                "matched_groups": 2,
+                "total_groups": 2,
+                "all_matched": true
+              },
+              "known_failed_checks": {
+                "matched_groups": 1,
+                "total_groups": 1,
+                "all_matched": true
+              }
+            },
+            "matched_groups": 11,
+            "total_groups": 11,
+            "needs_context": false,
+            "all_matched": true,
+            "scoring_note": "Fixed term-group recall check; reports lexical coverage, not semantic proof."
+          },
+          "code": {
+            "cases": [
+              {
+                "id": "ordinary-amount",
+                "stage": "stage1",
+                "passed": true
+              },
+              {
+                "id": "half-up-positive",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "half-up-negative",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "integer-type",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "accounting-negative",
+                "stage": "next_step",
+                "passed": true
+              }
+            ],
+            "passed": 5,
+            "total": 5,
+            "all_passed": true
+          },
+          "input_files": [
+            "money.py",
+            ".gitignore",
+            "REMVU.md"
+          ],
+          "visible_final_excerpt": "The accounting-parentheses step is implemented in `money.py`, and the local checks pass."
+        },
+        "without_memory": {
+          "process": {
+            "platform": "claude",
+            "client_version": "2.1.302",
+            "reported_models": [
+              "claude-haiku-5-5"
+            ],
+            "model_provenance": "native modelUsage",
+            "returncode": 0,
+            "timed_out": false,
+            "elapsed_seconds": 22.093,
+            "reported_usage": [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 10,
+                  "cache_creation_input_tokens": 4028,
+                  "cache_read_input_tokens": 34661,
+                  "output_tokens": 1815
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-haiku-5-5",
+                "counters": {
+                  "inputTokens": 10,
+                  "outputTokens": 1815,
+                  "cacheReadInputTokens": 34661,
+                  "cacheCreationInputTokens": 4028
+                }
+              }
+            ],
+            "prompt_chars": 1209,
+            "prompt_bytes": 1209,
+            "native_stdout_chars": 2999,
+            "native_stdout_bytes": 2999
+          },
+          "recall": {
+            "fields": {
+              "intent": {
+                "matched_groups": 0,
+                "total_groups": 2,
+                "all_matched": false
+              },
+              "constraints": {
+                "matched_groups": 2,
+                "total_groups": 5,
+                "all_matched": false
+              },
+              "rejected_directions": {
+                "matched_groups": 0,
+                "total_groups": 1,
+                "all_matched": false
+              },
+              "next_step": {
+                "matched_groups": 0,
+                "total_groups": 2,
+                "all_matched": false
+              },
+              "known_failed_checks": {
+                "matched_groups": 0,
+                "total_groups": 1,
+                "all_matched": false
+              }
+            },
+            "matched_groups": 2,
+            "total_groups": 11,
+            "needs_context": true,
+            "all_matched": false,
+            "scoring_note": "Fixed term-group recall check; reports lexical coverage, not semantic proof."
+          },
+          "code": {
+            "cases": [
+              {
+                "id": "ordinary-amount",
+                "stage": "stage1",
+                "passed": true
+              },
+              {
+                "id": "half-up-positive",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "half-up-negative",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "integer-type",
+                "stage": "invariant",
+                "passed": true
+              },
+              {
+                "id": "accounting-negative",
+                "stage": "next_step",
+                "passed": false,
+                "error_type": "InvalidOperation"
+              }
+            ],
+            "passed": 4,
+            "total": 5,
+            "all_passed": false
+          },
+          "input_files": [
+            "money.py",
+            ".gitignore"
+          ],
+          "visible_final_excerpt": "I can't identify the outstanding task, so I stopped before editing project code. I wrote `recall.json` with `needs_context: true`."
+        }
+      }
+    }
+  ],
+  "prior_blocked_attempts": [
+    {
+      "direction": "claude-codex",
+      "stage": "producer",
+      "reason": "The native approval guard rejected a BOM regression command because it contained Unicode whitespace. The producer recorded unknown, not a fabricated failure or pass.",
+      "resolution": "The harness fixture command was changed to the equivalent ASCII-only chr(65279) expression. The complete direction was rerun in a fresh output directory.",
+      "included_in_success_counts": false
+    }
+  ],
+  "limitations": [
+    "This is not a general coding benchmark and does not establish a token-savings rate.",
+    "Recall counts use fixed lexical term groups; inspect the published recall files alongside them.",
+    "Controls intentionally stop when user context is missing; their lower usage is not comparable completed work.",
+    "Usage fields are native counters. Top-level and per-model Claude usage overlap and must not be added together.",
+    "The Codex native JSON output used in these runs did not report an execution model name; it is left unreported.",
+    "The first CSV attempt was blocked and is disclosed separately; success counts describe the two completed fresh reruns/directions.",
+    "Raw provider JSON, hidden reasoning, account/session/auth data and original private runtime directories are not published."
+  ]
+}

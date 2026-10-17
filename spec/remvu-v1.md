@@ -43,6 +43,8 @@ The body is readable Markdown. The metadata is machine-readable; this version do
 
 `repo.fingerprint` identifies the observed code state. It is not proof of authorship or authenticity. Readers SHOULD compare the recorded commit and fingerprint with the project they received. A mismatch means the memory may be stale; it must not silently describe the new code as verified.
 
+The reference fingerprint covers selected project paths, executable state and content. It hashes canonical LF content for tracked pure-CRLF checkouts when Git declares a forced text policy, or when an LF index and automatic text policy authorize checkout conversion. Automatic policies retain the raw bytes of files historically indexed with CRLF. Binary, explicitly `-text`, mixed-line-ending and untracked files also retain raw content bytes; no Git clean filters are executed. Existing LF fingerprints remain unchanged. Equivalent Git text checkouts can therefore match across operating systems without having identical working-tree bytes. A commit-only change with the same code fingerprint does not make check evidence stale.
+
 ## Entries and provenance
 
 The reference writer groups entries into the fixed sections. Each entry has a stable ID, one kind, a statement and a basis. The kinds are `goal`, `constraint`, `preference`, `architecture`, `decision`, `rejected`, `progress`, `check`, `next_step`, `risk` and `change`.

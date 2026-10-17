@@ -9,7 +9,9 @@ import importlib
 import json
 import os
 from pathlib import Path
+import re
 import shlex
+import shutil
 import sys
 import tempfile
 import time
@@ -165,15 +167,51 @@ def _private_file(path, repo: Path) -> bool:
 
 
 def _memory_only(payload: dict, repo: Path) -> bool:
-    """Skip pure bookkeeping calls, but keep shell commands with extra work."""
+    """Skip recognized bookkeeping, retaining every ambiguous tool execution."""
     args = payload.get('tool_input')
     if not isinstance(args, dict):
         return False
+    tool = payload.get('tool_name')
     paths = [args[key] for key in ('file_path', 'path', 'filePath') if isinstance(args.get(key), str)]
-    if paths and all(_private_file(path, repo) for path in paths):
-        return True
+    if tool in {'Read', 'Edit', 'Write'} and paths:
+        try:
+            root = repo.resolve()
+            # A private-looking symlink may actually read or change project code.
+            resolved = [(Path(path) if Path(path).is_absolute() else root / path).resolve() for path in paths]
+            return all(path == root / 'REMVU.md' or root / '.remvu' in path.parents for path in resolved)
+        except (OSError, RuntimeError, ValueError):
+            return False
+    # Native unified exec is exposed to these hooks as Bash. Other tool names
+    # and Windows shell dialects have no established standalone-call contract.
+    if tool != 'Bash' or os.name == 'nt':
+        return False
     command = args.get('command', args.get('cmd'))
     if not isinstance(command, str):
+        return False
+
+    # shlex alone loses the distinction between a quoted newline and a second
+    # shell command, and leaves command substitutions inside double quotes.
+    quote = None
+    index = 0
+    while index < len(command):
+        char = command[index]
+        if quote == "'":
+            if char == "'":
+                quote = None
+        elif char == '\\':
+            if index + 1 >= len(command):
+                return False
+            index += 1
+        elif char == quote:
+            quote = None
+        elif quote is None and char in "'\"":
+            quote = char
+        elif char == '`' or command.startswith('$(', index):
+            return False
+        elif quote is None and char in ';&|<>\r\n':
+            return False
+        index += 1
+    if quote is not None:
         return False
     try:
         parser = shlex.shlex(command, posix=True, punctuation_chars=';&|<>')
@@ -181,12 +219,47 @@ def _memory_only(payload: dict, repo: Path) -> bool:
         tokens = list(parser)
     except ValueError:
         return False
-    if any(token and all(c in ';&|<>' for c in token) for token in tokens):
+    if not tokens:
         return False
-    for i, token in enumerate(tokens[:-1]):
-        if token.replace('\\', '/').rsplit('/', 1)[-1] == 'remvu.py':
-            return tokens[i + 1] in {'status', 'entries', 'events', 'show', 'update', 'resolve-conflict', 'check', 'handoff', 'share', 'hook'}
-    return False
+
+    installed = Path(__file__).resolve().with_name('remvu.py')
+
+    def installed_script(token):
+        candidate = Path(token)
+        try:
+            # A symlink to just the script in another directory changes Python's
+            # import directory and cannot be treated as this installed runtime.
+            return (candidate.is_absolute() and candidate.parent.resolve() == installed.parent
+                    and candidate.resolve() == installed)
+        except (OSError, RuntimeError, ValueError):
+            return False
+
+    def known_python(token):
+        candidate = Path(token)
+        try:
+            if candidate.is_absolute() and candidate.resolve() == Path(sys.executable).resolve():
+                return True
+            if not re.fullmatch(r'python(?:[0-9]+(?:\.[0-9]+)*)?', candidate.name):
+                return False
+            executable = shutil.which(candidate.name)
+            if not executable:
+                return False
+            if candidate.is_absolute():
+                return candidate.resolve() == Path(executable).resolve()
+            return token == candidate.name
+        except (OSError, RuntimeError, ValueError):
+            return False
+
+    if installed_script(tokens[0]):
+        action = 1
+    elif len(tokens) >= 2 and known_python(tokens[0]) and installed_script(tokens[1]):
+        action = 2
+    else:
+        return False
+    return len(tokens) > action and tokens[action] in {
+        'status', 'entries', 'events', 'show', 'update', 'resolve-conflict',
+        'check', 'handoff', 'share', 'hook',
+    }
 
 
 def _context(root: Path, state: dict) -> str:
@@ -325,7 +398,7 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
                               f'(runtime: {script}; status, events, bounded show EVENT_ID as needed, '
                               'then update --proposal FILE using base_revision and the reviewed event_count as base_event_count). '
                               'Run Remvu commands separately, without pipes, redirects or shell chaining; '
-                              'write the proposal under .remvu/ using the file tool. '
+                              'prefer update --proposal-json with shell-quoted JSON to avoid a proposal-file edit event. '
                               'Include inline tool sources for check outcomes. '
                               'Keep user intent, constraints, rejected decisions, failed checks, and next steps. '
                               'Finish with a separate handoff command for the next session. '
@@ -342,6 +415,9 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
 
 
 def main(argv=None) -> int:
+    for stream in (sys.stdin, sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--platform', required=True, choices=sorted(PLATFORMS))
     parser.add_argument('--event', required=True, choices=sorted(EVENTS))

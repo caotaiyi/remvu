@@ -6,11 +6,17 @@ Give the next agent the project code and one `REMVU.md` file. It can read the go
 
 [中文](README.zh-CN.md) · [Format proposal](spec/remvu-v1.md) · [Compatibility](docs/compatibility.md) · [Validation report](docs/validation-report.md) · [Handoff walkthrough](docs/demo.md)
 
-Remvu 0.2 is a release candidate and an open format proposal. Check the validation report for observed platform behavior; generated hooks and simulated payload tests alone do not establish a live integration.
+Remvu v0.2.0 is a reference implementation and open format proposal. Two real CLI handoffs passed on small fixed tasks: Claude Code to Codex and Codex to Claude Code. In both cases the fresh receiver matched all 11 fixed context term groups and completed the outstanding behavior checks. [Results and limits](docs/validation-report.md).
+
+![30-second replay of the two real cross-agent handoff results](docs/assets/remvu-live-replay.gif)
+
+This is a 30-second evidence replay, not an original screen recording. The actual model run times are shown; [inspect the source results](docs/demo.md).
 
 ## Start in an existing project
 
 Requires Python 3.10+ and Git for repository state and patches. The runtime uses the Python standard library and makes no model API calls.
+
+Keep this checkout outside the target project, for example in a dedicated tools directory.
 
 ```bash
 git clone https://github.com/caotaiyi/remvu.git
@@ -62,7 +68,7 @@ python3 skills/remvu/scripts/remvu.py handoff --repo /path/to/project
 python3 skills/remvu/scripts/remvu.py check --repo /path/to/project --document /tmp/REMVU.md
 ```
 
-`status` and entry previews are bounded; `status --full` is an explicit full-state read. Update proposals use `base_revision`, a reviewed `base_event_count` watermark and typed entries. Newer events remain pending after an update. The protocol permits older writers to omit the watermark, which acknowledges no new events. See the [synthetic examples](examples/remvu/) and [proposal schema](spec/proposal.schema.json).
+`status` and entry previews are bounded; `status --full` is an explicit full-state read. Update proposals use `base_revision`, a reviewed `base_event_count` watermark and typed entries. Newer events remain pending after an update. The protocol permits older writers to omit the watermark, which acknowledges no new events. `--proposal-json 'JSON'` is an alternative to `--proposal FILE` with the same schema. Use a standalone inline update during hook-driven consolidation to avoid recording a new proposal-file edit. See the [synthetic examples](examples/remvu/) and [proposal schema](spec/proposal.schema.json).
 
 Reconcile a stale proposal against current memory, then record its resolution with `resolve-conflict ID --repo PROJECT --base-revision N --note TEXT`; add `--entry-id ID` for each reconciled entry. The original proposal and resolution stay archived. The first-read summary defaults to 8,000 characters; important detail remains available below it. A receiver can use `check --document FILE --repo PROJECT` without initializing Remvu.
 

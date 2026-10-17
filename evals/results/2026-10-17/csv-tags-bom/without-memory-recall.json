@@ -1,0 +1,13 @@
+{
+  "intent": "unknown",
+  "constraints": [
+    "Use only current project files; do not inspect other runs, repositories, installed skills, or original chat histories.",
+    "Preserve the existing public signature: normalize_tags(value: str) -> list[str].",
+    "Edit only existing project Python modules and recall.json.",
+    "Do not install Remvu, create .remvu/, use another agent, change Git configuration, or commit."
+  ],
+  "rejected_directions": "unknown",
+  "next_step": "Obtain the outstanding task requirements before changing normalize_tags; the project has no REMVU.md or other task description.",
+  "known_failed_checks": "unknown",
+  "needs_context": true
+}

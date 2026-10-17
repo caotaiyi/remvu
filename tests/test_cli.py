@@ -117,6 +117,16 @@ class CliTest(unittest.TestCase):
         self.assertTrue(self.cli('share', '--repo', self.repo)['ok'])
         self.assertTrue((self.repo / '.remvu' / reviewed['resolution_ref']).is_file())
 
+    def test_inline_proposal_consolidates_reviewed_events_without_a_file(self):
+        spec = importlib.util.spec_from_file_location('remvu_inline_test_core', SCRIPT.with_name('remvu_core.py'))
+        core = importlib.util.module_from_spec(spec); spec.loader.exec_module(core)
+        core.record_event(self.repo, {'kind': 'tool_result', 'output': 'Observed check output.'})
+        result = self.cli('update', '--repo', self.repo, '--proposal-json',
+                          json.dumps({'base_revision': 0, 'base_event_count': 1, 'entries': []}))
+        self.assertTrue(result['ok'])
+        self.assertFalse(result['pending_consolidation'])
+        self.assertFalse((self.repo / '.remvu/proposal.json').exists())
+
     def test_bounded_event_reads_check_blob_integrity(self):
         spec = importlib.util.spec_from_file_location('remvu_cli_test_core', SCRIPT.with_name('remvu_core.py'))
         core = importlib.util.module_from_spec(spec); spec.loader.exec_module(core)

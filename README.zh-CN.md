@@ -6,11 +6,17 @@
 
 [English](README.md) · [格式提案](spec/remvu-v1.md) · [兼容情况](docs/compatibility.md) · [验证报告](docs/validation-report.md) · [接手演示](docs/demo.md)
 
-0.2 目前是候选版本，`remvu/1` 是开放格式提案。真实客户端验证与模拟测试分别记录；生成了 hook 配置不代表客户端已经执行它。
+v0.2.0 提供参考实现，并发布 `remvu/1` 开放格式提案。两项真实 CLI 接手已通过，分别为 Claude Code 到 Codex、Codex 到 Claude Code。全新接收方均命中评分用的 11 组上下文词项，并完成剩余行为检查。[结果与限制](docs/validation-report.md)。
+
+![两项真实跨 agent 接手结果的 30 秒回放](docs/assets/remvu-live-replay.gif)
+
+这是 30 秒证据回放，并非原始屏幕录像。画面标有模型实际运行耗时；[查看对应结果](docs/demo.md)。
 
 ## 安装到项目
 
 需要 Python 3.10+。获取 Git 状态和补丁还需要 Git。运行时仅用 Python 标准库，不调用模型 API。
+
+将 Remvu 克隆到目标项目之外，例如专门存放工具的目录。
 
 ```bash
 git clone https://github.com/caotaiyi/remvu.git
@@ -57,7 +63,9 @@ python3 skills/remvu/scripts/remvu.py handoff --repo /path/to/project
 python3 skills/remvu/scripts/remvu.py check --repo /path/to/project --document /tmp/REMVU.md
 ```
 
-`status` 与条目预览都有长度限制，只有显式 `status --full` 才读取完整状态。更新时记录 `base_revision` 和已经审阅的 `base_event_count`；水位之后的新事件继续待整理，省略水位不会确认任何新事件。冲突经核对并应用协调后的修改后，用 `resolve-conflict ID --repo PROJECT --base-revision N --note TEXT` 记录处理结果，可重复 `--entry-id ID` 关联条目。原提案与处理记录一起保留。
+`status` 与条目预览都有长度限制，只有显式 `status --full` 才读取完整状态。更新时记录 `base_revision` 和已经审阅的 `base_event_count`；水位之后的新事件继续待整理，省略水位不会确认任何新事件。`--proposal-json 'JSON'` 可替代 `--proposal FILE`，两者格式相同且不能同时使用。Hook 驱动的整理使用独立的 inline 更新命令，避免写 proposal 文件又产生新的编辑事件。
+
+冲突经核对并应用协调后的修改后，用 `resolve-conflict ID --repo PROJECT --base-revision N --note TEXT` 记录处理结果，可重复 `--entry-id ID` 关联条目。原提案与处理记录一起保留。
 
 接收方无需初始化本地记忆，便可运行 `check --document FILE --repo PROJECT`。更新格式见[合成示例](examples/remvu/)和 [proposal schema](spec/proposal.schema.json)。原有 `$agent-task-export` skill 和证据导出器继续保留；可通过 `import-legacy` 导入经过检查的旧记录包，或用 `legacy --help` 调用原命令，详见[迁移说明](docs/migration.md)。
 

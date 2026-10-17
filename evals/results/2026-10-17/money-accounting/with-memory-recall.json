@@ -1,0 +1,23 @@
+{
+  "intent": "Parse human-entered money amounts into exact integer cents for billing.",
+  "constraints": [
+    "Return integer cents.",
+    "Use Decimal with ROUND_HALF_UP.",
+    "Keep the public signature parse_cents(amount: str) -> int.",
+    "Use only the Python standard library.",
+    "Support ordinary signed or unsigned decimal strings, allowing surrounding whitespace.",
+    "Stage 1 deliberately left accounting-style parentheses unsupported; the outstanding next step (stage 2) now adds them.",
+    "Work only on this small evaluation project; do not inspect eval runners, other runs or sibling fixtures.",
+    "Edit only money.py and ignored [PRIVATE REFERENCE] files; Remvu init may update .gitignore.",
+    "Use the actual local Remvu runtime without installing it globally.",
+    "Do not commit, generate the public file, install hooks or complete the outstanding step."
+  ],
+  "rejected_directions": [
+    "Do not use binary floating-point arithmetic for monetary conversion."
+  ],
+  "next_step": "Accept accounting-style parenthesized negative amounts such as (12.345) as -1235 cents, while keeping ordinary signed amounts and Decimal ROUND_HALF_UP behavior. Edit money.py only.",
+  "known_failed_checks": [
+    "MONEY_ACCOUNTING: python3 -c 'from money import parse_cents; assert parse_cents(\"(12.345)\") == -1235' failed with decimal.InvalidOperation (ConversionSyntax), exit code 1, before the accounting-parentheses change."
+  ],
+  "needs_context": false
+}

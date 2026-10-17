@@ -22,6 +22,6 @@ A test run does not establish a live client integration or a token-saving claim.
 
 ## Release requirements
 
-Before a stable 0.2 release, pass the checks in [the validation report](docs/validation-report.md), including real Claude Code to Codex and Codex to Claude Code handoffs. A receiver must have code and `REMVU.md` only, with no original chat or Remvu installation. Release automation must not substitute fixture tests for these observations.
+Before a release, pass the checks in [the validation report](docs/validation-report.md), including real Claude Code to Codex and Codex to Claude Code handoffs. A receiver must have code and `REMVU.md` only, with no original chat or Remvu installation. Release automation must not substitute fixture tests for these observations.
 
 MIT-licensed contributions retain the project's existing license. Prose should use plain language and claims supported by evidence. The public introduction follows [Humanizer](https://github.com/blader/humanizer)'s editing rules; it is not a runtime dependency.

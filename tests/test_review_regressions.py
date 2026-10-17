@@ -1,9 +1,12 @@
 """Regressions for independently reproduced continuity and validation failures."""
 import importlib.util
+import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -121,6 +124,92 @@ class ReviewRegressionTest(unittest.TestCase):
         text = core.render_document(self.repo, 'public')
         self.assertNotIn('STALE CODE', text)
         self.assertNotIn('STALE CHECK EVIDENCE', text)
+
+    def test_git_autocrlf_checkout_matches_lf_sender_without_changing_old_lf_hash(self):
+        self.git('config', 'core.autocrlf', 'true')
+        (self.repo / 'app.py').write_bytes(b'value = 1\n')
+        # Match the pre-fix LF fingerprint byte for byte, including mode encoding.
+        previous = hashlib.sha256()
+        previous.update(b'app.py\0')
+        previous.update(hashlib.sha256(b'file\x000\0value = 1\n').digest())
+        previous.update(b'\0')
+        self.assertEqual(core._snapshot(self.repo)['fingerprint'], previous.hexdigest())
+        (self.repo / '.gitignore').write_bytes(b'.remvu/\n__pycache__/\n')
+        self.git('add', '.gitignore')
+        self.git('commit', '-qm', 'LF generated ignore file')
+        self.update(note('goal', 'Share code across checkout EOL policies.'))
+        document = core.write_document(self.repo, visibility='public')
+        receiver = self.root / 'crlf-receiver'
+        subprocess.run(['git', 'clone', '-q', '-c', 'core.autocrlf=true', str(self.repo), str(receiver)], check=True)
+        self.assertIn(b'\r\n', (receiver / '.gitignore').read_bytes())
+        shutil.copy(document['path'], receiver / 'REMVU.md')
+        result = core.check_project(receiver, receiver / 'REMVU.md')
+        self.assertTrue(result['ok'], result)
+        self.assertEqual(result['current_snapshot']['fingerprint'], core._snapshot(self.repo)['fingerprint'])
+
+    def test_explicit_git_text_eol_policy_works_without_autocrlf(self):
+        self.git('config', 'core.autocrlf', 'false')
+        (self.repo / 'app.py').write_bytes(b'value = 1\n')
+        (self.repo / '.gitattributes').write_bytes(b'*.txt text eol=crlf\n')
+        (self.repo / 'notes.txt').write_bytes(b'line one\nline two\n')
+        self.git('add', '.gitattributes', 'notes.txt')
+        self.git('commit', '-qm', 'Explicit text checkout policy')
+        sender = core._snapshot(self.repo)
+        receiver = self.root / 'attribute-receiver'
+        subprocess.run(['git', 'clone', '-q', '-c', 'core.autocrlf=false', str(self.repo), str(receiver)], check=True)
+        self.assertIn(b'\r\n', (receiver / 'notes.txt').read_bytes())
+        self.assertEqual(sender['fingerprint'], core._snapshot(receiver)['fingerprint'])
+
+    def test_binary_untracked_and_explicit_raw_eol_changes_remain_significant(self):
+        self.git('config', 'core.autocrlf', 'true')
+        (self.repo / '.gitattributes').write_bytes(b'raw.txt -text\n')
+        paths = {'binary.bin': b'\0binary\r\nbytes\r\n', 'raw.txt': b'raw\r\ntext\r\n'}
+        for name, body in paths.items():
+            (self.repo / name).write_bytes(body)
+        self.git('add', '.gitattributes', 'binary.bin', 'raw.txt')
+        self.git('commit', '-qm', 'Binary and explicitly raw fixtures')
+        baseline = core._snapshot(self.repo)['fingerprint']
+        for name, body in paths.items():
+            with self.subTest(path=name):
+                (self.repo / name).write_bytes(body.replace(b'\r\n', b'\n'))
+                self.assertNotEqual(core._snapshot(self.repo)['fingerprint'], baseline)
+                (self.repo / name).write_bytes(body)
+        untracked = self.repo / 'untracked.txt'
+        untracked.write_bytes(b'new\r\nlines\r\n')
+        with_crlf = core._snapshot(self.repo)['fingerprint']
+        untracked.write_bytes(b'new\nlines\n')
+        self.assertNotEqual(core._snapshot(self.repo)['fingerprint'], with_crlf)
+
+    def test_tracked_raw_eol_change_is_not_hidden_without_git_conversion_policy(self):
+        self.git('config', 'core.autocrlf', 'false')
+        (self.repo / 'app.py').write_bytes(b'value = 1\n')
+        baseline = core._snapshot(self.repo)['fingerprint']
+        (self.repo / 'app.py').write_bytes(b'value = 1\r\n')
+        self.assertNotEqual(core._snapshot(self.repo)['fingerprint'], baseline)
+
+    def test_historical_crlf_index_is_preserved_by_automatic_git_text_policy(self):
+        self.git('config', 'core.autocrlf', 'false')
+        (self.repo / 'app.py').write_bytes(b'value = 1\n')
+        (self.repo / 'historical.txt').write_bytes(b'historical\r\ntext\r\n')
+        self.git('add', 'historical.txt')
+        self.git('commit', '-qm', 'Historically committed CRLF')
+        baseline = core._snapshot(self.repo)['fingerprint']
+        self.assertIn('i/crlf', self.git('ls-files', '--eol', '--', 'historical.txt'))
+        self.git('config', 'core.autocrlf', 'true')
+        self.assertEqual(core._snapshot(self.repo)['fingerprint'], baseline)
+        attributes = self.repo / '.git/info/attributes'
+        for policy in ('*.txt text=auto\n', '*.txt text=auto eol=lf\n'):
+            with self.subTest(policy=policy):
+                attributes.write_text(policy, encoding='utf-8')
+                self.assertEqual(core._snapshot(self.repo)['fingerprint'], baseline)
+
+    def test_remvu_cli_uses_utf8_json_under_legacy_pipe_encoding(self):
+        self.update(note('goal', '保留中文和 emoji ✅'))
+        script = SCRIPT.with_name('remvu.py')
+        process = subprocess.run([sys.executable, str(script), 'status', '--repo', str(self.repo)],
+                                 capture_output=True, env={**os.environ, 'PYTHONIOENCODING': 'cp1252'})
+        self.assertEqual(process.returncode, 0, process.stderr.decode('utf-8'))
+        self.assertIn('保留中文和 emoji ✅', process.stdout.decode('utf-8'))
 
     def test_legacy_check_without_derived_provenance_remains_historical(self):
         self.update(check())

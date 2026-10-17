@@ -1,16 +1,26 @@
-# A cross-agent handoff in 30 seconds
+# A 30-second replay of real handoffs
 
-The intended demonstration shows one real task moving between Claude Code and Codex. A receiver gets the project code and `REMVU.md`; it has no original chat and no Remvu installation. Live acceptance results belong in the [validation report](validation-report.md).
+![Evidence replay of the native Claude Code and Codex results](assets/remvu-live-replay.gif)
 
-## Recording sequence
+This animation replays recorded results from two actual native-CLI handoffs on 2026-10-17. It is not an original screen recording. Its 30-second presentation is shorter than the model executions, whose actual elapsed times appear in the replay and below.
 
-| Time | Screen action |
-| --- | --- |
-| 0-6 seconds | Show the source agent's task and the constraint it must preserve. |
-| 6-12 seconds | Run `/remvu share` or `$remvu share`; show the generated document's goal, code state and unfinished step. |
-| 12-22 seconds | Switch to a fresh receiver with only code and the file. Ask it to read `REMVU.md` and complete that step. |
-| 22-30 seconds | Show the resulting code and executed check, then the preserved constraint or avoided rejected direction. |
+| Direction and task | Producer | Receiver with memory | Control without memory |
+| --- | --- | --- | --- |
+| Claude Code to Codex: CSV tags and initial BOM | 52.734 s | 36.642 s; 11/11 recall term groups, 4/4 behavior checks | 23.042 s; stopped for missing context, 1/11 recall, 3/4 baseline checks |
+| Codex to Claude Code: exact money and accounting negatives | 59.362 s | 37.901 s; 11/11 recall term groups, 5/5 behavior checks | 22.093 s; stopped for missing context, 2/11 recall, 4/5 baseline checks |
 
-Display the real elapsed time for any model work omitted by editing. A 30-second recording is a compact presentation, not a claim that the full task takes 30 seconds. Do not stage synthetic output as a real client result.
+Each receiver had project code and Git history; the memory arm additionally received one `REMVU.md`. No original chat, private memory, project Remvu installation or hidden acceptance tests were copied. Both arms received the same continuation instruction. Recall scores use fixed lexical term groups; the behavior checks test the produced code independently.
 
-For a local format walkthrough, use [the synthetic conformance example](../examples/remvu/). It demonstrates the file structure and validator only. The real recording and its evidence can be added after both live handoff directions pass.
+The controls left the deliberately unfinished step incomplete, so their shorter runs do not measure equivalent completed work. These two examples establish functional handoff results, not a general coding benchmark or a token-saving rate.
+
+## Inspect or reproduce
+
+The [safe result JSON](../evals/results/live-2026-10-17.json) contains client versions, native usage counters, file hashes, code checks and reviewed visible excerpts. The linked result directories contain the actual stage-one code, completed code, handoff and recall files. Raw private sessions are excluded.
+
+The [replay manifest](assets/remvu-live-replay.json) records the animation and source-report hashes. Rendering uses the optional development dependency Pillow. Rebuild it from the report with:
+
+```bash
+python3 evals/render_demo.py
+```
+
+Reproduce the model trial with [the live evaluation runner](../evals/README.md). It requires authenticated native clients and consumes the accounts' real model/subscription usage. The [validation report](validation-report.md) separates these handoffs from lifecycle-hook observations and local regression tests.

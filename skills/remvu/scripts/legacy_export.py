@@ -449,6 +449,11 @@ def archive(args):
 
 
 def main(argv=None):
+    # JSON is UTF-8 on pipes as well as terminals; Windows' legacy locale codec
+    # cannot represent ordinary transcript text such as Chinese or emoji.
+    for stream in (sys.stdin, sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
     d = sub.add_parser('discover', help='List metadata only; never print transcripts')

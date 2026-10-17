@@ -13,6 +13,8 @@ Startup points the current agent at a bounded handoff. Pre-tool events record at
 
 The active agent performs the semantic update from its existing context. Scripts do not make extra model requests. Stop-hook repair is bounded to one request per logical user turn; continuation prompts cannot restart the loop. If repair still fails, report the pending state and stop retrying during that turn.
 
+Bookkeeping detection is conservative: it recognizes only the exact installed runtime in a supported standalone Python or Bash invocation. Compound commands, substitutions, same-named scripts and unknown file tools stay recorded. Windows shell commands always remain evidence because their native dialect has not been verified; they may leave pending events requiring review. Native Windows automatic clean consolidation is not supported, while CLI/core and UTF-8 transport are tested separately.
+
 Codex provides native turn IDs. Claude Code turns are derived from prompt boundaries; an identical prompt delivered again during a still-open interrupted turn cannot be distinguished from a duplicate without parsing unstable transcripts. The adapter does not parse transcripts.
 
 Local hooks and skill shims refer to the absolute installed script location. Re-run initialization after moving that installation and review changed hooks again. Exact ignore rules keep newly generated local paths private. If Git already tracks one of those paths, initialization warns and preserves the index; ignore rules cannot untrack an existing file.

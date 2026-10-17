@@ -1,0 +1,204 @@
+{
+  "format": "remvu-live-hooks-report/1",
+  "recorded_at_utc": "2026-10-17T13:32:07.106735+00:00",
+  "scope": "Native host hook activation, bounded Stop repair and guided local handoff smoke tests. Synthetic temporary projects only. This is not a frozen release performance benchmark or a cross-agent handoff test.",
+  "environment": {
+    "os": "Darwin",
+    "architecture": "arm64",
+    "python_version": "3.9.6",
+    "note": "Observed interpreter version is reported as tested; it does not expand the documented support guarantee."
+  },
+  "privacy": {
+    "raw_cli_stream_saved_by_harness": false,
+    "hidden_reasoning_exported": false,
+    "system_or_developer_prompt_exported": false,
+    "auth_records_exported": false,
+    "personal_paths_exported": false,
+    "captured_fields": "Allowlisted native hook response counts, canary presence/length, task assertions, memory counters, check results and provider usage counters. Native clients used --no-session-persistence or --ephemeral."
+  },
+  "trust": {
+    "bypass_flags_used": false,
+    "global_trust_or_config_hand_edited": false,
+    "claude": "Native authenticated Claude account; print mode in a fixture created and inspected by the harness. Ordinary allowed tools, without permission bypass.",
+    "codex": "Normal TTY folder trust; inspected generated hook commands; /hooks reviewed one exact handler then trusted the remaining inspected handlers. Eight handlers displayed active. The normal client persisted its trust decision."
+  },
+  "clients": {
+    "claude": {
+      "version": "2.1.302",
+      "capture": "--print --output-format stream-json --verbose --include-hook-events --no-session-persistence --effort low",
+      "natural_smoke": {
+        "process_exit": 0,
+        "task_bytes_correct": true,
+        "memory_revision": 2,
+        "event_count": 17,
+        "consolidated_event_count": 8,
+        "pending_consolidation": true,
+        "stop_repair_requests": 1,
+        "usage": {
+          "input_tokens": 26,
+          "cache_creation_input_tokens": 16949,
+          "cache_read_input_tokens": 142908,
+          "output_tokens": 5277
+        },
+        "native_hook_response_counts": {
+          "SessionStart": 1,
+          "UserPromptSubmit": 1,
+          "PreToolUse": 11,
+          "PostToolUse": 9,
+          "Stop": 2
+        },
+        "native_hook_errors": [],
+        "startup_context": {
+          "exit_code": 0,
+          "context_characters": 539,
+          "canary_present": true
+        },
+        "stop_flush_response_count": 1,
+        "duration_ms": 49803,
+        "native_turns": 13,
+        "outcome": "Task and activation passed; first consolidation remained pending because compound bookkeeping commands generated additional events. Unsupported pass evidence stayed unknown."
+      },
+      "guided_skill_continuation": {
+        "process_exit": 0,
+        "instruction_level": "Explicit /remvu invocation with standalone bookkeeping commands, inline source evidence, private proposal writes and reviewed event watermark. Runtime current; shim predates the final wording update.",
+        "native_hook_response_counts": {
+          "SessionStart": 1,
+          "UserPromptSubmit": 1,
+          "PreToolUse": 19,
+          "PostToolUse": 18,
+          "PostToolUseFailure": 1,
+          "Stop": 2
+        },
+        "native_hook_errors": [],
+        "stop_flush_response_count": 1,
+        "memory_revision": 4,
+        "event_count": 24,
+        "consolidated_event_count": 24,
+        "pending_consolidation": false,
+        "active_checks": [
+          {
+            "id": "check-task-txt-exact-bytes-recheck",
+            "result": "passed",
+            "source_count": 1,
+            "flags": []
+          },
+          {
+            "id": "check-remvu-check-pending-failed",
+            "result": "failed",
+            "source_count": 1,
+            "flags": []
+          }
+        ],
+        "handoff_revision": 4,
+        "final_check_document_exit": 0,
+        "final_check_document_issue_codes": [],
+        "usage": {
+          "input_tokens": 38,
+          "cache_creation_input_tokens": 36224,
+          "cache_read_input_tokens": 492011,
+          "output_tokens": 11082
+        },
+        "duration_ms": 90094,
+        "native_turns": 21,
+        "additional_user_prompt_during_run": false,
+        "outcome": "Passed: actual check passed, known failed check retained, no pending events and current private handoff."
+      },
+      "session_end_observed_in_private_ledger": true,
+      "max_stop_repair_requests_per_observed_session": 1
+    },
+    "codex": {
+      "version": "0.163.0-alpha.10.2",
+      "capture": "exec --ephemeral --json --sandbox workspace-write; ordinary on-request approvals; model reasoning effort low",
+      "natural_smoke": {
+        "process_exit": 0,
+        "task_bytes_correct": true,
+        "memory_revision": 2,
+        "event_count": 9,
+        "consolidated_event_count": 7,
+        "pending_consolidation": true,
+        "stop_repair_requests": 1,
+        "usage": {
+          "input_tokens": 266833,
+          "cached_input_tokens": 241024,
+          "output_tokens": 1157
+        },
+        "startup_canary_in_first_visible_response": true,
+        "tools_before_first_visible_response": false,
+        "native_recorded_trigger_counts": {
+          "UserPromptSubmit": 1,
+          "PreToolUse": 4,
+          "PostToolUse": 4
+        },
+        "nonfatal_error_item_count": 1,
+        "stderr_present": true,
+        "outcome": "Task and activation passed; compound proposal-write/update/status call left its own two events pending. Error item body was deliberately not retained."
+      },
+      "guided_updated_skill_continuation": {
+        "process_exit": 0,
+        "instruction_level": "Reinitialized updated shipping skill, explicitly invoked $remvu, and requested standalone --proposal-json bookkeeping with reviewed event watermark.",
+        "memory_revision": 3,
+        "event_count": 22,
+        "consolidated_event_count": 22,
+        "pending_consolidation": false,
+        "new_stop_repair_requests": 0,
+        "native_recorded_trigger_counts_this_run": {
+          "UserPromptSubmit": 1,
+          "PreToolUse": 6,
+          "PostToolUse": 6
+        },
+        "active_checks": [
+          {
+            "id": "native-smoke-byte-recheck",
+            "result": "passed",
+            "source_types": [
+              "tool"
+            ],
+            "flags": []
+          }
+        ],
+        "handoff_revision": 3,
+        "final_check_document_exit": 0,
+        "final_check_document_issue_codes": [],
+        "nonfatal_error_item_count": 1,
+        "stderr_present": true,
+        "error_body_retained": false,
+        "usage": {
+          "input_tokens": 725899,
+          "cached_input_tokens": 679040,
+          "output_tokens": 2297
+        },
+        "additional_user_prompt_during_run": false,
+        "outcome": "Passed: actual check passed with evidence, no pending events and current private handoff."
+      },
+      "session_end_observed_in_private_ledger": true,
+      "max_stop_repair_requests_per_observed_session": 1
+    }
+  },
+  "conclusions": {
+    "native_activation_observed_on_both_clients": true,
+    "actual_tool_attempt_and_result_recording_observed": true,
+    "stop_repair_bounded_to_one_per_observed_turn": true,
+    "guided_consolidation_finished_without_pending_events_on_both_clients": true,
+    "guided_handoffs_match_memory_revision_and_pass_document_check": true,
+    "unguided_automatic_consolidation_reliability_established": false,
+    "token_savings_established": false
+  },
+  "limitations": [
+    "Initial natural smoke attempts retained pending events after agents combined bookkeeping commands; this is preserved as an observed limitation, not relabeled as success.",
+    "Guided follow-ups used explicit instructions. They establish working documented paths, not universal model compliance.",
+    "Native PreCompact, PostCompact and Interrupt behavior was not exercised. Windows and Linux hosts were not exercised.",
+    "Codex emitted a nonfatal error item and stderr in both runs. Their bodies were excluded by the capture allowlist; the report does not claim error-free bootstrap.",
+    "Usage counters are raw platform-reported values, including cache counters. They are not compared across clients and establish no cost or token reduction.",
+    "Hook activation required normal host trust/account access; an initially file-sandboxed Claude status check could not access its native account, so authenticated tests used the normal host runtime."
+  ],
+  "official_references": [
+    "https://learn.chatgpt.com/docs/hooks",
+    "https://code.claude.com/docs/en/hooks"
+  ],
+  "runtime_files_at_report_generation_sha256": {
+    "remvu.py": "c866fa4b2179dd772c8ec9430330f6837429586b71fe6db3029731e3452fe4ad",
+    "remvu_core.py": "dd0e3ada7b9ade0396e3b7365b996d254670c2a4c107cf1378492829b48bf66c",
+    "remvu_hooks.py": "bd152d02595a18904fb32c5ae6acd3b3469461d4a9e5c47ad413671b1059ccba",
+    "remvu_init.py": "9bd962b68befd53b7c33bc561e00e5d11587df805b6d07f329a848013de11a51"
+  }
+}

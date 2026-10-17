@@ -240,8 +240,39 @@ def _ignored(name):
     return name == 'REMVU.md' or name == '.remvu' or name.startswith('.remvu/')
 
 
+def _git_normalized_eol_paths(repo):
+    """Recognize Git-authorized checkout EOL conversion without running filters.
+
+    Only tracked text with CRLF worktree lines is eligible. Binary, untracked,
+    mixed-EOL and explicitly -text files keep their exact bytes. The existing
+    LF fingerprint remains unchanged on every platform.
+    """
+    autocrlf = (_git(repo, 'config', '--get', 'core.autocrlf') or '').strip().lower()
+    configured = autocrlf in ('true', 'input')
+    normalized = set()
+    for row in (_git(repo, 'ls-files', '--eol', '-z', required=True) or '').split('\0'):
+        if '\t' not in row:
+            continue
+        description, name = row.split('\t', 1)
+        fields = description.split()
+        if len(fields) < 2 or fields[1] != 'w/crlf':
+            continue
+        attributes = fields[2:]
+        if fields[0] == 'i/-text' or any('-text' in value for value in attributes):
+            continue
+        auto_text = any(value in ('attr/text=auto', 'text=auto') for value in attributes)
+        forced_text = (any(value in ('attr/text', 'text') for value in attributes)
+                       or (not auto_text and any(value.startswith(('eol=', 'attr/eol='))
+                                                 for value in attributes)))
+        # Git's automatic policy preserves files historically stored with CRLF,
+        # including text=auto plus eol. Only a forced text policy changes that.
+        if forced_text or (fields[0] == 'i/lf' and (configured or auto_text)):
+            normalized.add(name)
+    return normalized
+
+
 def _snapshot(repo):
-    """Exact code fingerprint including uncommitted and untracked project files."""
+    """Code-state fingerprint with declared Git text EOL normalization."""
     repo = _root(repo)
     try:
         top = _git(repo, 'rev-parse', '--show-toplevel')
@@ -250,6 +281,7 @@ def _snapshot(repo):
     is_git = bool(top and Path(top.strip()).resolve() == repo)
     commit = tree = remote = None
     tracked_modes = {}
+    normalized_eol = set()
     dirty_paths = []
     if is_git:
         commit = _git(repo, 'rev-parse', '--verify', 'HEAD')
@@ -257,6 +289,7 @@ def _snapshot(repo):
         remote = _git(repo, 'remote', 'get-url', 'origin')
         raw = _git(repo, 'ls-files', '-co', '--exclude-standard', '-z', required=True)
         names = sorted(set(x for x in raw.split('\0') if x and not _ignored(x)))
+        normalized_eol = _git_normalized_eol_paths(repo)
         if os.name == 'nt':
             for row in (_git(repo, 'ls-files', '--stage', '-z', required=True) or '').split('\0'):
                 if '\t' in row:
@@ -294,7 +327,10 @@ def _snapshot(repo):
         elif path.is_file():
             try:
                 executable = tracked_modes.get(name, False) if os.name == 'nt' else bool(os.lstat(path).st_mode & 0o111)
-                data = b'file\0' + (b'1' if executable else b'0') + b'\0' + path.read_bytes()
+                contents = path.read_bytes()
+                if name in normalized_eol:
+                    contents = contents.replace(b'\r\n', b'\n')
+                data = b'file\0' + (b'1' if executable else b'0') + b'\0' + contents
             except OSError as error:
                 raise ValueError('cannot fingerprint project file') from error
         elif path.is_dir() and (path / '.git').exists():
