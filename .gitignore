@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+exports/
+.task-export-*/
+*.zip
+*.tar.gz
+*.jsonl
+!examples/*.jsonl

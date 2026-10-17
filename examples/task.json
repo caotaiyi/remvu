@@ -1,0 +1,9 @@
+{
+  "goal": "Fix CSV imports containing quoted commas.",
+  "outcome": "The synthetic example records an attempted parser edit and one passing check.",
+  "constraints": ["Keep the public import interface unchanged."],
+  "decisions": ["Use the standard CSV parser so quoted fields are handled by an existing parser; see e000001."],
+  "checks": ["The recorded check returned exit code 0; see call e000004 and result e000005."],
+  "next_steps": ["Re-run the check in the actual checkout before relying on the result."],
+  "risks": ["This is synthetic demonstration data, not a real project result."]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Task Export"
+  short_description: "Export task evidence for efficient agent handoffs"
+  default_prompt: "Use $agent-task-export to export this task into a compact handoff with indexed evidence and verification gaps."

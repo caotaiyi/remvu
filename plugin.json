@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "agent-task-export",
+  "version": "0.1.0",
+  "description": "Local task evidence export with compact agent handoffs, indexed tool records and verification gaps.",
+  "author": {"name": "caotaiyi"},
+  "repository": "https://github.com/caotaiyi/agent-task-export",
+  "license": "MIT",
+  "keywords": ["skills", "agent-handoff", "task-export", "codex"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Agent Task Export",
+        "shortDescription": "Compact task evidence exports",
+        "longDescription": "Export observable task messages, tool calls, edits and checks into a local bundle. Read a compact handoff first and fetch evidence by ID. Requires local Python 3.10+; excludes hidden reasoning.",
+        "developerName": "caotaiyi",
+        "category": "Productivity",
+        "capabilities": [],
+        "defaultPrompt": "Export this task as a compact handoff with indexed evidence and verification gaps."
+      }
+    }
+  }
+}
