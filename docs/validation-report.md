@@ -52,19 +52,23 @@ Claude's top-level and per-model counters overlap and must not be added together
 
 | Check | Observed result | Evidence |
 | --- | --- | --- |
-| Complete local regression suite | 126 passed in 95.942 s, zero skips | `python3 -m unittest discover -s tests -v` on macOS system Python 3.9.6 |
-| Subsequent legacy help forwarding fix | Seven targeted CLI tests passed | Existing legacy integration now also asserts the forwarded help |
+| Complete local regression suite | 137 passed in 82.042 s, zero skips | `python3 -m unittest discover -s tests -v` on macOS system Python 3.9.6, runtime commit `04da0e1a1807d004543e2332ca4d7784778cd100` |
 | Format conformance | Seven cases passed with strict JSON Schema validation | `python3 spec/validate_examples.py --require-jsonschema` |
 | Skill validation | Official skill validator passed | Remvu frontmatter and metadata validation |
 | Public handoff integrity | Both real handoffs and all published artifact hashes verified | Artifact records in the live JSON |
-| Final release packages | Final committed build and extracted-package smoke pending | `python3 scripts/build_release.py --out /tmp/remvu-release`; audited plugin ZIP, skill ZIP and `SHA256SUMS` |
+| Release packages | Both committed component archives from `04da0e1` audited and smoke-tested after extraction at new paths; SHA256SUMS matched | Plugin and skill versions/legacy help passed; standalone skill init/update/share/check/withhold/private-history retention/handoff/validate passed |
 | Repository migration | Rename, old URL 301 redirect and retained `v0.1.0` verified | [Remvu repository](https://github.com/caotaiyi/remvu) |
 | Remote CI first run | Four Linux/macOS jobs passed; two Windows jobs failed | [Run 39036609097](https://github.com/caotaiyi/remvu/actions/runs/39036609097) |
 | Remote CI second run | Four Linux/macOS jobs passed; two Windows jobs still failed | [Run 39037439873](https://github.com/caotaiyi/remvu/actions/runs/39037439873) at runtime commit `a13fbc96dd0137039f62732b74cafbd1277c8da4` |
+| Remote CI after final fixes | All six jobs passed: Python 3.10 and 3.12 on Linux, macOS and Windows | [Run 39038137341](https://github.com/caotaiyi/remvu/actions/runs/39038137341) at runtime commit `04da0e1a1807d004543e2332ca4d7784778cd100` |
 
-The declared minimum is Python 3.10. The local system Python 3.9.6 run does not replace checks of the supported range. CI targets Python 3.10 and 3.12 on Linux, macOS and Windows. New regression cases cover stale check evidence, event-review watermarks, retained conflicts and explicit resolution, cold receiver checks and strict metadata.
+Each Linux and macOS job executed all 137 tests with zero skips. Each Windows job passed 135 executed tests and skipped two POSIX-permission symlink fixtures: `test_symlinked_config_destination_is_refused` and `test_symlinked_hook_lock_is_refused_without_external_write`. Their skip reason was `Symlink fixture needs POSIX permissions`. The private-looking-symlink classification test did execute and pass on Windows. Strict schema checks and release-package audits passed in all six jobs.
 
-The first Windows jobs exposed three issues: Git text checkout line endings changed a code fingerprint, the legacy CLI used cp1252 for Chinese output, and a hook fixture executed its POSIX command instead of its Windows branch. Changes constrain normalization to Git-authorized text, use UTF-8 standard streams for CLI/hooks, and exercise `commandWindows` with Chinese paths and content. Windows still failed in the second run, so diagnosis and a further rerun remain pending. Both failing runs stay linked above.
+The declared minimum is Python 3.10. The local system Python 3.9.6 run is separate from the successful Python 3.10/3.12 CI matrix. New regression cases cover stale check evidence, event-review watermarks, retained conflicts and explicit resolution, cold receiver checks, strict metadata and audited public withdrawal. Withdrawing public scope preserves claims, sources, check fingerprints and unreviewed events.
+
+The first Windows jobs exposed three issues: Git text checkout line endings changed a code fingerprint, the legacy CLI used cp1252 for Chinese output, and a hook fixture executed its POSIX command instead of its Windows branch. The final fixes constrain normalization to Git-authorized text, use UTF-8 standard streams for CLI/hooks, and exercise `commandWindows` with Chinese paths and content. Windows still failed in the second run and passed in the third after the remaining corrections. Both failing runs stay linked above.
+
+Release archives provide their actual `SHA256SUMS`. A rebuild after documentation-only changes must preserve the audited component bytes and file modes before publication.
 
 ## Lifecycle hooks
 

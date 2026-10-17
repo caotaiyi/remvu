@@ -5,20 +5,20 @@ Remvu v0.2.0 is a reference implementation of the `remvu/1` open format proposal
 | Capability | Current observation |
 | --- | --- |
 | `remvu/1` generation and validation | Seven conformance cases passed, including JSON Schema checks |
-| Revisioned memory, evidence and public isolation | Complete local suite: 126 passed, zero skips on macOS Python 3.9.6 |
+| Revisioned memory, evidence and public isolation | Complete local suite: 137 passed, zero skips on macOS Python 3.9.6 |
 | Version 0.1 export and import | Legacy regression and import checks passed in the local suite |
 | Claude Code to Codex handoff | Real fresh receiver: 11/11 context term groups and 4/4 behavior checks |
 | Codex to Claude Code handoff | Real fresh receiver: 11/11 context term groups and 5/5 behavior checks |
 | Claude Code lifecycle hooks | On macOS, native activation, tool events, bounded Stop and clean skill-guided consolidation observed |
 | Codex lifecycle hooks | On macOS, native activation, tool events, bounded Stop and clean skill-guided consolidation observed |
-| Linux and macOS, Python 3.10 and 3.12 | All four jobs passed in both recorded CI runs |
-| Windows, Python 3.10 and 3.12 | Both jobs failed in both recorded CI runs; further diagnosis and rerun pending |
+| Linux and macOS, Python 3.10 and 3.12 | All four final runtime CI jobs passed; 137 tests and zero skips per job |
+| Windows, Python 3.10 and 3.12 | Both final runtime CI jobs passed; 135 tests executed and two POSIX symlink-fixture skips per job |
 
-The native handoff clients were Claude Code `2.1.302` and Codex `0.163.0-alpha.10.2`. These two small functional tasks do not establish broad coding performance or token savings. The [validation report](validation-report.md) links their artifacts, exact usage and outstanding checks.
+The native handoff clients were Claude Code `2.1.302` and Codex `0.163.0-alpha.10.2`. These two small functional tasks do not establish broad coding performance or token savings. [Final runtime CI passed all six jobs](https://github.com/caotaiyi/remvu/actions/runs/39038137341); the [validation report](validation-report.md) records earlier failures, native artifacts and exact usage.
 
 Initial natural hook runs retained pending events when agent bookkeeping created observations beyond its reviewed watermark. Subsequent skill-guided continuations reached clean handoffs and current checks in both clients. Native client observations are limited to macOS; CI checks local code and synthetic payloads across operating systems. Detailed repair counts and the original pending outcomes are retained in the [native hook report](../evals/live-hooks-report.json) and [validation report](validation-report.md).
 
-Windows shell commands are recorded conservatively rather than classified as safe bookkeeping. They may leave pending events for human or agent review; native Windows automatic clean consolidation is not supported. CLI/core behavior and UTF-8 hook transport have separate CI coverage. On other platforms, bookkeeping detection requires the exact installed runtime in a recognized standalone Python or Bash invocation; compound commands, substitutions, same-named scripts and unknown file tools remain evidence.
+Windows shell commands are recorded conservatively rather than classified as safe bookkeeping. They may leave pending events for human or agent review; native Windows automatic clean consolidation is not supported. For a new manual CLI-only setup, choose `init --platform none`. CLI/core behavior and UTF-8 hook transport have separate CI coverage. On other platforms, bookkeeping detection requires the exact installed runtime in a recognized standalone Python or Bash invocation; compound commands, substitutions, same-named scripts and unknown file tools remain evidence.
 
 A receiver can check a standalone document against its project without initializing local memory. Recorded checks retain their historical code fingerprints; later notes do not refresh an old passing result. Other agents can read the Markdown format, but no native lifecycle adapter is claimed for them.
 

@@ -1,5 +1,7 @@
 # Remvu
 
+[![CI](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml)
+
 随项目流转的 AI 记忆。
 
 把项目代码和一个 `REMVU.md` 文件交给下一个 agent，它就能读取目标、约束、关键决策、代码状态、验证结果和下一步。接收方无需安装 Remvu，也无需拿到原聊天。

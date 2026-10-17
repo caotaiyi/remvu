@@ -1,5 +1,7 @@
 # Remvu
 
+[![CI](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml)
+
 Portable project memory for coding agents.
 
 Give the next agent the project code and one `REMVU.md` file. It can read the goal, constraints, decisions, code state, checks and remaining work without installing Remvu or opening the original chat.
