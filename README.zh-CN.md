@@ -67,6 +67,8 @@ python3 skills/remvu/scripts/remvu.py check --repo /path/to/project --document /
 
 冲突经核对并应用协调后的修改后，用 `resolve-conflict ID --repo PROJECT --base-revision N --note TEXT` 记录处理结果，可重复 `--entry-id ID` 关联条目。原提案与处理记录一起保留。
 
+用 `withhold ID [ID...] --repo PROJECT --base-revision N --note TEXT` 可将已选公开条目收窄为私有，并保留原始主张、依据和审计记录。它只影响后续分享，已生成的公开文件不会被改写。
+
 接收方无需初始化本地记忆，便可运行 `check --document FILE --repo PROJECT`。更新格式见[合成示例](examples/remvu/)和 [proposal schema](spec/proposal.schema.json)。原有 `$agent-task-export` skill 和证据导出器继续保留；可通过 `import-legacy` 导入经过检查的旧记录包，或用 `legacy --help` 调用原命令，详见[迁移说明](docs/migration.md)。
 
 [格式规范](spec/remvu-v1.md)、schemas 和兼容样例允许其他 agent 独立实现读写。开发与发布要求见 [CONTRIBUTING.md](CONTRIBUTING.md)。

@@ -258,7 +258,7 @@ def _memory_only(payload: dict, repo: Path) -> bool:
         return False
     return len(tokens) > action and tokens[action] in {
         'status', 'entries', 'events', 'show', 'update', 'resolve-conflict',
-        'check', 'handoff', 'share', 'hook',
+        'check', 'handoff', 'share', 'withhold', 'hook',
     }
 
 

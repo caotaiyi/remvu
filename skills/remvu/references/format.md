@@ -61,4 +61,6 @@ python3 SCRIPT check --repo /path/to/project
 
 Repeat `--entry-id` for additional reconciled entries; omit it when the reviewed resolution adds none. The original proposal and resolution are archived together. This command records the resolution; it does not apply the stale proposal. Unresolved conflicts block public sharing.
 
+Claims and sources stay immutable. To narrow previously selected public material, use `withhold ID [ID...] --repo PROJECT --base-revision CURRENT_REVISION --note "Reason"`. The command records the original entry/visibility and note, then makes those entries private. It does not acknowledge events or refresh code/check fingerprints. A withdrawn claim remains in local history; create a new self-contained public summary when needed. Review public entries that refer to a withdrawn ID, because sharing cannot depend on private history. Already generated files remain unchanged.
+
 The generated `REMVU.md` uses `remvu/1` metadata and fixed sections. `Start Here` defaults to 8,000 characters; long entries use explicit pointers to the full statements below. If even those pointers cannot fit, generation fails instead of silently dropping constraints or open work. `check` compares the recorded code state with the current project. A mismatch invalidates assumptions about freshness, not the historical record.

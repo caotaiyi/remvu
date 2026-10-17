@@ -5,14 +5,14 @@ Remvu v0.2.0 is a reference implementation of the `remvu/1` open format proposal
 | Capability | Current observation |
 | --- | --- |
 | `remvu/1` generation and validation | Seven conformance cases passed, including JSON Schema checks |
-| Revisioned memory, evidence and public isolation | Local regression suite passed; final release rerun pending |
+| Revisioned memory, evidence and public isolation | Complete local suite: 126 passed, zero skips on macOS Python 3.9.6 |
 | Version 0.1 export and import | Legacy regression and import checks passed in the local suite |
 | Claude Code to Codex handoff | Real fresh receiver: 11/11 context term groups and 4/4 behavior checks |
 | Codex to Claude Code handoff | Real fresh receiver: 11/11 context term groups and 5/5 behavior checks |
 | Claude Code lifecycle hooks | On macOS, native activation, tool events, bounded Stop and clean skill-guided consolidation observed |
 | Codex lifecycle hooks | On macOS, native activation, tool events, bounded Stop and clean skill-guided consolidation observed |
-| Linux and macOS, Python 3.10 and 3.12 | All four first-run CI jobs passed |
-| Windows, Python 3.10 and 3.12 | First-run CI jobs failed; fix and rerun pending |
+| Linux and macOS, Python 3.10 and 3.12 | All four jobs passed in both recorded CI runs |
+| Windows, Python 3.10 and 3.12 | Both jobs failed in both recorded CI runs; further diagnosis and rerun pending |
 
 The native handoff clients were Claude Code `2.1.302` and Codex `0.163.0-alpha.10.2`. These two small functional tasks do not establish broad coding performance or token savings. The [validation report](validation-report.md) links their artifacts, exact usage and outstanding checks.
 

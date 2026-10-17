@@ -30,6 +30,7 @@ def parser():
         ('check', 'Check memory integrity and code freshness'),
         ('import-legacy', 'Import a verified v0.1 evidence bundle as unverified notes'),
         ('resolve-conflict', 'Record a reviewed resolution while retaining the original proposal'),
+        ('withhold', 'Withdraw selected entries from future public files, retaining local history'),
     ):
         sub = commands.add_parser(name, help=help_text)
         sub.add_argument('--repo', default='.', help='Project root (default: current directory)')
@@ -61,6 +62,10 @@ def parser():
             sub.add_argument('--base-revision', type=int, required=True)
             sub.add_argument('--note', required=True)
             sub.add_argument('--entry-id', action='append', default=[])
+        elif name == 'withhold':
+            sub.add_argument('entry_ids', nargs='+', metavar='ID')
+            sub.add_argument('--base-revision', type=int, required=True)
+            sub.add_argument('--note', required=True)
     validate = commands.add_parser('validate', help='Validate a standalone REMVU.md without importing it')
     validate.add_argument('document')
     legacy = commands.add_parser('legacy', help='Run the preserved v0.1 evidence exporter')
@@ -116,10 +121,12 @@ def main(argv=None):
     for stream in (sys.stdin, sys.stdout, sys.stderr):
         if hasattr(stream, 'reconfigure'):
             stream.reconfigure(encoding='utf-8')
-    args = parser().parse_args(argv)
-    if args.command == 'legacy':
+    arguments = sys.argv[1:] if argv is None else list(argv)
+    # Preserve the legacy parser's own help and option handling verbatim.
+    if arguments and arguments[0] == 'legacy':
         engine = Path(__file__).with_name('legacy_export.py')
-        return subprocess.call([sys.executable, str(engine), *args.arguments])
+        return subprocess.call([sys.executable, str(engine), *arguments[1:]])
+    args = parser().parse_args(arguments)
     try:
         import remvu_core as core
         if args.command == 'validate':
@@ -190,6 +197,8 @@ def main(argv=None):
             elif args.command == 'resolve-conflict':
                 result = core.resolve_conflict(repo, args.conflict_id, args.base_revision,
                                                args.note, entry_ids=args.entry_id)
+            elif args.command == 'withhold':
+                result = core.withhold_entries(repo, args.entry_ids, args.base_revision, args.note)
             else:
                 raise ValueError('unsupported command')
         emit(result)

@@ -90,6 +90,10 @@ class CliTest(unittest.TestCase):
         self.assertEqual(self.cli('status', '--repo', self.repo)['entries'][0]['result'], 'failed')
 
     def test_self_contained_legacy_engine_and_import(self):
+        help_result = subprocess.run([sys.executable, str(SCRIPT), 'legacy', '--help'],
+                                     capture_output=True, encoding='utf-8')
+        self.assertEqual(help_result.returncode, 0, help_result.stderr)
+        self.assertIn('discover,export,verify,show,archive', help_result.stdout)
         bundle = self.root / 'legacy'
         exported = self.cli('legacy', 'export', '--source', ROOT / 'examples/session.jsonl',
                             '--task', ROOT / 'examples/task.json', '--out', bundle)
@@ -126,6 +130,28 @@ class CliTest(unittest.TestCase):
         self.assertTrue(result['ok'])
         self.assertFalse(result['pending_consolidation'])
         self.assertFalse((self.repo / '.remvu/proposal.json').exists())
+
+    def test_withhold_recovers_public_scope_without_deleting_history(self):
+        self.proposal([{'id': 'private-history', 'kind': 'decision', 'text': 'PRIVATE HISTORY',
+                        'basis': 'inferred'}])
+        self.proposal([{'id': 'public-mistake', 'kind': 'decision', 'text': 'Superseding draft.',
+                        'basis': 'inferred', 'visibility': 'public', 'supersedes': ['private-history'],
+                        'sources': [{'type': 'user', 'excerpt': 'A reviewed public conclusion.', 'visibility': 'public'}]}], base=1)
+        self.cli('share', '--repo', self.repo, ok=False)
+        withdrawn = self.cli('withhold', 'public-mistake', '--repo', self.repo,
+                             '--base-revision', 2, '--note', 'Keep the internal history private.')
+        self.assertTrue(withdrawn['ok'])
+        self.proposal([{'id': 'public-summary', 'kind': 'decision', 'text': 'A self-contained public conclusion.',
+                        'basis': 'inferred', 'visibility': 'public',
+                        'sources': [{'type': 'user', 'excerpt': 'A reviewed public conclusion.', 'visibility': 'public'}]}], base=3)
+        shared = self.cli('share', '--repo', self.repo)
+        text = Path(shared['path']).read_text(encoding='utf-8')
+        self.assertIn('A self-contained public conclusion.', text)
+        self.assertNotIn('PRIVATE HISTORY', text)
+        state = self.cli('status', '--repo', self.repo, '--full')
+        self.assertEqual(len(state['entries']), 3)
+        self.assertEqual(state['entries'][1]['supersedes'], ['private-history'])
+        self.assertEqual(state['entries'][1]['visibility'], 'private')
 
     def test_bounded_event_reads_check_blob_integrity(self):
         spec = importlib.util.spec_from_file_location('remvu_cli_test_core', SCRIPT.with_name('remvu_core.py'))

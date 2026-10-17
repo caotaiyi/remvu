@@ -72,6 +72,8 @@ python3 skills/remvu/scripts/remvu.py check --repo /path/to/project --document /
 
 Reconcile a stale proposal against current memory, then record its resolution with `resolve-conflict ID --repo PROJECT --base-revision N --note TEXT`; add `--entry-id ID` for each reconciled entry. The original proposal and resolution stay archived. The first-read summary defaults to 8,000 characters; important detail remains available below it. A receiver can use `check --document FILE --repo PROJECT` without initializing Remvu.
 
+Narrow future shares with `withhold ID [ID...] --repo PROJECT --base-revision N --note TEXT`. It records the withdrawal while retaining the original claims and evidence; existing exported files stay unchanged.
+
 Existing Agent Task Export bundles and commands remain available. Use `import-legacy --repo PROJECT BUNDLE` to bring reviewed notes into memory, or `legacy --help` for the original indexed evidence exporter. The [migration guide](docs/migration.md) describes the differences.
 
 ## Build on the format

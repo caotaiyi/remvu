@@ -6,9 +6,11 @@
 - Add the `remvu/1` project-memory proposal, JSON metadata and update schemas.
 - Add private local memory, revisioned semantic updates, lifecycle adapters and explicit public handoffs.
 - Preserve reviewed-event watermarks, archived conflict resolutions and historical code fingerprints for checks; keep default reads bounded.
+- Add audited public-to-private withdrawal for future shares while preserving the original claims, sources and history.
 - Keep the version 0.1 evidence exporter and legacy skill for migration.
 - Add compatibility and validation reporting, adapter contribution guidance and CI configuration.
 - Publish two real Claude Code/Codex handoff comparisons, with independent code checks, context recall and native usage counters.
+- Use UTF-8 CLI/hook streams and Git-authorized text line-ending normalization; keep Windows shell recording conservative instead of guessing which commands are bookkeeping.
 
 This release provides a reference implementation and an open format proposal. See [the validation report](docs/validation-report.md) for observed compatibility and remaining limitations.
 

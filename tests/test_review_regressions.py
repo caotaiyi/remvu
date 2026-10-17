@@ -125,7 +125,7 @@ class ReviewRegressionTest(unittest.TestCase):
         self.assertNotIn('STALE CODE', text)
         self.assertNotIn('STALE CHECK EVIDENCE', text)
 
-    def test_git_autocrlf_checkout_matches_lf_sender_without_changing_old_lf_hash(self):
+    def _assert_git_autocrlf_checkout_roundtrip(self):
         self.git('config', 'core.autocrlf', 'true')
         (self.repo / 'app.py').write_bytes(b'value = 1\n')
         # Match the pre-fix LF fingerprint byte for byte, including mode encoding.
@@ -135,8 +135,11 @@ class ReviewRegressionTest(unittest.TestCase):
         previous.update(b'\0')
         self.assertEqual(core._snapshot(self.repo)['fingerprint'], previous.hexdigest())
         (self.repo / '.gitignore').write_bytes(b'.remvu/\n__pycache__/\n')
-        self.git('add', '.gitignore')
-        self.git('commit', '-qm', 'LF generated ignore file')
+        # Writing LF above can also migrate a historically CRLF-indexed app.py.
+        # Commit the entire fixture change before exercising the share guard.
+        self.git('add', 'app.py', '.gitignore')
+        self.git('commit', '-qm', 'LF sender fixture and generated ignore file')
+        self.assertEqual(self.git('status', '--porcelain', '--untracked-files=all'), '')
         self.update(note('goal', 'Share code across checkout EOL policies.'))
         document = core.write_document(self.repo, visibility='public')
         receiver = self.root / 'crlf-receiver'
@@ -146,6 +149,18 @@ class ReviewRegressionTest(unittest.TestCase):
         result = core.check_project(receiver, receiver / 'REMVU.md')
         self.assertTrue(result['ok'], result)
         self.assertEqual(result['current_snapshot']['fingerprint'], core._snapshot(self.repo)['fingerprint'])
+
+    def test_git_autocrlf_checkout_matches_lf_sender_without_changing_old_lf_hash(self):
+        self._assert_git_autocrlf_checkout_roundtrip()
+
+    def test_git_autocrlf_roundtrip_from_historically_crlf_indexed_sender(self):
+        # Reproduce the Windows CI baseline independently of host Git defaults.
+        self.git('config', 'core.autocrlf', 'false')
+        (self.repo / 'app.py').write_bytes(b'value = 1\r\n')
+        self.git('add', 'app.py')
+        self.git('commit', '-qm', 'Historically CRLF-indexed sender fixture')
+        self.assertIn('i/crlf', self.git('ls-files', '--eol', '--', 'app.py'))
+        self._assert_git_autocrlf_checkout_roundtrip()
 
     def test_explicit_git_text_eol_policy_works_without_autocrlf(self):
         self.git('config', 'core.autocrlf', 'false')

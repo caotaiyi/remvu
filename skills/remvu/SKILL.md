@@ -32,6 +32,8 @@ Use `user_confirmed` for the user's explicit statements, `observed` for visible 
 
 Entries and sources default to private in `.remvu/`. Select public material explicitly within the user's sharing scope. Every public entry needs public sources with sufficient inline excerpts so the receiver can understand the evidence without private attachments. Review excerpts for secrets, personal paths and unrelated content. Do not mark all local history public to make validation pass.
 
+If an existing public entry should be excluded, use `withhold ID [ID...] --repo /path/to/project --base-revision CURRENT_REVISION --note "Reason for narrowing the share scope."`. This audited operation only narrows visibility; it preserves the claim, sources, check fingerprint and history. For a public entry that links private history, withhold it and any affected public dependents, then add a self-contained public summary without private-ID links. Recheck before sharing. Withdrawal does not edit an already generated or published file; generate and review a new one explicitly.
+
 `share` produces one readable file and never commits, pushes or uploads it. Pending evidence or unresolved conflicts block sharing; a dirty tree also stops it by default. Prefer a committed code state. Use `--include-patch` only after the user explicitly chooses to carry the uncommitted tracked diff, then inspect the patch's public scope. List resources the patch cannot carry. Read [references/sharing.md](references/sharing.md) for this path.
 
 Run `python3 SCRIPT validate /path/to/REMVU.md` before returning the file. Mention excluded private material, unavailable resources, stale state or unverified results when they affect the receiver.

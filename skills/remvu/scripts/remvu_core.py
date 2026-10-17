@@ -589,6 +589,49 @@ def resolve_conflict(repo, conflict_id, base_revision, note, entry_ids=None):
                 'pending_consolidation': state['pending_consolidation']}
 
 
+def withhold_entries(repo, entry_ids, base_revision, note):
+    """Narrow public visibility with an audit; existing shared files stay untouched."""
+    if (not isinstance(entry_ids, list) or not entry_ids or len(entry_ids) > 1000
+            or any(not isinstance(item, str) or not ID.fullmatch(item) for item in entry_ids)):
+        raise ValueError('entry_ids must contain one to 1000 valid entry IDs')
+    entry_ids = list(dict.fromkeys(entry_ids))
+    if type(base_revision) is not int or base_revision < 0:
+        raise ValueError('base_revision must be a nonnegative integer')
+    note = _string(note, 'withdrawal note', maximum=10000, required=True)
+    warning = ('Existing public files may still include withdrawn data. They were not rewritten or removed; '
+               'review them and regenerate REMVU.md explicitly when appropriate.')
+    with _lock(repo) as root:
+        state = _load_unlocked(root)
+        if base_revision != state['revision']:
+            return {'ok': False, 'revision': state['revision'], 'withheld_ids': [], 'already_private_ids': [],
+                    'reason': 'stale revision; reload memory before narrowing public scope', 'warning': warning}
+        by_id = {entry['id']: entry for entry in state['entries']}
+        if any(item not in by_id for item in entry_ids):
+            raise ValueError('withdrawal references an unknown entry ID')
+        if any(by_id[item].get('visibility') not in ('public', 'private') for item in entry_ids):
+            raise ValueError('invalid entry visibility in stored memory')
+        to_withhold = [item for item in entry_ids if by_id[item]['visibility'] == 'public']
+        already_private = [item for item in entry_ids if by_id[item]['visibility'] == 'private']
+        if to_withhold:
+            audit = state.setdefault('share_withdrawals', [])
+            if not isinstance(audit, list):
+                raise ValueError('invalid share withdrawal audit index')
+            originals = [json.loads(_json(by_id[item])) for item in to_withhold]
+            revision, timestamp = state['revision'] + 1, _now()
+            for item in to_withhold:
+                by_id[item]['visibility'] = 'private'
+                audit.append({'entry_id': item, 'from_visibility': 'public', 'to_visibility': 'private',
+                              'revision': revision, 'note': note, 'at': timestamp})
+            state['revision'] = revision
+            # Deliberately leave code provenance and the event watermark intact.
+            _save(root, state, 'withhold_entries', {'base_revision': base_revision, 'entry_ids': to_withhold,
+                                                   'note': note, 'original_public_entries': originals})
+        return {'ok': True, 'revision': state['revision'], 'withheld_ids': to_withhold,
+                'already_private_ids': already_private, 'pending_consolidation': state['pending_consolidation'],
+                'event_count': len(state['events']),
+                'consolidated_event_count': state.get('consolidated_event_count', 0), 'warning': warning}
+
+
 def _check_is_stale(entry, snapshot):
     observed = entry.get('observed_code')
     return (not isinstance(observed, dict)
@@ -637,14 +680,16 @@ def _escape(text):
 
 
 def _check_public_entry(entry):
+    remedy = (' Existing entry sources are immutable; withhold this entry, then create a new '
+              'self-contained public entry with shareable inline excerpts.')
     if not entry['sources']:
-        raise ValueError('public entry ' + entry['id'] + ' has no inline sources; add public excerpt citations or keep it private')
+        raise ValueError('public entry ' + entry['id'] + ' has no inline sources.' + remedy)
     for source in entry['sources']:
         if source['visibility'] != 'public' or not source.get('excerpt', '').strip():
-            raise ValueError('public entry ' + entry['id'] + ' depends on a private or missing excerpt; mark a shareable inline source public')
+            raise ValueError('public entry ' + entry['id'] + ' depends on a private or missing excerpt.' + remedy)
         if source.get('ref') and source['type'] in ('file', 'url'):
             if LOCAL_PATH.search(source['ref']) or PRIVATE_REF.search(source['ref']):
-                raise ValueError('public source ref points to private data; provide a safe inline excerpt')
+                raise ValueError('public entry ' + entry['id'] + ' source ref points to private data.' + remedy)
 
 
 def _line(entry, visibility, public_ids=None, snapshot=None):
@@ -671,7 +716,9 @@ def _line(entry, visibility, public_ids=None, snapshot=None):
         if visibility == 'public':
             missing = [i for i in ids if i not in public_ids]
             if missing:
-                raise ValueError('public history crosses private entries; provide a public history summary before sharing')
+                raise ValueError('public entry ' + entry['id'] + ' history crosses private entries; '
+                                 'history is immutable. Withhold the mistakenly public entry, then create a new '
+                                 'self-contained public summary without private entry IDs.')
         if ids:
             lines += ['  ' + key.replace('_', ' ').capitalize() + ': ' + ', '.join(ids) + '.']
     for number, source in enumerate(entry['sources'], 1):

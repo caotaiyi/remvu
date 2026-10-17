@@ -4,6 +4,8 @@
 
 Before sharing, review the selected entries and all their inline sources. Include the facts the receiver needs to continue, with enough context to distinguish user intent from agent inference. Keep private raw logs, credentials, personal paths, unrelated requests and attachment references out of the public file. Resolve retained conflicts explicitly and consolidate reviewed events through their recorded watermark; either remaining condition blocks public sharing.
 
+Use `withhold ID [ID...] --repo PROJECT --base-revision CURRENT_REVISION --note "Reason"` to remove selected public entries from future shares. This audited operation narrows visibility while retaining claims, sources, fingerprints and history; it does not review pending events or refresh code. If public history points to a private ID, withhold the affected public entries and add a new self-contained public summary without that link. Recheck the resulting scope before generating another file. Existing public files and uploads are not changed by withdrawal.
+
 When code has changed since the recorded state, refresh memory and repeat the relevant checks. Sharing stops when tracked or untracked changes exist. The preferred path is to commit the intended project changes using the project's normal workflow.
 
 If the user explicitly chooses to carry uncommitted work:

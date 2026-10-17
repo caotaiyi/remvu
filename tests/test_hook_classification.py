@@ -32,7 +32,7 @@ class HookClassificationTest(unittest.TestCase):
 
     def test_exact_installed_direct_call_and_python_invocation_are_bookkeeping(self):
         expected = os.name != 'nt'
-        for action in ('status', 'entries', 'events', 'show', 'check', 'handoff', 'share', 'resolve-conflict'):
+        for action in ('status', 'entries', 'events', 'show', 'check', 'handoff', 'share', 'resolve-conflict', 'withhold'):
             with self.subTest(action=action):
                 self.assertEqual(self.classified(self.python_call(action)), expected)
                 self.assertEqual(self.classified(shlex.join([str(self.script), action])), expected)

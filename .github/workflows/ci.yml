@@ -28,3 +28,5 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Format conformance examples
         run: python spec/validate_examples.py --require-jsonschema
+      - name: Audit release packages
+        run: python scripts/build_release.py --out "${{ runner.temp }}/remvu-release"
