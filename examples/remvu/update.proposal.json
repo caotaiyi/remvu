@@ -1,0 +1,62 @@
+{
+  "base_revision": 0,
+  "base_event_count": 0,
+  "entries": [
+    {
+      "id": "goal-csv-totals",
+      "kind": "goal",
+      "text": "Extend the CSV report with a total column.",
+      "basis": "user_confirmed",
+      "visibility": "public",
+      "sources": [{"type": "user", "label": "Synthetic task", "excerpt": "Add a total column to the CSV report.", "visibility": "public"}]
+    },
+    {
+      "id": "keep-column-order",
+      "kind": "constraint",
+      "text": "Preserve the order and names of the existing CSV columns.",
+      "basis": "user_confirmed",
+      "visibility": "public",
+      "sources": [{"type": "user", "label": "Synthetic task", "excerpt": "Keep the existing CSV columns in their current order.", "visibility": "public"}]
+    },
+    {
+      "id": "inferred-small-input",
+      "kind": "architecture",
+      "text": "The current reader appears intended for small reports; the user has not confirmed a size limit.",
+      "basis": "inferred",
+      "visibility": "public",
+      "sources": [{"type": "file", "ref": "report.py", "label": "Synthetic baseline", "excerpt": "def rows(items): return list(items)", "visibility": "public"}]
+    },
+    {
+      "id": "reject-streaming-rewrite",
+      "kind": "rejected",
+      "text": "Do not repeat the proposed streaming rewrite in this task; the user asked for the smaller CSV change.",
+      "basis": "user_confirmed",
+      "visibility": "public",
+      "sources": [{"type": "user", "label": "Synthetic decision", "excerpt": "Keep this change small. Do not replace the reader with the proposed streaming design.", "visibility": "public"}]
+    },
+    {
+      "id": "observed-old-check-failed",
+      "kind": "check",
+      "text": "The synthetic test for the total column failed before the implementation was added. This is example evidence, not a real repository test result.",
+      "basis": "observed",
+      "visibility": "public",
+      "result": "failed",
+      "exit_code": 1,
+      "sources": [{"type": "tool", "label": "Synthetic test output", "excerpt": "python -m unittest test_report: FAIL: total column missing; exit code 1 (synthetic)", "visibility": "public"}]
+    },
+    {
+      "id": "next-implement-totals",
+      "kind": "next_step",
+      "text": "Implement the total column and rerun the relevant checks; preserve the recorded failure until a new observed result supersedes it.",
+      "basis": "unverified",
+      "visibility": "public",
+      "sources": [{"type": "user", "label": "Synthetic remaining work", "excerpt": "The total column still needs implementation and a test run.", "visibility": "public"}]
+    },
+    {
+      "id": "private-local-note",
+      "kind": "preference",
+      "text": "This synthetic private note must stay out of the public example.",
+      "basis": "unverified"
+    }
+  ]
+}

@@ -1,22 +1,22 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "agent-task-export",
-  "version": "0.1.0",
-  "description": "Local task evidence export with compact agent handoffs, indexed tool records and verification gaps.",
+  "name": "remvu",
+  "version": "0.2.0-rc.1",
+  "description": "Portable project memory and evidence-backed handoffs for coding agents.",
   "author": {"name": "caotaiyi"},
-  "repository": "https://github.com/caotaiyi/agent-task-export",
+  "repository": "https://github.com/caotaiyi/remvu",
   "license": "MIT",
-  "keywords": ["skills", "agent-handoff", "task-export", "codex"],
+  "keywords": ["skills", "project-memory", "agent-handoff", "codex", "claude-code", "remvu"],
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "Agent Task Export",
-        "shortDescription": "Compact task evidence exports",
-        "longDescription": "Export observable task messages, tool calls, edits and checks into a local bundle. Read a compact handoff first and fetch evidence by ID. Requires local Python 3.10+; excludes hidden reasoning.",
+        "displayName": "Remvu",
+        "shortDescription": "Portable project memory",
+        "longDescription": "Maintain private project memory and create a single REMVU.md handoff with intent, decisions, code state and evidence. Includes Claude Code and Codex lifecycle adapters and the legacy evidence exporter. Requires local Python 3.10+; excludes hidden reasoning. See the repository compatibility report for tested clients.",
         "developerName": "caotaiyi",
         "category": "Productivity",
         "capabilities": [],
-        "defaultPrompt": "Export this task as a compact handoff with indexed evidence and verification gaps."
+        "defaultPrompt": "Use Remvu to update this project's memory and prepare a verified handoff."
       }
     }
   }

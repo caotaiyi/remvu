@@ -1,0 +1,4 @@
+interface:
+  display_name: "Remvu"
+  short_description: "Portable project memory for coding agents"
+  default_prompt: "Use $remvu to update this project's memory and prepare a concise, verified handoff."

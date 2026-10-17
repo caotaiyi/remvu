@@ -1,6 +1,6 @@
 ---
 name: agent-task-export
-description: Export a completed or ongoing AI task into a compact handoff with indexed tool evidence, edit records and verification gaps. Use for task records, session exports, agent handoffs and post-task reviews.
+description: Legacy v0.1 indexed evidence-bundle exporter. Use when explicitly requested to export or inspect an Agent Task Export bundle, or to preserve compatibility with its original commands. Use remvu for persistent project memory and new single-file handoffs.
 ---
 
 # Agent task export

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/caotaiyi/remvu/blob/main/spec/metadata.schema.json",
+  "title": "Remvu format 1 document metadata",
+  "type": "object",
+  "required": ["format", "project_id", "revision", "repo", "generated_at", "visibility", "summary_chars", "omitted_private_entries"],
+  "properties": {
+    "format": {"const": "remvu/1"},
+    "project_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"},
+    "revision": {"type": "integer", "minimum": 0},
+    "repo": {
+      "type": "object",
+      "required": ["name", "remote", "commit", "tree", "fingerprint", "dirty", "git"],
+      "properties": {
+        "name": {"type": "string"},
+        "remote": {"type": ["string", "null"]},
+        "commit": {"type": ["string", "null"]},
+        "tree": {"type": ["string", "null"]},
+        "fingerprint": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "dirty": {"type": "boolean"},
+        "git": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "generated_at": {"type": "string", "format": "date-time"},
+    "visibility": {"enum": ["private", "public"]},
+    "summary_chars": {"type": "integer", "minimum": 0},
+    "omitted_private_entries": {"type": "integer", "minimum": 0}
+  },
+  "additionalProperties": false
+}

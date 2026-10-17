@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/caotaiyi/remvu/blob/main/spec/proposal.schema.json",
+  "title": "Remvu semantic-memory update proposal",
+  "type": "object",
+  "required": ["base_revision", "entries"],
+  "properties": {
+    "base_revision": {"type": "integer", "minimum": 0},
+    "base_event_count": {"type": "integer", "minimum": 0},
+    "entries": {"type": "array", "maxItems": 1000, "items": {"$ref": "#/$defs/entry"}}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {"enum": ["user", "tool", "file", "url", "event", "legacy"]},
+        "label": {"type": "string", "maxLength": 500},
+        "ref": {"type": "string", "maxLength": 2000},
+        "excerpt": {"type": "string", "maxLength": 100000},
+        "visibility": {"enum": ["private", "public"], "default": "private"}
+      },
+      "additionalProperties": false
+    },
+    "entry": {
+      "type": "object",
+      "required": ["kind", "text", "basis"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"},
+        "kind": {"enum": ["goal", "constraint", "preference", "architecture", "decision", "rejected", "progress", "check", "next_step", "risk", "change"]},
+        "text": {"type": "string", "minLength": 1, "maxLength": 100000},
+        "basis": {"enum": ["user_confirmed", "observed", "inferred", "unverified"]},
+        "visibility": {"enum": ["private", "public"], "default": "private"},
+        "sources": {"type": "array", "maxItems": 100, "items": {"$ref": "#/$defs/source"}},
+        "supersedes": {"type": "array", "maxItems": 1000, "items": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,95}$"}, "uniqueItems": true},
+        "result": {"enum": ["passed", "failed", "unknown"]},
+        "exit_code": {"type": ["integer", "null"]}
+      },
+      "allOf": [
+        {"if": {"required": ["result"]}, "then": {"properties": {"kind": {"const": "check"}}}},
+        {"if": {"required": ["exit_code"]}, "then": {"properties": {"kind": {"const": "check"}}}}
+      ],
+      "additionalProperties": false
+    }
+  }
+}
