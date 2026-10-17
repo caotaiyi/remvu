@@ -14,6 +14,14 @@ Remvu v0.2.0 is a reference implementation and open format proposal. Two real CL
 
 This is a 30-second evidence replay, not an original screen recording. The actual model run times are shown; [inspect the source results](docs/demo.md).
 
+## For multi-model platforms and API relay services
+
+**Change models or clients, and take the project context with you.**
+
+Users of multi-model platforms and API relay services can carry recorded goals, constraints, rejected approaches and unfinished work into a fresh coding-agent session. The next agent gets the reasons behind the code alongside the code itself, reducing the need to explain that background again.
+
+Platform builders can use the open format as a project-memory and handoff feature in their agent clients or workflows. This requires access to project files and observable tool results; forwarding API requests alone does not supply that context. Relay-platform integration is a use case for extension, rather than a bundled gateway adapter. Current live evidence covers Claude Code and Codex handoffs, and does not establish token or cost savings.
+
 ## Start in an existing project
 
 Requires Python 3.10+ and Git for repository state and patches. The runtime uses the Python standard library and makes no model API calls.
