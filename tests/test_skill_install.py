@@ -30,6 +30,7 @@ class SkillInstallTest(unittest.TestCase):
                 self.assertEqual((target / 'SKILL.md').read_bytes(), (ROOT / 'skills/remvu/SKILL.md').read_bytes())
                 self.assertTrue((target / 'assets/note-template.md').is_file())
                 self.assertEqual(list(target.rglob('*.py')), [])
+                self.assertTrue((target / 'LICENSE').is_file())
             self.assertFalse((project / '.remvu').exists())
             self.assertFalse((project / '.claude/settings.local.json').exists())
             self.assertFalse((project / '.codex/hooks.json').exists())

@@ -25,6 +25,8 @@ try {
         $target = Join-Path $parent 'remvu'
         New-Item -ItemType Directory -Path $target | Out-Null
         Copy-Item -LiteralPath (Join-Path $skill 'SKILL.md') -Destination $target
+        $license = Join-Path $Source 'LICENSE'
+        if (Test-Path -LiteralPath $license) { Copy-Item -LiteralPath $license -Destination $target }
         foreach ($component in @('references', 'assets', 'agents')) {
             $path = Join-Path $skill $component
             if (Test-Path -LiteralPath $path) { Copy-Item -Recurse -LiteralPath $path -Destination (Join-Path $target $component) }

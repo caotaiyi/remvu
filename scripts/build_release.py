@@ -113,11 +113,19 @@ def main():
             info.compress_type = zipfile.ZIP_DEFLATED
             target.writestr(info, body)
         add_kit('packages/' + skill.name, skill.read_bytes())
-        add_kit('packages/SHA256SUMS', hashlib.sha256(skill.read_bytes()).hexdigest() + '  ' + skill.name + '\n')
+        add_kit('packages/' + markdown.name, markdown.read_bytes())
+        add_kit('packages/SHA256SUMS', ''.join(hashlib.sha256(path.read_bytes()).hexdigest() + '  ' + path.name + '\n' for path in (skill, markdown)))
         add_kit('START-HERE.txt',
             'Remvu ' + version + ' candidate acceptance kit / 候选验收包\n\n'
-            'Requires Python 3.9+ and Git. Windows 11 x64 is a native test target, not a verified claim.\n'
-            '需要 Python 3.9+ 和 Git。在解压后的此目录中打开终端。\n\n'
+            'Recommended / 推荐：Markdown save/resume, no Python or hooks / 无需 Python 或 hooks.\n'
+            'Unzip packages/remvu-markdown-v' + version + '.zip, then copy its remvu folder to\n'
+            'PROJECT/.claude/skills/remvu and PROJECT/.agents/skills/remvu. Preserve existing folders first.\n'
+            '解压 Markdown 包，把 remvu 文件夹分别复制到项目的 .claude/skills/ 和 .agents/skills/，保留已有版本。\n'
+            'Ask /remvu save in Claude Code or $remvu save in Codex; use resume in a fresh session.\n'
+            'See docs/quickstart.zh-CN.md. Windows native verification remains pending.\n'
+            '先按快速开始验证保存和接手，回传实际客户端/系统版本和结果即可，不要发私人记录。\n\n'
+            'Optional strict-engine acceptance below requires Python 3.9+ and Git.\n'
+            '以下是可选严格引擎验收，才需要 Python 3.9+ 和 Git。在此目录中打开终端。\n\n'
             '1. Run / 运行: python scripts/package_smoke.py packages\n'
             '   This uses only temporary synthetic projects; it is not a native-client test.\n'
             '   这一步仅检查临时合成项目，不代表真实客户端通过。\n'

@@ -29,6 +29,7 @@ for client in .claude .agents; do
   target=$project/$client/skills/remvu
   mkdir "$target"
   cp "$skill/SKILL.md" "$target/SKILL.md"
+  [ ! -f "$source/LICENSE" ] || cp "$source/LICENSE" "$target/LICENSE"
   for component in references assets agents; do
     [ ! -d "$skill/$component" ] || cp -R "$skill/$component" "$target/$component"
   done
