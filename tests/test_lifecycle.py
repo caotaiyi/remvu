@@ -174,6 +174,9 @@ class LifecycleTest(unittest.TestCase):
         before = shim.read_text()
         shim.write_text(before + 'user edits')
         with self.assertRaisesRegex(ValueError, 'edited'):
+            self.install()
+        self.assertEqual(shim.read_text(), before + 'user edits')
+        with self.assertRaisesRegex(ValueError, 'edited'):
             life.uninstall(self.repo)
         shim.write_text(before)
         config = self.repo / '.codex/hooks.json'
@@ -258,7 +261,8 @@ class LifecycleTest(unittest.TestCase):
         shim = (self.repo / '.agents/skills/remvu/SKILL.md').read_text()
         self.assertEqual(installed['runtime_python'], manifest['python'])
         self.assertIn('Python interpreter: `' + manifest['python'] + '`', shim)
-        with patch.object(setup.sys, 'executable', str(self.root / 'different-python')):
+        with patch.object(setup.sys, 'executable', str(self.root / 'different-python')), \
+             patch.object(setup, '_skill_shim', return_value='a future version template'):
             self.assertTrue(life.uninstall(self.repo)['ok'])
 
     @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows path semantics')

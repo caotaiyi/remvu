@@ -127,7 +127,8 @@ def _initialize_runtime(repo, platforms, scripts):
     except ValueError as error:
         raise ValueError('Selected runtime initialization failed; configuration checkpoint was retained') from error
     if process.returncode != 0 or not isinstance(result, dict) or result.get('ok') is not True:
-        raise ValueError('Selected runtime initialization failed; inspect the reviewed runtime and retained checkpoint')
+        detail = core.scrub(str(result.get('error', 'inspect the reviewed runtime and retained checkpoint')))[:500] if isinstance(result, dict) else 'invalid result'
+        raise ValueError('Selected runtime initialization failed: ' + detail)
     return result
 
 
@@ -241,7 +242,10 @@ def uninstall(repo):
             if instruction.exists():
                 changes[instruction] = _remove_block(setup._read(instruction))
             shim = _safe(repo / ('.claude/skills/remvu/SKILL.md' if client == 'claude' else '.agents/skills/remvu/SKILL.md'))
-            if shim.exists() and setup._read(shim) == setup._skill_shim(scripts, manifest.get('python')):
+            expected_hash = manifest.get('skill_shims', {}).get(client)
+            unchanged = (hashlib.sha256(setup._read(shim).encode('utf-8')).hexdigest() == expected_hash
+                         if expected_hash else setup._read(shim) == setup._skill_shim(scripts, manifest.get('python')))
+            if shim.exists() and unchanged:
                 removals.append(shim)
             elif shim.exists():
                 raise ValueError('Project skill was edited since installation; preserve/reconcile it before uninstalling')

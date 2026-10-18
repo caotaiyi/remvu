@@ -196,6 +196,7 @@ def initialize(repo, platforms=('claude', 'codex'), scripts_dir=None) -> dict:
     if (root / '.remvu/state.json').exists():
         core.load_state(root)  # Refuse damaged state before modifying configuration.
     previous_manifest = root / '.remvu/adapters.json'
+    prior = {}
     if previous_manifest.exists():
         prior = json.loads(_read(previous_manifest))
         if prior.get('format') != 'remvu-adapters/1':
@@ -217,6 +218,9 @@ def initialize(repo, platforms=('claude', 'codex'), scripts_dir=None) -> dict:
         skill_dir = '.claude/skills/remvu' if platform == 'claude' else '.agents/skills/remvu'
         shim = root / skill_dir / 'SKILL.md'
         old = _read(shim)
+        expected_hash = prior.get('skill_shims', {}).get(platform)
+        if old and expected_hash and hashlib.sha256(old.encode('utf-8')).hexdigest() != expected_hash:
+            raise ValueError('The project Remvu skill was edited; preserve and reconcile those edits before reinstalling.')
         # Do not overwrite an independently authored skill of the same name.
         if old and 'This project adapter uses the installed Remvu scripts' not in old:
             raise ValueError(f'An unrelated remvu skill already exists: {shim}')
@@ -249,6 +253,9 @@ def initialize(repo, platforms=('claude', 'codex'), scripts_dir=None) -> dict:
         'format': 'remvu-adapters/1', 'platforms': list(platforms),
         'scripts_dir': str(scripts), 'python': str(Path(sys.executable).resolve()),
         'handlers': {p: {event: _handler(p, event, scripts, root) for event in EVENTS[p]} for p in platforms},
+        'skill_shims': {p: hashlib.sha256(changes[root / ('.claude/skills/remvu/SKILL.md' if p == 'claude'
+                                                       else '.agents/skills/remvu/SKILL.md')].encode('utf-8')).hexdigest()
+                        for p in platforms},
         'trust': 'Host review is required; Remvu never grants hook trust or changes permissions.',
         'portability': 'Local configs contain absolute installation paths. Re-run init after moving the runtime. '
                        'Public REMVU.md remains readable without this installation.',
