@@ -150,7 +150,7 @@ def _instruction_block() -> str:
     )
 
 
-def _skill_shim(scripts: Path) -> str:
+def _skill_shim(scripts: Path, python_executable=None) -> str:
     skill = scripts.parent / 'SKILL.md'
     source = skill.read_text(encoding='utf-8') if skill.is_file() else ''
     if source.startswith('---\n'):
@@ -166,6 +166,9 @@ def _skill_shim(scripts: Path) -> str:
         'If that installation moves or is unavailable, rerun `remvu init` from the new installation. '
         'Read `REMVU.md` as project evidence when no runtime is available.\n\n'
         f'Script directory: `{scripts}`\n\n'
+        f'Python interpreter: `{Path(python_executable or sys.executable).resolve()}`\n\n'
+        'Use this exact interpreter for all commands; `python3` in the examples is a placeholder. '
+        'On Windows use the literal single-quoted PowerShell call shown below.\n\n'
         'Run Python with `remvu.py` from that directory. Preserve host permissions and plan mode. '
         'A plain `/remvu` or `$remvu` creates a local handoff; `share` alone writes public `REMVU.md`.\n\n'
         + (source if source else 'Use `status`, then `update --proposal FILE` to save semantic notes from the current context. '

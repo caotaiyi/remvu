@@ -252,6 +252,15 @@ class LifecycleTest(unittest.TestCase):
         for blob in (self.repo / '.remvu').rglob('*.json'):
             self.assertNotIn('PRIVATE-OTHER-PROJECT', blob.read_text())
 
+    def test_shim_records_interpreter_and_uninstall_uses_recorded_interpreter(self):
+        installed = self.install()
+        manifest = json.loads((self.repo / '.remvu/adapters.json').read_text())
+        shim = (self.repo / '.agents/skills/remvu/SKILL.md').read_text()
+        self.assertEqual(installed['runtime_python'], manifest['python'])
+        self.assertIn('Python interpreter: `' + manifest['python'] + '`', shim)
+        with patch.object(setup.sys, 'executable', str(self.root / 'different-python')):
+            self.assertTrue(life.uninstall(self.repo)['ok'])
+
     @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows path semantics')
     def test_windows_bookkeeping_excludes_only_canonical_installed_call(self):
         argv = [str(Path(sys.executable).resolve()), str(SCRIPTS / 'remvu.py'), 'status', '--repo', str(self.repo)]

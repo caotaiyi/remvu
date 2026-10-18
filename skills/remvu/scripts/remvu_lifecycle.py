@@ -195,6 +195,7 @@ def install(repo, source=None, home=None, platforms=None, rollback=False):
                           'previous_scripts': previous, 'checkpoint': str(checkpoint.relative_to(repo)),
                           'platforms': list(selected), 'installed_at': core._now()})
     result.update(runtime_scripts=str(scripts), action='rollback' if rollback else 'install',
+                  runtime_python=str(Path(sys.executable).resolve()),
                   activation='awaiting_host_review', preflight=preflight(),
                   note='Checksums detect local changes; they do not authenticate the publisher. Review the source/release.')
     return result
@@ -240,7 +241,7 @@ def uninstall(repo):
             if instruction.exists():
                 changes[instruction] = _remove_block(setup._read(instruction))
             shim = _safe(repo / ('.claude/skills/remvu/SKILL.md' if client == 'claude' else '.agents/skills/remvu/SKILL.md'))
-            if shim.exists() and setup._read(shim) == setup._skill_shim(scripts):
+            if shim.exists() and setup._read(shim) == setup._skill_shim(scripts, manifest.get('python')):
                 removals.append(shim)
             elif shim.exists():
                 raise ValueError('Project skill was edited since installation; preserve/reconcile it before uninstalling')
