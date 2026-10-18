@@ -127,7 +127,8 @@ class LifecycleTest(unittest.TestCase):
         (root / 'state.json').write_text('{}')
         (root / 'snapshots/latest.json').write_text('{}')
         orphan = root / ('journal/' + 'a' * 32 + '.json')
-        orphan.write_text(json.dumps({'created_at': '2999', 'operation': 'uncommitted', 'payload': 'do not replay'}))
+        orphan.write_text(json.dumps({'format': 'remvu-journal/1', 'revision': 1, 'state_integrity': 'f' * 64,
+                                      'created_at': '2999', 'operation': 'uncommitted', 'payload': 'do not replay'}))
         self.assertTrue(life.repair(self.repo)['ok'])
         self.assertTrue(orphan.exists())
         self.assertIn('uncommitted_journal', [i['code'] for i in core.check_project(self.repo)['issues']])
@@ -145,6 +146,30 @@ class LifecycleTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'No verified snapshot'):
             life.repair(self.repo)
         self.assertEqual((root / 'state.json').read_text(), 'broken')
+
+    def test_older_snapshot_recovery_never_reuses_a_stale_writer_revision(self):
+        setup.initialize(self.repo, (), SCRIPTS)
+        for revision in range(5):
+            core.apply_update(self.repo, {'base_revision': revision, 'entries': []})
+        root = self.repo / '.remvu'
+        for path in (root / 'snapshots').glob('*.json'):
+            if json.loads(path.read_text())['revision'] > 1:
+                path.unlink()
+        (root / 'state.json').write_text('damaged')
+        life.repair(self.repo)
+        self.assertEqual(core.load_state(self.repo)['revision'], 6)
+        stale = core.apply_update(self.repo, {'base_revision': 2, 'entries': []})
+        self.assertFalse(stale['ok'])
+        self.assertTrue(stale['conflicts'])
+
+    def test_recovery_refuses_unreadable_revision_history(self):
+        setup.initialize(self.repo, (), SCRIPTS)
+        root = self.repo / '.remvu'
+        (root / 'journal' / ('b' * 32 + '.json')).write_text('{}')
+        (root / 'state.json').write_text('damaged')
+        with self.assertRaisesRegex(ValueError, 'cannot safely choose a recovery revision'):
+            life.repair(self.repo)
+        self.assertEqual((root / 'state.json').read_text(), 'damaged')
 
     def test_ledger_repair_preserves_original_and_does_not_clear_events(self):
         setup.initialize(self.repo, (), SCRIPTS)

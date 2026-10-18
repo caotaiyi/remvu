@@ -343,6 +343,28 @@ def _valid_snapshot(root, path):
     return state
 
 
+def _recovery_revision(root, state):
+    """Reserve historical/orphan revisions; an older snapshot must not reuse one.
+
+    A stale writer may still hold any previously issued revision. Journal payloads
+    are never replayed here. Unreadable revision metadata requires a private
+    backup rather than guessing a CAS version and accepting an old proposal.
+    """
+    ceiling = state['revision']
+    for path in core._safe_child(root, 'journal').glob('*.json'):
+        try:
+            record = _read(_safe(path))
+            if (not isinstance(record, dict) or record.get('format') != 'remvu-journal/1'
+                    or type(record.get('revision')) is not int or record['revision'] < 0
+                    or not isinstance(record.get('state_integrity'), str)
+                    or not re.fullmatch(r'[0-9a-f]{64}', record['state_integrity'])):
+                raise ValueError('Invalid journal revision metadata')
+        except (ValueError, OSError):
+            raise ValueError('Journal metadata is damaged; cannot safely choose a recovery revision. Restore a verified private backup.') from None
+        ceiling = max(ceiling, record['revision'])
+    return ceiling + 1
+
+
 def repair(repo):
     repo = _safe(repo).resolve()
     if not (repo / '.remvu').is_dir():
@@ -384,7 +406,7 @@ def repair(repo):
                 latest = core._safe_child(root, 'snapshots/latest.json')
                 if latest.exists():
                     shutil.copyfile(latest, backup / 'latest.json')
-                state['revision'] += 1
+                state['revision'] = _recovery_revision(root, state)
                 state['pending_consolidation'] = True
                 state['issues'].append({'code': 'recovered_snapshot', 'message': 'Recovered a verified snapshot; inspect retained journals for work not represented here.'})
                 core._save(root, state, 'repair_snapshot', {'backup': str(backup.relative_to(root))})

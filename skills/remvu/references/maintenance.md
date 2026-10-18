@@ -64,6 +64,11 @@ use full status only if necessary, record remaining gaps as risks, and apply a
 reviewed semantic proposal before creating a fresh handoff. Repair cannot infer
 lost work. Old public files are not changed by repair.
 
+Snapshot recovery reserves a revision above all retained journal revisions,
+including uncommitted attempts, so an old writer cannot reuse an earlier number
+after recovery. Unreadable journal revision metadata prevents safe automatic
+recovery; retain the files and restore a verified private backup instead.
+
 Hook failures also leave private observation-gap markers when the filesystem
 allows writing them. Doctor reports these gaps and sharing is blocked. Repair
 indexes their existence as pending evidence, retaining the marker in a local
