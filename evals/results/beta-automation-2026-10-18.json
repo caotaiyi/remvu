@@ -2,53 +2,59 @@
   "format": "remvu-beta-automated-validation/1",
   "date": "2026-10-18",
   "version": "0.3.0-beta.1",
-  "source_revision": "32e3dc06faa928b0bb119dfa0c415c17fecb5211",
+  "source_revision": "2c338762888ec4a7d6fdb63a61868715a4c34e8e",
   "ci": {
-    "run_url": "https://github.com/caotaiyi/remvu/actions/runs/39094189585",
+    "run_url": "https://github.com/caotaiyi/remvu/actions/runs/39095606306",
     "all_jobs_passed": true,
     "jobs": {
-      "macos-latest / Python 3.10": {
-        "discovered": 160,
-        "elapsed_seconds": 34.6,
-        "skipped": 1,
-        "passed": 159,
-        "failed": 0
-      },
-      "ubuntu-latest / Python 3.12": {
-        "discovered": 160,
-        "elapsed_seconds": 23.833,
-        "skipped": 1,
-        "passed": 159,
-        "failed": 0
-      },
-      "ubuntu-latest / Python 3.10": {
-        "discovered": 160,
-        "elapsed_seconds": 24.082,
-        "skipped": 1,
-        "passed": 159,
-        "failed": 0
-      },
       "windows-latest / Python 3.10": {
-        "discovered": 160,
-        "elapsed_seconds": 146.314,
+        "discovered": 163,
+        "elapsed_seconds": 125.156,
         "skipped": 2,
-        "passed": 158,
+        "passed": 161,
         "failed": 0
       },
       "windows-latest / Python 3.12": {
-        "discovered": 160,
-        "elapsed_seconds": 159.535,
+        "discovered": 163,
+        "elapsed_seconds": 120.361,
         "skipped": 2,
-        "passed": 158,
+        "passed": 161,
         "failed": 0
       },
       "macos-latest / Python 3.12": {
-        "discovered": 160,
-        "elapsed_seconds": 30.749,
+        "discovered": 163,
+        "elapsed_seconds": 46.806,
         "skipped": 1,
-        "passed": 159,
+        "passed": 162,
+        "failed": 0
+      },
+      "ubuntu-latest / Python 3.12": {
+        "discovered": 163,
+        "elapsed_seconds": 25.755,
+        "skipped": 1,
+        "passed": 162,
+        "failed": 0
+      },
+      "ubuntu-latest / Python 3.10": {
+        "discovered": 163,
+        "elapsed_seconds": 26.425,
+        "skipped": 1,
+        "passed": 162,
+        "failed": 0
+      },
+      "macos-latest / Python 3.10": {
+        "discovered": 163,
+        "elapsed_seconds": 50.121,
+        "skipped": 1,
+        "passed": 162,
         "failed": 0
       }
+    },
+    "windows_concurrency_stress": {
+      "iterations_per_windows_job": 10,
+      "windows_jobs_passed": 2,
+      "assertion": "six distinct events and zero warnings in every trial",
+      "native_client_acceptance": false
     }
   },
   "schema_conformance_cases": 7,
@@ -58,7 +64,7 @@
     "format": "remvu-package-smoke/1",
     "python": "3.12.15",
     "platform": "darwin",
-    "archive_sha256": "c52031f22ec4bf9a49dbe5e9f44d97b4a4f5ce72799031b3d0804dd23c1176c9",
+    "archive_sha256": "93ce7259f794df2f251ff00039871245379b08a23c51b9d8f2ce63297e77c85b",
     "checks": [
       "fresh_install",
       "source_relocation",
@@ -76,20 +82,20 @@
   "packages": [
     {
       "name": "remvu-plugin-v0.3.0-beta.1.zip",
-      "sha256": "b260872e540c7e4dd88dbac5a6f11b3000dae7c5fa933f4410f33e5d6b4a71ca",
-      "bytes": 80541,
+      "sha256": "56e89509eb57bcd18edf1ab348a33e3ce16e33f5395f6f1e3c9f589b334fcf22",
+      "bytes": 81017,
       "archive_entries": 27
     },
     {
       "name": "remvu-skill-v0.3.0-beta.1.zip",
-      "sha256": "c52031f22ec4bf9a49dbe5e9f44d97b4a4f5ce72799031b3d0804dd23c1176c9",
-      "bytes": 64241,
+      "sha256": "93ce7259f794df2f251ff00039871245379b08a23c51b9d8f2ce63297e77c85b",
+      "bytes": 64717,
       "archive_entries": 13
     },
     {
       "name": "remvu-acceptance-v0.3.0-beta.1.zip",
-      "sha256": "35c98c1777939b908722fbf34b7a22294f92a01331435965f7aec11958d2d316",
-      "bytes": 145508,
+      "sha256": "e0191fe3dd9a8d8cf7fc31641e965a4bd92d34837616fc70c94e3ae009034536",
+      "bytes": 146451,
       "archive_entries": 34
     }
   ],
@@ -104,5 +110,6 @@
     "Windows skips two POSIX protection fixtures; macOS/Linux skip the Windows-only path fixture.",
     "Native regression failures and the focused follow-up are retained in separate reports.",
     "Private raw records are not published; no token or cost savings percentage is established."
-  ]
+  ],
+  "retained_failure_report": "beta-windows-concurrency-regression.json"
 }

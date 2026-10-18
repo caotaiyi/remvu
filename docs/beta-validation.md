@@ -36,12 +36,21 @@ Raw provider output, chat logs and private runtime directories are not published
 
 ## Automated checks
 
-Frozen candidate code: `32e3dc06faa928b0bb119dfa0c415c17fecb5211`.
-[All six CI jobs passed](https://github.com/caotaiyi/remvu/actions/runs/39094189585)
-on Linux, macOS and Windows with Python 3.10/3.12. Each job discovered 160 tests:
-macOS/Linux passed 159 and skipped the Windows-only path fixture; Windows passed
-158 and skipped two POSIX protection fixtures. Seven strict format conformance
+Frozen candidate code: `2c338762888ec4a7d6fdb63a61868715a4c34e8e`.
+[All six CI jobs passed](https://github.com/caotaiyi/remvu/actions/runs/39095606306)
+on Linux, macOS and Windows with Python 3.10/3.12. Each job discovered 163 tests:
+macOS/Linux passed 162 and skipped the Windows-only path fixture; Windows passed
+161 and skipped two POSIX protection fixtures. Seven strict format conformance
 cases passed with JSON Schema checks.
+
+A subsequent run of the earlier implementation exposed an intermittent Windows
+six-writer lock timeout. The original [failed run](https://github.com/caotaiyi/remvu/actions/runs/39094755273)
+and [reviewed failure summary](../evals/results/beta-windows-concurrency-regression.json)
+remain available. The final code waits up to five seconds for normal hooks and
+one second for short lifecycle events, within their configured host deadlines.
+A held-writer regression passes, and both final Windows CI jobs additionally
+passed ten six-writer stress trials with all event/no-warning assertions intact.
+These are transport tests, not native-client acceptance or a reliability rate.
 
 The fresh-archive lifecycle smoke passed in every CI job and locally on Python
 3.12.15. It covers installation, source relocation, repeated installation, status,
@@ -52,13 +61,13 @@ clock and timezone differences no longer change the packages.
 
 [Machine-readable automation evidence](../evals/results/beta-automation-2026-10-18.json)
 records counts, skips, actual test times and package hashes. To reproduce the
-same assets, build with `--ref 32e3dc06faa928b0bb119dfa0c415c17fecb5211`.
+same assets, build with `--ref 2c338762888ec4a7d6fdb63a61868715a4c34e8e`.
 Documentation-only updates after this revision do not change the tested runtime.
 
 Lifecycle coverage also includes upgrade/rollback, edited-skill preservation,
 recorded interpreter/ownership, failed-install preservation of concurrent events,
 checksum tampering, missing evidence, orphan journals, observation gaps, worktree
-isolation and bounded Stop repair. Synthetic payloads are not native clients.
+isolation, non-reused recovery revisions and bounded Stop repair. Synthetic payloads are not native clients.
 
 If a shared runtime is damaged, preserve it and install reviewed source into a
 fresh `--home` directory, then review the new hook definitions normally. Reusing
