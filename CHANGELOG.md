@@ -5,7 +5,7 @@
 - Make a no-Python Markdown skill the default, with save/resume as the two primary actions; keep the strict engine optional.
 - Add native shell/PowerShell skill-copy installers and a Markdown-only archive, without configuring hooks.
 - Make engine Stop handling quiet and nonblocking, preserving pending evidence.
-- Lower the optional installer floor to Python 3.9 and extend CI accordingly.
+- Support the optional engine on macOS/Linux Python 3.9+ and Windows Python 3.10+; reject Windows 3.9 managed installs after retained recorder stress failures. Keep its strict manual reproduction workflow.
 - Add a fixed ten-task HANDOFF.md comparison protocol with native clients; report results and limits separately.
 
 - Add managed, checksum-indexed runtime installation independent of the source clone.

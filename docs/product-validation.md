@@ -2,7 +2,17 @@
 
 This report covers the new explicit save/resume skill. The historical strict-engine matrix remains in [compatibility](compatibility.md). The beta is still a candidate.
 
-## Local mechanics
+## Final supported candidate
+
+Reference runtime and package source: `b29423bdc07464e8b3ea0fc68d1575755f3b7e86`. [Final CI](https://github.com/caotaiyi/remvu/actions/runs/39138270476) passed all **eight supported combinations**: Linux/macOS Python 3.9, 3.10 and 3.12; Windows Python 3.10 and 3.12. Each discovered 170 tests; Linux/macOS passed 169 with one platform skip, Windows passed 166 with four platform skips. Both supported Windows jobs additionally passed ten repetitions of six distinct hook writers with zero warnings (twenty trials total). The local macOS Python 3.9.6 run passed 169 with one skip, and the fresh archive lifecycle smoke passed.
+
+All four ZIPs and SHA256SUMS were compared byte for byte with the final CI artifacts and matched. The Markdown-only archive contains ten files, zero Python files, and is 18,086 bytes. These checks do not certify native skill discovery or GUI behavior. Windows Python 3.9 is explicitly unsupported, with its failed stress runs retained below and a strict manual reproduction workflow. It is **not** counted as a passing combination.
+
+The final README also states that save must happen while the original agent can respond. A missing note cannot reconstruct an unsaved conversation after quota exhaustion. The default skill is a manual handoff workflow, not automatic recovery of all project activity.
+
+Documentation-only updates after the reference commit do not change the tested runtime or candidate archives. The beta remains an unpublished draft while the native client matrix is incomplete.
+
+## Local mechanics (initial run)
 
 The local macOS Python 3.9 test run passed: 167 discovered, 166 passed and one Windows-only skip. Two new tests install the skill into a fresh directory with no Python binary in the installer's PATH and reject existing/symlinked skill targets. This is an installer-mechanics check, not native slash-command or GUI certification. Python is used to run developer tests only.
 

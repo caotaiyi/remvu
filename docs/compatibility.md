@@ -1,6 +1,6 @@
 # Optional engine runtime boundary
 
-The default Markdown skill needs no Python. The managed engine supports Python 3.9+ on macOS/Linux and 3.10+ on Windows. Windows Python 3.9 repeatedly failed strict six-writer pressure tests and is explicitly unsupported; its failures are retained in the product report, with a manual experimental workflow for reproduction. It is not counted as a passed matrix combination. Native client acceptance below remains separate.
+The default Markdown skill needs no Python. The managed engine supports Python 3.9+ on macOS/Linux and 3.10+ on Windows. Windows Python 3.9 repeatedly failed strict six-writer pressure tests and is explicitly unsupported; its failures are retained in the product report, with a manual experimental workflow for reproduction. It is not counted as a passed matrix combination. The [final supported CI](https://github.com/caotaiyi/remvu/actions/runs/39138270476) passed eight combinations at b29423b. See [the product report](product-validation.md) for counts, artifacts and retained failures. Native client acceptance below remains separate.
 
 # Markdown skill status
 
