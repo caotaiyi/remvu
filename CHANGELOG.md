@@ -2,6 +2,12 @@
 
 ## 0.3.0-beta.1 candidate (not released)
 
+- Make a no-Python Markdown skill the default, with save/resume as the two primary actions; keep the strict engine optional.
+- Add native shell/PowerShell skill-copy installers and a Markdown-only archive, without configuring hooks.
+- Make engine Stop handling quiet and nonblocking, preserving pending evidence.
+- Lower the optional installer floor to Python 3.9 and extend CI accordingly.
+- Add a fixed ten-task HANDOFF.md comparison protocol with native clients; report results and limits separately.
+
 - Add managed, checksum-indexed runtime installation independent of the source clone.
 - Add doctor, reviewed-source upgrade/rollback, conservative uninstall, verified snapshot/ledger repair and allowlisted local diagnostics.
 - Preserve configuration checkpoints and concurrent evidence on failed installation; retain private memory on uninstall.

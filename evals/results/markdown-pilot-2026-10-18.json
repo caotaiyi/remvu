@@ -1,0 +1,164 @@
+{
+  "protocol": "markdown-paired/1",
+  "task_manifest_sha256": "e64813d3360c8ee0dd0e4bda2809ab655c23ebe0fd7316cd3a5fe115f17b1b92",
+  "clients": {
+    "codex": "0.163.0-alpha.10.2",
+    "claude": "2.1.302"
+  },
+  "limitations": [
+    "Synthetic small JavaScript tasks, not representative of all projects.",
+    "One producer writes both summaries; setup usage cannot isolate Remvu save cost.",
+    "One trial per condition; no statistical reliability or cost-saving claim.",
+    "Ordinary HANDOFF.md is the baseline; no runtime on either receiver.",
+    "Repair rounds count independent evaluator feedback, not all internal rework.",
+    "Rejected-route attempts are not automatically measured; final code needs separate review.",
+    "CLI results do not establish desktop, VS Code or Windows support."
+  ],
+  "results": [
+    {
+      "task": "labels-bom",
+      "direction": "claude-codex",
+      "starting_checks": {
+        "passed": 3,
+        "total": 4,
+        "failed_case_ids": [
+          3
+        ]
+      },
+      "producer_seconds": 36.435,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "result",
+          "counters": {
+            "input_tokens": 18,
+            "cache_creation_input_tokens": 13454,
+            "cache_read_input_tokens": 97219,
+            "output_tokens": 5833
+          }
+        },
+        {
+          "source": "modelUsage",
+          "model": "claude-haiku-5-5",
+          "counters": {
+            "inputTokens": 18,
+            "outputTokens": 5833,
+            "cacheReadInputTokens": 97219,
+            "cacheCreationInputTokens": 13454
+          }
+        }
+      ],
+      "arms": [],
+      "setup_failed": true
+    },
+    {
+      "task": "config-null",
+      "direction": "codex-claude",
+      "starting_checks": {
+        "passed": 4,
+        "total": 5,
+        "failed_case_ids": [
+          0
+        ]
+      },
+      "producer_seconds": 57.96,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "turn.completed",
+          "counters": {
+            "input_tokens": 123791,
+            "cached_input_tokens": 115328,
+            "output_tokens": 2158
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "remvu",
+          "handoff_bytes": 4212,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 9.574,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 4372,
+                  "cache_read_input_tokens": 16187,
+                  "output_tokens": 721
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 721,
+                  "cacheReadInputTokens": 16187,
+                  "cacheCreationInputTokens": 4372
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "handoff",
+          "handoff_bytes": 814,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 8.974,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 2187,
+                  "cache_read_input_tokens": 15706,
+                  "output_tokens": 810
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 810,
+                  "cacheReadInputTokens": 15706,
+                  "cacheCreationInputTokens": 2187
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    }
+  ],
+  "status": "pilot_with_preserved_setup_failure",
+  "failure_explanation": "labels-bom: host denied .git/info/exclude edit; producer preserved privacy and did not save. config-null: both receiver arms completed, Remvu note was larger. Revised workflow uses normal .gitignore edits."
+}

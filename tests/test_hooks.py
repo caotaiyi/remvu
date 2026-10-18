@@ -162,8 +162,7 @@ class AdapterTest(unittest.TestCase):
         self.tool()
         self.assertEqual(len(self.state()['events']), 1)
         first = self.call('Stop', turn_id='turn-one')
-        self.assertEqual(first['decision'], 'block')
-        self.assertIn(hooks.FLUSH_MARKER, first['reason'])
+        self.assertEqual(first, {})
         self.assertEqual(self.call('Stop', turn_id='turn-one'), {})
         self.assertEqual(self.call('Stop', turn_id='another', stop_hook_active=True), {})
         self.assertTrue(self.state()['pending_consolidation'])
@@ -193,7 +192,7 @@ class AdapterTest(unittest.TestCase):
         self.initialize(())
         self.tool()
         first = self.call('Stop', turn_id='turn-one')
-        self.call('UserPromptSubmit', turn_id='continued-turn', prompt=first['reason'])
+        self.call('UserPromptSubmit', turn_id='continued-turn', prompt=hooks.FLUSH_MARKER + 'legacy continuation')
         self.assertEqual(self.call('Stop', turn_id='continued-turn'), {})
         self.assertEqual(len(self.state()['events']), 1)
 
@@ -202,11 +201,11 @@ class AdapterTest(unittest.TestCase):
         self.call('UserPromptSubmit', platform='claude', prompt='Same task')
         self.call('UserPromptSubmit', platform='claude', prompt='Same task')
         self.assertEqual(len(self.state()['events']), 1)
-        self.assertEqual(self.call('Stop', platform='claude')['decision'], 'block')
+        self.assertEqual(self.call('Stop', platform='claude'), {})
         self.assertEqual(self.call('Stop', platform='claude'), {})
         self.call('UserPromptSubmit', platform='claude', prompt='Same task')
         self.assertEqual(len(self.state()['events']), 2)
-        self.assertEqual(self.call('Stop', platform='claude')['decision'], 'block')
+        self.assertEqual(self.call('Stop', platform='claude'), {})
 
     def test_plan_mode_preserves_pending_without_any_hook_write(self):
         self.initialize(())

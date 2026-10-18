@@ -9,9 +9,9 @@
 
 Codex hook trust is managed through `/hooks`. Do not infer activation from the presence of `hooks.json`. Claude Code applies its own settings and hook approval rules. An adapter must not bypass those client controls.
 
-Startup points the current agent at a bounded handoff. Pre-tool events record attempted calls; post-tool events record results using the same call ID, so an interrupted attempt is not presented as completed. Stop requests one semantic update when relevant work is pending. Pre-compaction and interruption/end events retain pending status so incomplete recording stays visible. An abnormal exit can prevent the agent's semantic update; hooks must not label that session complete.
+Startup points the current agent at a bounded handoff. Pre-tool events record attempted calls; post-tool events record results using the same call ID, so an interrupted attempt is not presented as completed. Stop never blocks completion or asks the agent to restart; pending events remain available for an explicit update. Pre-compaction and interruption/end events retain pending status so incomplete recording stays visible. An abnormal exit can prevent the agent's semantic update; hooks must not label that session complete.
 
-The active agent performs the semantic update from its existing context. Scripts do not make extra model requests. Stop-hook repair is bounded to one request per logical user turn; continuation prompts cannot restart the loop. If repair still fails, report the pending state and stop retrying during that turn.
+The active agent performs the semantic update from its existing context. Scripts do not make extra model requests. Consolidation is explicit. Do not trigger semantic updates from Stop. Failed updates retain pending state for later review.
 
 Bookkeeping detection recognizes only the exact installed runtime in a standalone supported invocation. On Windows it accepts the literal, single-quoted PowerShell form shown in the skill, including an absolute interpreter path and leading call operator. Compound commands, interpolation, other shell forms, same-named scripts and unknown file tools stay recorded. Parser/CLI coverage does not certify native Windows automatic consolidation; that remains pending real client acceptance.
 

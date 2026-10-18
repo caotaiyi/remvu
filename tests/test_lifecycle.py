@@ -243,7 +243,7 @@ class LifecycleTest(unittest.TestCase):
         context = hooks.run_hook('codex', 'SessionStart', {'session_id': 'gap-fixture'}, self.repo)
         self.assertIn('Observation gaps remain', context['hookSpecificOutput']['additionalContext'])
         first_stop = hooks.run_hook('codex', 'Stop', {'session_id': 'gap-fixture'}, self.repo)
-        self.assertEqual(first_stop['decision'], 'block')
+        self.assertEqual(first_stop, {})
         self.assertEqual(hooks.run_hook('codex', 'Stop', {'session_id': 'gap-fixture'}, self.repo), {})
         with self.assertRaisesRegex(ValueError, 'observation gaps'):
             core.render_document(self.repo, visibility='public')

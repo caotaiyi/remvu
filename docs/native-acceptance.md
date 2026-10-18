@@ -6,7 +6,7 @@ local hook receipts do not complete this checklist.
 
 ## Windows: prepare before testing
 
-1. Use Windows 11 x64, Python 3.10+ from [python.org](https://www.python.org/downloads/windows/)
+1. Use Windows 11 x64, Python 3.9+ from [python.org](https://www.python.org/downloads/windows/)
    and Git from [git-scm.com](https://git-scm.com/download/win).
 2. Sign in normally to Claude Code and Codex. Open the local Code workspace in
    each desktop app and its official VS Code extension. Ordinary desktop chat
@@ -24,7 +24,7 @@ Windows 准备好上述工具和登录后即可离开。后面的实际验收仍
 
 ## One profile at a time
 
-Use `python3` on macOS and your Python 3.10+ launcher (`python` or `py -3.12`)
+Use `python3` on macOS and your Python 3.9+ launcher (`python` or `py -3.12`)
 on Windows. Commands below use `python`.
 
 ```text
@@ -78,8 +78,7 @@ For each producer profile, record observed outcomes for:
 
 For **automatic** support additionally run several task turns, a real context
 compaction, interruption/restart and simultaneous sessions. Verify no lost
-constraints/events, stale-code warnings, retained conflicts and at most one Stop
-repair per turn. Artificial hook payloads cover regressions but cannot substitute
+constraints/events, stale-code warnings, retained conflicts and nonblocking Stop behavior with pending work retained. Artificial hook payloads cover regressions but cannot substitute
 for these native actions. If an entry supports manual skill invocation only,
 record it as manual after its manual lifecycle checks pass.
 

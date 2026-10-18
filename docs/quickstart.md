@@ -1,42 +1,29 @@
-# Install Remvu in a project
+# Install the Markdown skill (no Python)
 
-Give your coding agent this instruction:
+Ask the agent to review this repository and install only its project skill. The usual save/resume workflow never runs the Python installer or enables hooks.
 
-> Install Remvu from https://github.com/caotaiyi/remvu in this local project.
-> Read its current candidate status and compatibility report first. Check Python
-> 3.10+ and Git; help me install missing prerequisites from their official sources.
-> Review and clone the source outside my project, run scripts/install.py for this
-> project, then run doctor using the stable runtime path it prints. Preserve my
-> existing settings and private data. Guide me through the client's normal hook
-> review; report configuration, observed execution and native support separately.
+From a reviewed checkout on macOS:
 
-The current main branch contains a **v0.3.0-beta.1 candidate**. Its twelve-profile
-native acceptance is still pending. The published v0.2.0 release and its evidence
-remain available; they do not certify the candidate.
-
-For a manual install after reviewing the source:
-
-```bash
-git clone https://github.com/caotaiyi/remvu.git
-python3 remvu/scripts/install.py --repo /absolute/path/to/project --platform both
+```sh
+sh /path/to/remvu/scripts/install-skill.sh /absolute/path/to/project
 ```
 
-On Windows use your Python 3.10+ launcher, for example `py -3.12`, in place of
-`python3`. The installer checks Python and Git, copies the skill to a stable user
-directory and merges project adapters. It does not sign you in or grant trust.
-You may move the source checkout afterward. Use `--platform claude`, `codex` or
-`none` when appropriate. `none` does not uninstall already-configured adapters.
+Set `REMVU_SOURCE=/path/to/remvu` for offline installation from that checkout; otherwise the script fetches a fresh source with Git. On Windows PowerShell, after reviewing the source:
 
-Restart the client if required and complete normal hook review. Then ask
-`/remvu doctor` in Claude Code or `$remvu doctor` in Codex. Hook execution receipts
-are useful diagnostics, but do not prove automatic consolidation or identify the
-desktop/IDE entry point. If the skill is not discovered, run the printed CLI
-directly and check that you opened the project root in the client.
+```powershell
+& 'C:\path\remvu\scripts\install-skill.ps1' -Project 'C:\project' -Source 'C:\path\remvu'
+```
 
-Use `/remvu` or `$remvu` to save a local handoff. Use `share` only when you want
-a reviewed, shareable `REMVU.md`. A receiving agent needs project code and that
-file; it need not install Remvu. An unsupported automatic flow can use manual
-commands while its native compatibility remains pending.
+The scripts copy `skills/remvu` into `.claude/skills/remvu` and `.agents/skills/remvu`. They refuse existing skills and symlink/reparse destinations. The Markdown installers copy only SKILL.md, references/, assets/ and agents/. They do not alter execution policy, client settings, hooks, Python or global configuration. Normal client project trust still applies. Native Windows execution is pending verification.
 
-[Maintenance and recovery](../skills/remvu/references/maintenance.md) ·
-[FAQ](faq.md) · [Native test instructions](native-acceptance.md)
+You can also copy the skill directory to those locations with the file manager. Preserve any existing Remvu skill first. A manual full-directory copy includes optional Python files, but the Markdown installers exclude them. Those files are never used for Markdown save/resume. A minimal copy needs SKILL.md, references/, assets/ and agents/ only.
+
+Open a fresh session if the skill is not discovered. In Claude Code ask `/remvu save`; in Codex ask `$remvu save`. To continue, ask the receiving agent for `remvu resume` using its native skill syntax, or simply tell it to read the handoff file.
+
+Save protects the local `.remvu/` path before writing memory. If the directory is already tracked or privacy cannot be checked, it asks for an external local destination. Do not commit private notes. Only an explicit share request produces a reviewed public file.
+
+To update, preserve the old skill directories and copy a reviewed new version; the installer does not overwrite them. To undo that update, restore the preserved directories. To remove this Markdown installation, remove only the two copied `remvu` skill directories; preserve `.remvu/` memory. This does not remove adapters from a previous Python engine installation: use the engine's documented uninstall or the client's hook settings for those.
+
+## Optional engine
+
+The existing managed engine installation, upgrade, rollback, diagnostics and uninstall remain available with Python 3.9+ and Git. See [maintenance](../skills/remvu/references/maintenance.md). Existing engine `.remvu/state.json` files are never edited by the Markdown skill. Existing engine projects should read the migration notes in [note rules](../skills/remvu/references/notes.md#existing-engine-projects).

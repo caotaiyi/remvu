@@ -1,6 +1,6 @@
 # Installation and maintenance
 
-Use the absolute runtime script path printed by `install`. Python 3.10+ and Git
+Use the absolute runtime script path printed by `install`. Python 3.9+ and Git
 are prerequisites. If missing, the installing agent should use their official
 installers with normal host permissions, then retry. Remvu has no account.
 

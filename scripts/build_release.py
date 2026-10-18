@@ -21,7 +21,7 @@ def git(*args):
     return subprocess.check_output(['git', '-C', str(ROOT), *args], env={**os.environ, 'TZ': 'UTC'})
 
 
-def audit(path, skill=False, kit=False):
+def audit(path, skill=False, kit=False, markdown=False):
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
         for name in names:
@@ -30,7 +30,13 @@ def audit(path, skill=False, kit=False):
                 raise ValueError('unsafe archive path: ' + name)
             if name.endswith(('.pyc', '.jsonl')):
                 raise ValueError('unexpected cache/session file: ' + name)
-        if kit:
+        if markdown:
+            if any(name.endswith('.py') for name in names):
+                raise ValueError('Markdown package must contain no Python code')
+            for expected in ('remvu/SKILL.md', 'remvu/assets/note-template.md', 'remvu/references/notes.md', 'remvu/LICENSE'):
+                if expected not in names:
+                    raise ValueError('missing Markdown component: ' + expected)
+        elif kit:
             for expected in ('skills/remvu/scripts/remvu.py', 'scripts/native_acceptance.py', 'scripts/package_smoke.py',
                              'scripts/install.py', 'scripts/check_beta_readiness.py', 'docs/native-acceptance.md', 'LICENSE', 'START-HERE.txt'):
                 if expected not in names:
@@ -68,8 +74,9 @@ def main():
     plugin = out / ('remvu-plugin-v' + version + '.zip')
     skill = out / ('remvu-skill-v' + version + '.zip')
     kit = out / ('remvu-acceptance-v' + version + '.zip')
+    markdown = out / ('remvu-markdown-v' + version + '.zip')
     sums = out / 'SHA256SUMS'
-    if any(path.exists() for path in (plugin, skill, kit, sums)):
+    if any(path.exists() for path in (plugin, skill, kit, markdown, sums)):
         parser.error('use a fresh output directory')
     git('archive', '--format=zip', '--output=' + str(plugin), commit, 'plugin.json', 'LICENSE', 'skills')
     with zipfile.ZipFile(plugin) as source, zipfile.ZipFile(skill, 'w', compression=zipfile.ZIP_DEFLATED) as target:
@@ -86,9 +93,16 @@ def main():
         new.external_attr = license_info.external_attr
         new.compress_type = zipfile.ZIP_DEFLATED
         target.writestr(new, source.read('LICENSE'))
+    # A separate dependency-free artifact excludes scripts and the legacy exporter.
+    with zipfile.ZipFile(skill) as source, zipfile.ZipFile(markdown, 'w', compression=zipfile.ZIP_DEFLATED) as target:
+        for info in source.infolist():
+            if info.filename.startswith(('remvu/scripts/',)):
+                continue
+            target.writestr(info, source.read(info))
     git('archive', '--format=zip', '--output=' + str(kit), commit,
         'LICENSE', 'skills/remvu', 'scripts/install.py', 'scripts/native_acceptance.py',
         'scripts/package_smoke.py', 'scripts/windows-preflight.ps1', 'scripts/check_beta_readiness.py',
+        'scripts/install-skill.sh', 'scripts/install-skill.ps1',
         'docs/native-acceptance.md', 'docs/quickstart.md', 'docs/quickstart.zh-CN.md',
         'docs/faq.md', 'evals/beta-matrix.json')
     with zipfile.ZipFile(kit, 'a', compression=zipfile.ZIP_DEFLATED) as target:
@@ -102,8 +116,8 @@ def main():
         add_kit('packages/SHA256SUMS', hashlib.sha256(skill.read_bytes()).hexdigest() + '  ' + skill.name + '\n')
         add_kit('START-HERE.txt',
             'Remvu ' + version + ' candidate acceptance kit / 候选验收包\n\n'
-            'Requires Python 3.10+ and Git. Windows 11 x64 is a native test target, not a verified claim.\n'
-            '需要 Python 3.10+ 和 Git。在解压后的此目录中打开终端。\n\n'
+            'Requires Python 3.9+ and Git. Windows 11 x64 is a native test target, not a verified claim.\n'
+            '需要 Python 3.9+ 和 Git。在解压后的此目录中打开终端。\n\n'
             '1. Run / 运行: python scripts/package_smoke.py packages\n'
             '   This uses only temporary synthetic projects; it is not a native-client test.\n'
             '   这一步仅检查临时合成项目，不代表真实客户端通过。\n'
@@ -119,6 +133,9 @@ def main():
         count = audit(path, skill=is_skill, kit=is_kit)
         assets.append({'name': path.name, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
                        'bytes': path.stat().st_size, 'archive_entries': count})
+    count = audit(markdown, markdown=True)
+    assets.append({'name': markdown.name, 'sha256': hashlib.sha256(markdown.read_bytes()).hexdigest(),
+                   'bytes': markdown.stat().st_size, 'archive_entries': count})
     sums.write_text(''.join(item['sha256'] + '  ' + item['name'] + '\n' for item in assets), encoding='utf-8')
     print(json.dumps({'commit': commit, 'version': version, 'assets': assets,
                       'scope': 'Committed plugin/skill components and a synthetic native-acceptance kit; no private records.'}, indent=2))

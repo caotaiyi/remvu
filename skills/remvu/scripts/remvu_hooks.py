@@ -481,27 +481,8 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
             result = {}
             if event == 'Stop':
                 state = core.load_state(root)
-                gaps_present = any(core._safe_child(root / '.remvu', 'gaps').glob('*.json'))
-                key = turn
-                already_requested = (key in session['requested'] or payload.get('stop_hook_active') is True
-                                     or turn == session.get('continuation_turn'))
-                if (state.get('pending_consolidation') or gaps_present) and not already_requested:
-                    session['requested'].append(key)
-                    script = Path(__file__).resolve().parent / 'remvu.py'
-                    reason = (FLUSH_MARKER + ' Observed project events still await semantic consolidation. '
-                              + ('Observation gaps exist: first run doctor and repair to index them, preserving unknown work as unknown. ' if gaps_present else '')
-                              + 'Use the current conversation and Remvu skill to save one evidence-backed memory update '
-                              f'(runtime: {script}; status, events, bounded show EVENT_ID as needed, '
-                              'then update --proposal FILE using base_revision and the reviewed event_count as base_event_count). '
-                              'Run Remvu commands separately, without pipes, redirects or shell chaining; '
-                              'prefer update --proposal-json with shell-quoted JSON to avoid a proposal-file edit event. '
-                              'Include inline tool sources for check outcomes. '
-                              'Keep user intent, constraints, rejected decisions, failed checks, and next steps. '
-                              'Finish with a separate handoff command for the next session. '
-                              'Do not include hidden reasoning or publish/share memory. Respect host permissions; '
-                              'if a reliable update is impossible, leave pending state intact and report it. '
-                              'Do not repeat this flush request or start unrelated work.')
-                    result = {'decision': 'block', 'reason': reason}
+                # Quiet recording never asks the host to restart the agent or
+                # block completion. Pending evidence remains visible at resume.
                 session['open'] = False
             # Keep the active ledger bounded. Archive old sessions locally so
             # pruning operational counters never silently deletes their history.

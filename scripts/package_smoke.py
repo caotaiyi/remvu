@@ -2,7 +2,7 @@
 """Exercise a fresh skill archive's install/relocation/recovery/uninstall locally.
 
 No model calls, credentials or native-client support claims. Only temporary
-synthetic projects are written. Requires Python 3.10+ and Git.
+synthetic projects are written. Requires Python 3.9+ and Git.
 """
 import argparse
 import hashlib
@@ -25,8 +25,8 @@ def run(script, action, repo, *args, expected=0):
 
 
 def smoke(archive):
-    if sys.version_info < (3, 10):
-        raise ValueError('Use Python 3.10+')
+    if sys.version_info < (3, 9):
+        raise ValueError('Use Python 3.9+')
     if Path(archive).is_dir():
         candidates = list(Path(archive).glob('remvu-skill-v*.zip'))
         if len(candidates) != 1:

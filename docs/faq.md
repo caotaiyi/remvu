@@ -1,48 +1,37 @@
-# Troubleshooting / 常见问题
+# Questions / 常见问题
 
-**Installed, but hooks do not run? / 安装后没有自动记录？**
+**Do I need Python? / 需要 Python 吗？**
 
-Run `doctor`. Configuration and hook trust are separate. Open the correct local
-project, review exact hook definitions normally and restart if required. A runtime
-upgrade changes definitions and may require a new review. Do not bypass approval.
-Use the manual skill while investigating; do not mark the memory complete.
+No for the default Markdown skill. Save and resume use the agent's file tools. The optional strict engine needs Python 3.9+ and Git. Do not run scripts/install.py when you only want the Markdown workflow.
 
-**Memory remains pending? / 一直显示待整理？**
+**Will Remvu stop my session? / 会拦截结束吗？**
 
-Finish project operations, then ask `/remvu` or `$remvu` to review evidence and
-save an update. Commands must be separate. Windows PowerShell uses the literal
-single-quoted invocation shown in the skill. Compound commands and unknown shell
-forms are intentionally retained. The Stop hook requests at most one repair per
-turn; a pending result is truthful, not a reason to force the watermark forward.
+The default skill installs no hooks. The optional recorder's Stop handler is now quiet and nonblocking. Old installed copies retain old code: update the runtime or disable the exact Remvu Stop handler through normal client settings. Unreviewed work stays pending until explicitly consolidated.
 
-**Damaged state or a busy lock? / 状态损坏或锁忙？**
+**Is Markdown as reliable as the engine? / 轻量版有哪些限制？**
 
-Run `doctor`, then `repair` for verified snapshot/ledger recovery. A busy OS lock
-belongs to a running writer: close it and retry. Repair retains originals and
-pending work; it cannot recreate missing evidence. Do not delete state or replay
-orphan journals. See the [recovery instructions](../skills/remvu/references/maintenance.md).
+It has provenance labels, rejected decisions and explicit gaps, but no enforced concurrent lock, content fingerprint or automatic secret scan. Use one writer at a time and rerun relevant checks after code changes. Agent read-back catches some omissions; it does not certify completeness.
 
-**Can I move the clone or uninstall? / 能移动目录或卸载吗？**
+**Installed, but the command is missing? / 装了但找不到命令？**
 
-After managed `install`, yes: adapters point to the stable runtime copy. Legacy
-direct `init` still points at its source. Upgrade with reviewed source; rollback
-selects the previous managed runtime. Uninstall preserves memory, backups, ignore
-rules and shared runtimes, and retains edited hooks for review.
+Open a fresh session in the correct project and check the client supports project skills. Claude Code uses /remvu save; Codex uses $remvu save. Normal project trust still applies. Native desktop, VS Code and Windows verification remains pending. A receiver can read the file directly without installation.
 
-**Can I share a diagnostic? / 诊断会上传聊天吗？**
+**Can I upgrade or uninstall? / 怎么升级或卸载？**
 
-`diagnose` writes an allowlisted local report. Preview it before choosing to
-attach it to an issue. It excludes entry text, tool output, session IDs, paths,
-remote URLs and config bodies. No telemetry or automatic upload is enabled.
+For the Markdown copy, preserve the existing two remvu skill folders and replace them with a reviewed version; restore the preserved folders to roll back. Remove only those folders to uninstall. Keep .remvu/ memory. The installer refuses to overwrite existing skills. Earlier engine adapters require their own uninstall; see [maintenance](../skills/remvu/references/maintenance.md).
 
-**Will it save tokens? / 能节省 token 吗？**
+**Old engine state is pending or damaged? / 旧引擎状态待整理或损坏？**
 
-The runtime makes no model requests. Semantic updates use the active agent and
-still consume context. Doctor reports actual local bytes and counts; native
-evaluation reports usage when available. No savings percentage is established.
+Read [the engine workflow](../skills/remvu/references/engine-workflow.md). A Markdown save does not acknowledge engine events or resolve conflicts. doctor and repair preserve gaps and unknown work. Never force a watermark forward or turn a failed check into success. Do not delete live OS locks.
 
-**Can an API relay host this? / 中转站能直接接入吗？**
+**Will this save tokens? / 能省 token 吗？**
 
-The open format is available now. A useful integration needs project-file and
-observable-tool access. The dedicated platform pilot and self-hosted server are
-later stages; neither is bundled with this candidate.
+Saving and reading still use the current agent's context. No extra model API is called by the default workflow. Compare measured completed tasks and include overhead; no savings percentage is established.
+
+**Can I submit diagnostics? / 诊断会上传聊天吗？**
+
+The optional engine's diagnose command produces a local allowlisted report. Preview it, then submit only on explicit instruction. There is no telemetry or automatic upload. Keep raw private notes and logs out of public issues.
+
+**Can a relay service integrate it? / 中转站能接入吗？**
+
+A useful integration needs project files and observable results. API forwarding alone does not provide them. The format is open; a dedicated platform adapter and self-hosted server are not bundled.

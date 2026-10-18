@@ -40,7 +40,7 @@ def default_home():
 
 
 def preflight():
-    return {'python_supported': sys.version_info >= (3, 10),
+    return {'python_supported': sys.version_info >= (3, 9),
             'python': platform.python_version(), 'git_available': shutil.which('git') is not None,
             'clients_found': {name: shutil.which(name) is not None for name in ('claude', 'codex', 'code')},
             'system': platform.system(), 'machine': platform.machine()}
@@ -163,8 +163,8 @@ def install(repo, source=None, home=None, platforms=None, rollback=False):
     repo = _safe(repo).resolve()
     if not repo.is_dir():
         raise ValueError('Project directory must already exist')
-    if sys.version_info < (3, 10):
-        raise ValueError('Install Python 3.10+ using the official installer, then retry')
+    if sys.version_info < (3, 9):
+        raise ValueError('Install Python 3.9+ using the official installer, then retry')
     if not shutil.which('git'):
         raise ValueError('Install Git using the official installer, then retry')
     path = _safe(repo / '.remvu/installation.json')

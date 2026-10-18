@@ -1,3 +1,7 @@
+# Evaluation
+
+The default Markdown skill is evaluated against ordinary HANDOFF.md using [a fixed ten-task protocol](markdown-protocol.md) and [the native runner](run_markdown.py). The native inputs and limitations are frozen before the full run. The historical engine evaluation below remains separate.
+
 # Live Claude Code ↔ Codex handoff checks
 
 This runner launches the authenticated native CLIs. It uses the account's actual model/subscription usage. It does not call a model API directly. Unit tests do not launch models.

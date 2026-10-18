@@ -1,3 +1,7 @@
+# Markdown skill status
+
+The default skill now uses host file tools for explicit save/resume, with no Python runtime or hooks. This changes the setup requirement; it does not establish native compatibility by itself. Local installer and native Markdown trials are recorded separately in [the product report](product-validation.md). The earlier engine matrix below remains historical and does not certify the new path. Windows PowerShell, desktop and VS Code checks remain pending unless explicitly evidenced.
+
 # Compatibility
 
 ## v0.3.0-beta.1 candidate

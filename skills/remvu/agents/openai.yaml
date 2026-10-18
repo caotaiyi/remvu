@@ -1,4 +1,4 @@
 interface:
   display_name: "Remvu"
-  short_description: "Portable project memory for coding agents"
-  default_prompt: "Use $remvu to update this project's memory and prepare a concise, verified handoff."
+  short_description: "Save your project context. Resume in another agent."
+  default_prompt: "Use $remvu save to preserve this project's context, or $remvu resume to continue from a handoff."

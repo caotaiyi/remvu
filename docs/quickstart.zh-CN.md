@@ -1,37 +1,39 @@
-# 在项目中安装 Remvu
+# 安装 Markdown skill（无需 Python）
 
-把下面这段话交给 coding agent：
+把这句话交给当前项目中的编程 agent：
 
-> 请从 https://github.com/caotaiyi/remvu 为当前本地项目安装 Remvu。
-> 先阅读当前版本状态和兼容报告，检查 Python 3.10+ 与 Git；缺少时协助我从
-> 官方来源安装。审阅源码后，将它克隆到项目之外，使用 scripts/install.py
-> 安装到当前项目，再用安装结果给出的稳定脚本路径运行 doctor。保留已有配置
-> 和私人数据，引导我完成客户端正常的 hook 信任流程。分别说明配置是否完成、
-> 是否观察到执行，以及当前入口是否经过真实验收。
+> 从 https://github.com/caotaiyi/remvu 安装 Markdown 版 Remvu skill。先审阅 scripts/install-skill.sh 或 scripts/install-skill.ps1，再复制到本项目的 Claude Code 和 Codex skill 目录。保留已有 skill，不运行可选 Python 安装器，不启用 hooks。
 
-当前主分支提供 **v0.3.0-beta.1 候选实现**，12 种入口组合的真实验收尚未完成。
-已经发布的 v0.2.0 及其证据继续保留，不能据此认定新版已通过验收。
+它只复制 SKILL.md、references/、assets/ 和 agents/，不会安装 Python 文件或改变客户端设置。仍需完成客户端正常的项目信任；新 skill 未出现时，打开新会话。
 
-审阅源码后，也可以手动安装：
+## 手动安装
 
-```bash
-git clone https://github.com/caotaiyi/remvu.git
-python3 remvu/scripts/install.py --repo /项目的绝对路径 --platform both
+macOS，在审阅过的源码中运行：
+
+```sh
+REMVU_SOURCE=/path/to/remvu sh /path/to/remvu/scripts/install-skill.sh /absolute/path/to/project
 ```
 
-Windows 使用 Python 3.10+ 对应的启动命令替换 `python3`，例如 `py -3.12`。
-安装器检查 Python 和 Git，将 skill 复制到稳定的用户目录，再合并项目配置。
-它不会代替你登录或授予 hook 信任，安装后可以移动原来的克隆目录。
-只配置一个客户端时选 `--platform claude` 或 `codex`；新项目仅使用 CLI 时选
-`none`。`none` 不会卸载已有适配器。
+指定 REMVU_SOURCE 可以离线安装；未指定时会用 Git 获取仓库当前源码。Windows PowerShell：
 
-按客户端要求完成 hook 审查和重启，再调用 `/remvu doctor` 或 `$remvu doctor`。
-本地执行回执能帮助排错，不能证明自动整理已完成，也不能识别桌面或 IDE 入口。
-找不到 skill 时，先使用安装结果中的 CLI 路径，并确认客户端打开的是项目根目录。
+```powershell
+& 'C:\path\remvu\scripts\install-skill.ps1' -Project 'C:\project' -Source 'C:\path\remvu'
+```
 
-平时调用 `/remvu` 或 `$remvu` 更新本地交接。需要可分享文件时再调用 `share`，
-并检查生成的 `REMVU.md`。接收方只需要代码和这个文件。自动维护尚未验收的入口
-可以尝试手动命令，但兼容状态仍保留待验证。
+安装器不修改执行策略。Windows 真实执行仍待验收。如果客户端或系统限制脚本执行，可以使用文件管理器复制 skills/remvu 中的 SKILL.md、references/、assets/、agents/ 到项目的 `.claude/skills/remvu` 和 `.agents/skills/remvu`，先保留已有目录。
 
-[维护与恢复](../skills/remvu/references/maintenance.md) · [常见问题](faq.md) ·
-[Windows 与其他入口验收](native-acceptance.md)
+## 保存和接手
+
+Claude Code 输入 `/remvu save`，Codex 输入 `$remvu save`。文件保存在本地 `.remvu/notes/REMVU.md`，写入前 agent 会检查并排除私有目录的 Git 跟踪风险。已经被 Git 跟踪或无法检查时，先选择仓库外的本地保存位置，不要直接写入私有内容。
+
+新会话输入 `/remvu resume` 或 `$remvu resume`。接手方也可以直接读取交接文件，无需安装。换电脑时带上代码与选定文件；公开分享需要单独提出并审阅内容。
+
+## 更新、回退、卸载
+
+更新前保留两个旧 remvu skill 目录，再复制已审阅的新版本；安装器不会覆盖已有目录。需要回退时恢复旧目录。卸载只删除这两个复制的 remvu 目录，保留 `.remvu/` 私有记忆。
+
+这不会移除旧 Python 引擎留下的 hooks。旧引擎需要按[维护说明](../skills/remvu/references/maintenance.md)卸载，或在客户端正常 hook 设置中停用对应的 Remvu handler，不动其他配置。
+
+## 可选引擎
+
+严格格式校验、内容指纹、并发保护和损坏恢复仍由可选引擎提供，需要 Python 3.9+ 和 Git。Markdown skill 不编辑旧 `.remvu/state.json`，也不能替代引擎的冲突解决或事件整理。[具体差异](../skills/remvu/references/notes.md#existing-engine-projects)。

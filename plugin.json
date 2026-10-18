@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "remvu",
   "version": "0.3.0-beta.1",
-  "description": "Portable project memory and evidence-backed handoffs for coding agents.",
+  "description": "Save project context and resume in another coding agent. No Python required for the Markdown workflow.",
   "author": {
     "name": "caotaiyi"
   },
@@ -21,11 +21,11 @@
       "interface": {
         "displayName": "Remvu",
         "shortDescription": "Portable project memory",
-        "longDescription": "Maintain private project memory and create a single REMVU.md handoff with intent, decisions, code state and evidence. Includes Claude Code and Codex lifecycle adapters and the legacy evidence exporter. Requires local Python 3.10+; excludes hidden reasoning. See the repository compatibility report for tested clients.",
+        "longDescription": "Use save and resume to carry project goals, constraints, rejected approaches and unfinished work between Claude Code and Codex. The default Markdown skill needs no Python, hooks or Remvu account. Optional Python tools provide strict validation and observable event recording. Hidden reasoning is excluded; see the compatibility report for verified clients.",
         "developerName": "caotaiyi",
         "category": "Productivity",
         "capabilities": [],
-        "defaultPrompt": "Use Remvu to update this project's memory and prepare a verified handoff."
+        "defaultPrompt": "Use Remvu save to prepare a local handoff, or resume to continue from one."
       }
     }
   }
