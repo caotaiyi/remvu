@@ -74,11 +74,13 @@ def main():
         for info in source.infolist():
             if info.filename.startswith('skills/remvu/') and not info.is_dir():
                 new = zipfile.ZipInfo(info.filename[len('skills/'):], date_time=info.date_time)
+                new.create_system = 3
                 new.external_attr = info.external_attr
                 new.compress_type = zipfile.ZIP_DEFLATED
                 target.writestr(new, source.read(info))
         license_info = source.getinfo('LICENSE')
         new = zipfile.ZipInfo('remvu/LICENSE', date_time=license_info.date_time)
+        new.create_system = 3
         new.external_attr = license_info.external_attr
         new.compress_type = zipfile.ZIP_DEFLATED
         target.writestr(new, source.read('LICENSE'))
@@ -88,9 +90,15 @@ def main():
         'docs/native-acceptance.md', 'docs/quickstart.md', 'docs/quickstart.zh-CN.md',
         'docs/faq.md', 'evals/beta-matrix.json')
     with zipfile.ZipFile(kit, 'a', compression=zipfile.ZIP_DEFLATED) as target:
-        target.writestr('packages/' + skill.name, skill.read_bytes())
-        target.writestr('packages/SHA256SUMS', hashlib.sha256(skill.read_bytes()).hexdigest() + '  ' + skill.name + '\n')
-        target.writestr('START-HERE.txt',
+        def add_kit(name, body):
+            info = zipfile.ZipInfo(name, date_time=target.getinfo('LICENSE').date_time)
+            info.create_system = 3
+            info.external_attr = target.getinfo('LICENSE').external_attr
+            info.compress_type = zipfile.ZIP_DEFLATED
+            target.writestr(info, body)
+        add_kit('packages/' + skill.name, skill.read_bytes())
+        add_kit('packages/SHA256SUMS', hashlib.sha256(skill.read_bytes()).hexdigest() + '  ' + skill.name + '\n')
+        add_kit('START-HERE.txt',
             'Remvu ' + version + ' candidate acceptance kit / 候选验收包\n\n'
             'Requires Python 3.10+ and Git. Windows 11 x64 is a native test target, not a verified claim.\n'
             '需要 Python 3.10+ 和 Git。在解压后的此目录中打开终端。\n\n'
