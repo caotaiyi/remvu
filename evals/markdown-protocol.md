@@ -21,3 +21,5 @@ python3 evals/run_markdown.py --codex /path/to/codex --claude /path/to/claude --
 ```
 
 The first two-task pilot failed to save one note because `.git/info/exclude` was protected. The other task passed in both arms, with a larger Remvu note. Preserve that pilot separately. The revised workflow uses ordinary `.gitignore` edits before private writes and a shorter note template; its results are a new run, not a replacement for the failed pilot.
+
+Postrun limitation: the labels-bom fixture underspecifies its internal-U+FEFF boundary relative to the accepted trim() implementation. Both arms needed that boundary clarified. Keep its outcome, but do not interpret that correction as a memory-retention failure. A future task-set revision should state the boundary explicitly and use a new manifest hash.

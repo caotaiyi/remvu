@@ -31,7 +31,7 @@ Remvu 是一个 Markdown skill。它把目标、约束、否决过的方案、�
 
 ![历史 CLI 接手试验的 30 秒证据回放](docs/assets/remvu-live-replay.gif)
 
-[试验来源及限制](docs/demo.md)。轻量版需要单独验收，不能继承旧版的通过结论。
+[试验来源及限制](docs/demo.md)。轻量版已另做十任务 CLI 对照，结果见下文；旧版通过不能证明新入口兼容。
 
 ## 留下什么
 
@@ -55,6 +55,6 @@ Remvu 是一个 Markdown skill。它把目标、约束、否决过的方案、�
 
 当前仍为 **v0.3.0-beta.1 候选版**。Windows、桌面入口和 VS Code 原生验收尚未完成；复制成功或 CLI 通过不能证明这些入口兼容。[兼容矩阵](docs/compatibility.md) · [测试报告](docs/beta-validation.md)。
 
-对照实验需要加入普通 HANDOFF.md 基线，按同一任务的实际完成情况比较，并报告失败和额外开销。拿不到 token usage 时报告字符或字节，不推算节省比例。[评估说明](evals/README.md)。
+本轮十任务真实 CLI 对照中，普通 HANDOFF.md 与 Remvu 均首次通过 9/10，剩余任务各经一次纠正后完成。Remvu 文件更大，总计 34,614 字节，对照组为 10,039 字节。本轮没有证明完成效果、token 或费用方面的收益。[实测与限制](docs/product-validation.md) · [实验方案](evals/markdown-protocol.md)。
 
 MIT 开源协议。[参与贡献](CONTRIBUTING.md)。

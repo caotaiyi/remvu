@@ -1,0 +1,1102 @@
+{
+  "protocol": "markdown-paired/1",
+  "task_manifest_sha256": "e64813d3360c8ee0dd0e4bda2809ab655c23ebe0fd7316cd3a5fe115f17b1b92",
+  "skill_sha256": "8e57c34df266cec3b02e0d72b87981704301615e49f6328a722b77ad6149c8c5",
+  "notes_rules_sha256": "78896b4f290fb542a844531149718f55f1381f5e9b011f0e2ab5a911022556f1",
+  "template_sha256": "f836f39f26cb55f5dca671cc3ef15c6ba10837773ed18915516b4ac9b7f5a00d",
+  "clients": {
+    "codex": "0.163.0-alpha.10.2",
+    "claude": "2.1.302"
+  },
+  "limitations": [
+    "Synthetic small JavaScript tasks, not representative of all projects.",
+    "One producer writes both summaries; setup usage cannot isolate Remvu save cost.",
+    "One trial per condition; no statistical reliability or cost-saving claim.",
+    "Ordinary HANDOFF.md is the baseline; no runtime on either receiver.",
+    "Repair rounds count independent evaluator feedback, not all internal rework.",
+    "Rejected-route attempts are not automatically measured; final code needs separate review.",
+    "CLI results do not establish desktop, VS Code or Windows support.",
+    "Client-selected model IDs may differ between invocations; report native model counters without cross-provider token sums.",
+    "The labels-bom task has an underspecified internal-U+FEFF boundary: starting trim() removes it, while the fixed rubric preserves it. Both arms needed that explicit feedback; the correction is not evidence of memory loss. The frozen task is retained rather than silently repaired after the run."
+  ],
+  "results": [
+    {
+      "task": "config-null",
+      "direction": "codex-claude",
+      "starting_checks": {
+        "passed": 4,
+        "total": 5,
+        "failed_case_ids": [
+          0
+        ]
+      },
+      "producer_seconds": 111.776,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "turn.completed",
+          "counters": {
+            "input_tokens": 101518,
+            "cached_input_tokens": 92800,
+            "output_tokens": 1751
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "remvu",
+          "handoff_bytes": 4181,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 9.516,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 3337,
+                  "cache_read_input_tokens": 17003,
+                  "output_tokens": 747
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 747,
+                  "cacheReadInputTokens": 17003,
+                  "cacheCreationInputTokens": 3337
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "handoff",
+          "handoff_bytes": 789,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 9.008,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 2035,
+                  "cache_read_input_tokens": 15699,
+                  "output_tokens": 669
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 669,
+                  "cacheReadInputTokens": 15699,
+                  "cacheCreationInputTokens": 2035
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "labels-bom",
+      "direction": "claude-codex",
+      "starting_checks": {
+        "passed": 3,
+        "total": 4,
+        "failed_case_ids": [
+          3
+        ]
+      },
+      "producer_seconds": 28.491,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "result",
+          "counters": {
+            "input_tokens": 14,
+            "cache_creation_input_tokens": 9639,
+            "cache_read_input_tokens": 57650,
+            "output_tokens": 3031
+          }
+        },
+        {
+          "source": "modelUsage",
+          "model": "claude-sonnet-5-5",
+          "counters": {
+            "inputTokens": 14,
+            "outputTokens": 3031,
+            "cacheReadInputTokens": 57650,
+            "cacheCreationInputTokens": 9639
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "handoff",
+          "handoff_bytes": 866,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 4,
+            "failed_case_ids": [
+              3
+            ]
+          },
+          "final_checks": {
+            "passed": 4,
+            "total": 4,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 1,
+          "receiver_seconds": 58.664,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 60629,
+                  "cached_input_tokens": 53888,
+                  "output_tokens": 593
+                }
+              }
+            ],
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 76815,
+                  "cached_input_tokens": 66944,
+                  "output_tokens": 876
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "remvu",
+          "handoff_bytes": 2501,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 4,
+            "failed_case_ids": [
+              3
+            ]
+          },
+          "final_checks": {
+            "passed": 4,
+            "total": 4,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 1,
+          "receiver_seconds": 46.774,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 61677,
+                  "cached_input_tokens": 53888,
+                  "output_tokens": 600
+                }
+              }
+            ],
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 77411,
+                  "cached_input_tokens": 66432,
+                  "output_tokens": 808
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "suffix-once",
+      "direction": "claude-codex",
+      "starting_checks": {
+        "passed": 3,
+        "total": 5,
+        "failed_case_ids": [
+          0,
+          3
+        ]
+      },
+      "producer_seconds": 29.882,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "result",
+          "counters": {
+            "input_tokens": 14,
+            "cache_creation_input_tokens": 9783,
+            "cache_read_input_tokens": 60211,
+            "output_tokens": 3205
+          }
+        },
+        {
+          "source": "modelUsage",
+          "model": "claude-sonnet-5-5",
+          "counters": {
+            "inputTokens": 14,
+            "outputTokens": 3205,
+            "cacheReadInputTokens": 60211,
+            "cacheCreationInputTokens": 9783
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "handoff",
+          "handoff_bytes": 1185,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 26.115,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 60842,
+                  "cached_input_tokens": 56704,
+                  "output_tokens": 693
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "remvu",
+          "handoff_bytes": 2762,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 19.076,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 61691,
+                  "cached_input_tokens": 53888,
+                  "output_tokens": 573
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "ids-padding",
+      "direction": "codex-claude",
+      "starting_checks": {
+        "passed": 2,
+        "total": 3,
+        "failed_case_ids": [
+          0
+        ]
+      },
+      "producer_seconds": 51.514,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "turn.completed",
+          "counters": {
+            "input_tokens": 117930,
+            "cached_input_tokens": 104064,
+            "output_tokens": 1851
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "remvu",
+          "handoff_bytes": 4094,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 10.709,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 3440,
+                  "cache_read_input_tokens": 17040,
+                  "output_tokens": 936
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 936,
+                  "cacheReadInputTokens": 17040,
+                  "cacheCreationInputTokens": 3440
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "handoff",
+          "handoff_bytes": 916,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 10.1,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 2204,
+                  "cache_read_input_tokens": 15773,
+                  "output_tokens": 899
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 899,
+                  "cacheReadInputTokens": 15773,
+                  "cacheCreationInputTokens": 2204
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "flag-unknown",
+      "direction": "claude-codex",
+      "starting_checks": {
+        "passed": 4,
+        "total": 6,
+        "failed_case_ids": [
+          0,
+          1
+        ]
+      },
+      "producer_seconds": 28.568,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "result",
+          "counters": {
+            "input_tokens": 12,
+            "cache_creation_input_tokens": 10582,
+            "cache_read_input_tokens": 48112,
+            "output_tokens": 3507
+          }
+        },
+        {
+          "source": "modelUsage",
+          "model": "claude-sonnet-5-5",
+          "counters": {
+            "inputTokens": 12,
+            "outputTokens": 3507,
+            "cacheReadInputTokens": 48112,
+            "cacheCreationInputTokens": 10582
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "handoff",
+          "handoff_bytes": 1240,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 6,
+            "total": 6,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 6,
+            "total": 6,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 24.202,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 61378,
+                  "cached_input_tokens": 56960,
+                  "output_tokens": 692
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "remvu",
+          "handoff_bytes": 2882,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 6,
+            "total": 6,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 6,
+            "total": 6,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 22.787,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 61929,
+                  "cached_input_tokens": 51584,
+                  "output_tokens": 676
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "records-first",
+      "direction": "codex-claude",
+      "starting_checks": {
+        "passed": 1,
+        "total": 3,
+        "failed_case_ids": [
+          0,
+          1
+        ]
+      },
+      "producer_seconds": 55.045,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "turn.completed",
+          "counters": {
+            "input_tokens": 117540,
+            "cached_input_tokens": 107136,
+            "output_tokens": 2002
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "remvu",
+          "handoff_bytes": 4223,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 10.008,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 3617,
+                  "cache_read_input_tokens": 17120,
+                  "output_tokens": 951
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 951,
+                  "cacheReadInputTokens": 17120,
+                  "cacheCreationInputTokens": 3617
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "handoff",
+          "handoff_bytes": 995,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 10.242,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 2393,
+                  "cache_read_input_tokens": 15834,
+                  "output_tokens": 994
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 994,
+                  "cacheReadInputTokens": 15834,
+                  "cacheCreationInputTokens": 2393
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "paragraph-crlf",
+      "direction": "codex-claude",
+      "starting_checks": {
+        "passed": 3,
+        "total": 4,
+        "failed_case_ids": [
+          0
+        ]
+      },
+      "producer_seconds": 51.82,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "turn.completed",
+          "counters": {
+            "input_tokens": 117173,
+            "cached_input_tokens": 105472,
+            "output_tokens": 1902
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "remvu",
+          "handoff_bytes": 4366,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 4,
+            "total": 4,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 4,
+            "total": 4,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 8.837,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 3103,
+                  "cache_read_input_tokens": 16869,
+                  "output_tokens": 733
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 733,
+                  "cacheReadInputTokens": 16869,
+                  "cacheCreationInputTokens": 3103
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "handoff",
+          "handoff_bytes": 848,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 4,
+            "total": 4,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 4,
+            "total": 4,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 9.723,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 1926,
+                  "cache_read_input_tokens": 15621,
+                  "output_tokens": 884
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 884,
+                  "cacheReadInputTokens": 15621,
+                  "cacheCreationInputTokens": 1926
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "redact-copy",
+      "direction": "claude-codex",
+      "starting_checks": {
+        "passed": 0,
+        "total": 3,
+        "failed_case_ids": [
+          0,
+          1,
+          2
+        ]
+      },
+      "producer_seconds": 26.582,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "result",
+          "counters": {
+            "input_tokens": 12,
+            "cache_creation_input_tokens": 9543,
+            "cache_read_input_tokens": 48235,
+            "output_tokens": 3052
+          }
+        },
+        {
+          "source": "modelUsage",
+          "model": "claude-sonnet-5-5",
+          "counters": {
+            "inputTokens": 12,
+            "outputTokens": 3052,
+            "cacheReadInputTokens": 48235,
+            "cacheCreationInputTokens": 9543
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "handoff",
+          "handoff_bytes": 1130,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 23.481,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 98217,
+                  "cached_input_tokens": 85120,
+                  "output_tokens": 825
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "remvu",
+          "handoff_bytes": 2977,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 24.122,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 61812,
+                  "cached_input_tokens": 57216,
+                  "output_tokens": 674
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "header-first",
+      "direction": "claude-codex",
+      "starting_checks": {
+        "passed": 1,
+        "total": 3,
+        "failed_case_ids": [
+          0,
+          1
+        ]
+      },
+      "producer_seconds": 27.015,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "result",
+          "counters": {
+            "input_tokens": 12,
+            "cache_creation_input_tokens": 8263,
+            "cache_read_input_tokens": 48827,
+            "output_tokens": 3025
+          }
+        },
+        {
+          "source": "modelUsage",
+          "model": "claude-sonnet-5-5",
+          "counters": {
+            "inputTokens": 12,
+            "outputTokens": 3025,
+            "cacheReadInputTokens": 48827,
+            "cacheCreationInputTokens": 8263
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "handoff",
+          "handoff_bytes": 1309,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 21.796,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 60868,
+                  "cached_input_tokens": 56832,
+                  "output_tokens": 633
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "remvu",
+          "handoff_bytes": 2772,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 3,
+            "total": 3,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 22.356,
+          "reported_usage": [
+            [
+              {
+                "source": "turn.completed",
+                "counters": {
+                  "input_tokens": 61699,
+                  "cached_input_tokens": 57216,
+                  "output_tokens": 709
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    },
+    {
+      "task": "prefix-once",
+      "direction": "codex-claude",
+      "starting_checks": {
+        "passed": 3,
+        "total": 5,
+        "failed_case_ids": [
+          0,
+          4
+        ]
+      },
+      "producer_seconds": 62.221,
+      "producer_returncode": 0,
+      "producer_usage_joint_two_documents": [
+        {
+          "source": "turn.completed",
+          "counters": {
+            "input_tokens": 135502,
+            "cached_input_tokens": 117888,
+            "output_tokens": 1851
+          }
+        }
+      ],
+      "arms": [
+        {
+          "arm": "remvu",
+          "handoff_bytes": 3856,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 9.943,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 3508,
+                  "cache_read_input_tokens": 16989,
+                  "output_tokens": 902
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 902,
+                  "cacheReadInputTokens": 16989,
+                  "cacheCreationInputTokens": 3508
+                }
+              }
+            ]
+          ],
+          "completed": true
+        },
+        {
+          "arm": "handoff",
+          "handoff_bytes": 761,
+          "initial_returncode": 0,
+          "initial_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "final_checks": {
+            "passed": 5,
+            "total": 5,
+            "failed_case_ids": []
+          },
+          "repair_rounds": 0,
+          "receiver_seconds": 10.474,
+          "reported_usage": [
+            [
+              {
+                "source": "result",
+                "counters": {
+                  "input_tokens": 6,
+                  "cache_creation_input_tokens": 2207,
+                  "cache_read_input_tokens": 15723,
+                  "output_tokens": 834
+                }
+              },
+              {
+                "source": "modelUsage",
+                "model": "claude-sonnet-5-5",
+                "counters": {
+                  "inputTokens": 6,
+                  "outputTokens": 834,
+                  "cacheReadInputTokens": 15723,
+                  "cacheCreationInputTokens": 2207
+                }
+              }
+            ]
+          ],
+          "completed": true
+        }
+      ]
+    }
+  ],
+  "status": "completed_ten_paired_native_tasks",
+  "summary": {
+    "handoff": {
+      "tasks": 10,
+      "completed_after_at_most_one_correction": 10,
+      "completed_on_first_attempt": 9,
+      "evaluator_correction_rounds": 1,
+      "sum_receiver_elapsed_seconds_not_wallclock": 203.805,
+      "sum_handoff_bytes": 10039
+    },
+    "remvu": {
+      "tasks": 10,
+      "completed_after_at_most_one_correction": 10,
+      "completed_on_first_attempt": 9,
+      "evaluator_correction_rounds": 1,
+      "sum_receiver_elapsed_seconds_not_wallclock": 184.128,
+      "sum_handoff_bytes": 34614
+    }
+  },
+  "final_source_review": {
+    "method": "Source inspection by the implementing agent of all twenty final app.cjs files, published separately for review.",
+    "rejected_shortcuts_detected_in_final_code": {
+      "handoff": 0,
+      "remvu": 0
+    },
+    "attempt_counts": "unknown; final source does not establish which approaches were considered or attempted."
+  },
+  "postrun_isolation_check": {
+    "conventional_global_remvu_skill_paths_present": false,
+    "receiver_engine_artifacts_present": false,
+    "scope": "Postrun filesystem check; no OS-enforced read isolation or hidden tool-input audit claimed."
+  }
+}

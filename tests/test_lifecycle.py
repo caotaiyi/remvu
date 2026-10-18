@@ -39,8 +39,8 @@ class LifecycleTest(unittest.TestCase):
         original = {'theme': 'keep', 'hooks': {'Stop': [{'hooks': [{'type': 'command', 'command': 'user-hook'}]}]}}
         config = self.repo / '.claude/settings.local.json'
         config.parent.mkdir()
-        config.write_text(json.dumps(original))
-        (self.repo / 'CLAUDE.md').write_text('User instructions.\n')
+        config.write_text(json.dumps(original), encoding='utf-8')
+        (self.repo / 'CLAUDE.md').write_text('User instructions.\n', encoding='utf-8')
         installed = self.install(source)
         scripts = Path(installed['runtime_scripts'])
         self.assertNotIn(str(source), str(scripts))
@@ -51,11 +51,11 @@ class LifecycleTest(unittest.TestCase):
         before = (self.repo / '.remvu/state.json').read_bytes()
         self.assertTrue(life.uninstall(self.repo)['memory_retained'])
         self.assertEqual(before, (self.repo / '.remvu/state.json').read_bytes())
-        remaining = json.loads(config.read_text())
+        remaining = json.loads(config.read_text(encoding='utf-8'))
         self.assertEqual(remaining['theme'], 'keep')
         self.assertEqual(remaining['hooks']['Stop'], original['hooks']['Stop'])
-        self.assertIn('User instructions.', (self.repo / 'CLAUDE.md').read_text())
-        self.assertNotIn(setup.BEGIN, (self.repo / 'CLAUDE.md').read_text())
+        self.assertIn('User instructions.', (self.repo / 'CLAUDE.md').read_text(encoding='utf-8'))
+        self.assertNotIn(setup.BEGIN, (self.repo / 'CLAUDE.md').read_text(encoding='utf-8'))
         self.assertTrue(scripts.exists())
         self.assertTrue(life.uninstall(self.repo)['ok'])
 
@@ -63,13 +63,13 @@ class LifecycleTest(unittest.TestCase):
         first = self.install()['runtime_scripts']
         source = self.root / 'changed'
         shutil.copytree(SCRIPTS.parent, source, ignore=shutil.ignore_patterns('__pycache__'))
-        (source / 'SKILL.md').write_text((source / 'SKILL.md').read_text() + '\nA revised instruction.\n')
+        (source / 'SKILL.md').write_text((source / 'SKILL.md').read_text(encoding='utf-8') + '\nA revised instruction.\n', encoding='utf-8')
         second = self.install(source)['runtime_scripts']
         self.assertNotEqual(first, second)
         with patch.object(life.sys, 'version_info', (3, 12)):
             self.assertEqual(life.install(self.repo, rollback=True)['runtime_scripts'], first)
-        self.assertEqual(json.loads((self.repo / '.remvu/adapters.json').read_text())['scripts_dir'], first)
-        (Path(second) / 'remvu.py').write_text('tampered')
+        self.assertEqual(json.loads((self.repo / '.remvu/adapters.json').read_text(encoding='utf-8'))['scripts_dir'], first)
+        (Path(second) / 'remvu.py').write_text('tampered', encoding='utf-8')
         with patch.object(life.sys, 'version_info', (3, 12)):
             with self.assertRaisesRegex(ValueError, 'checksum'):
                 life.install(self.repo, rollback=True)
@@ -96,7 +96,7 @@ class LifecycleTest(unittest.TestCase):
         self.install()
         health = life.doctor(self.repo)
         self.assertTrue(all(a['activation'] == 'awaiting_host_review' for a in health['adapters']))
-        scripts = Path(json.loads((self.repo / '.remvu/adapters.json').read_text())['scripts_dir'])
+        scripts = Path(json.loads((self.repo / '.remvu/adapters.json').read_text(encoding='utf-8'))['scripts_dir'])
         result = subprocess.run([sys.executable, str(scripts / 'remvu_hooks.py'), '--platform', 'codex', '--event', 'SessionStart', '--repo', str(self.repo)],
                                 input=json.dumps({'session_id': 'synthetic-not-a-native-client'}).encode(), capture_output=True)
         self.assertEqual(result.returncode, 0)
@@ -112,10 +112,10 @@ class LifecycleTest(unittest.TestCase):
         setup.initialize(self.repo, (), SCRIPTS)
         core.record_event(self.repo, {'kind': 'tool_result', 'output': 'retained'})
         damaged = self.repo / '.remvu/state.json'
-        damaged.write_text('{broken')
+        damaged.write_text('{broken', encoding='utf-8')
         result = life.repair(self.repo)
         self.assertFalse(result['semantic_refresh_claimed'])
-        self.assertEqual((self.repo / result['backup'] / 'state.json').read_text(), '{broken')
+        self.assertEqual((self.repo / result['backup'] / 'state.json').read_text(encoding='utf-8'), '{broken')
         self.assertTrue(core.load_state(self.repo)['pending_consolidation'])
         self.assertEqual(len(core.load_state(self.repo)['events']), 1)
         self.assertIn('pending_consolidation', [i['code'] for i in core.check_project(self.repo)['issues']])
@@ -124,11 +124,11 @@ class LifecycleTest(unittest.TestCase):
         setup.initialize(self.repo, (), SCRIPTS)
         root = self.repo / '.remvu'
         core.record_event(self.repo, {'kind': 'tool_result', 'output': 'retained'})
-        (root / 'state.json').write_text('{}')
-        (root / 'snapshots/latest.json').write_text('{}')
+        (root / 'state.json').write_text('{}', encoding='utf-8')
+        (root / 'snapshots/latest.json').write_text('{}', encoding='utf-8')
         orphan = root / ('journal/' + 'a' * 32 + '.json')
         orphan.write_text(json.dumps({'format': 'remvu-journal/1', 'revision': 1, 'state_integrity': 'f' * 64,
-                                      'created_at': '2999', 'operation': 'uncommitted', 'payload': 'do not replay'}))
+                                      'created_at': '2999', 'operation': 'uncommitted', 'payload': 'do not replay'}), encoding='utf-8')
         self.assertTrue(life.repair(self.repo)['ok'])
         self.assertTrue(orphan.exists())
         self.assertIn('uncommitted_journal', [i['code'] for i in core.check_project(self.repo)['issues']])
@@ -139,13 +139,13 @@ class LifecycleTest(unittest.TestCase):
         root = self.repo / '.remvu'
         # Every recoverable snapshot now references the missing blob.
         for path in (root / 'snapshots').glob('*.json'):
-            if not json.loads(path.read_text())['events']:
+            if not json.loads(path.read_text(encoding='utf-8'))['events']:
                 path.unlink()
         next((root / 'blobs').glob('*.json')).unlink()
-        (root / 'state.json').write_text('broken')
+        (root / 'state.json').write_text('broken', encoding='utf-8')
         with self.assertRaisesRegex(ValueError, 'No verified snapshot'):
             life.repair(self.repo)
-        self.assertEqual((root / 'state.json').read_text(), 'broken')
+        self.assertEqual((root / 'state.json').read_text(encoding='utf-8'), 'broken')
 
     def test_older_snapshot_recovery_never_reuses_a_stale_writer_revision(self):
         setup.initialize(self.repo, (), SCRIPTS)
@@ -153,9 +153,9 @@ class LifecycleTest(unittest.TestCase):
             core.apply_update(self.repo, {'base_revision': revision, 'entries': []})
         root = self.repo / '.remvu'
         for path in (root / 'snapshots').glob('*.json'):
-            if json.loads(path.read_text())['revision'] > 1:
+            if json.loads(path.read_text(encoding='utf-8'))['revision'] > 1:
                 path.unlink()
-        (root / 'state.json').write_text('damaged')
+        (root / 'state.json').write_text('damaged', encoding='utf-8')
         life.repair(self.repo)
         self.assertEqual(core.load_state(self.repo)['revision'], 6)
         stale = core.apply_update(self.repo, {'base_revision': 2, 'entries': []})
@@ -165,19 +165,19 @@ class LifecycleTest(unittest.TestCase):
     def test_recovery_refuses_unreadable_revision_history(self):
         setup.initialize(self.repo, (), SCRIPTS)
         root = self.repo / '.remvu'
-        (root / 'journal' / ('b' * 32 + '.json')).write_text('{}')
-        (root / 'state.json').write_text('damaged')
+        (root / 'journal' / ('b' * 32 + '.json')).write_text('{}', encoding='utf-8')
+        (root / 'state.json').write_text('damaged', encoding='utf-8')
         with self.assertRaisesRegex(ValueError, 'cannot safely choose a recovery revision'):
             life.repair(self.repo)
-        self.assertEqual((root / 'state.json').read_text(), 'damaged')
+        self.assertEqual((root / 'state.json').read_text(encoding='utf-8'), 'damaged')
 
     def test_ledger_repair_preserves_original_and_does_not_clear_events(self):
         setup.initialize(self.repo, (), SCRIPTS)
         ledger = self.repo / '.remvu/hooks/state.json'
         ledger.parent.mkdir()
-        ledger.write_text('bad')
+        ledger.write_text('bad', encoding='utf-8')
         result = life.repair(self.repo)
-        self.assertEqual((self.repo / result['backup'] / 'hooks-state.json').read_text(), 'bad')
+        self.assertEqual((self.repo / result['backup'] / 'hooks-state.json').read_text(encoding='utf-8'), 'bad')
         self.assertTrue(core.load_state(self.repo)['pending_consolidation'])
         self.assertEqual(hooks._load_ledger(ledger)['sessions'], {})
 
@@ -186,7 +186,7 @@ class LifecycleTest(unittest.TestCase):
         core.record_event(self.repo, {'kind': 'tool_result', 'output': 'Bearer SECRET-DIAGNOSTIC-CANARY https://private.invalid'})
         destination = self.root / 'report.json'
         life.diagnose(self.repo, destination)
-        text = destination.read_text()
+        text = destination.read_text(encoding='utf-8')
         for secret in ('CANARY', 'private.invalid', str(self.root), 'tool_result'):
             self.assertNotIn(secret, text)
         self.assertFalse(json.loads(text)['ok'])
@@ -196,20 +196,20 @@ class LifecycleTest(unittest.TestCase):
     def test_uninstall_refuses_edited_skill_and_retains_edited_hooks(self):
         self.install()
         shim = self.repo / '.agents/skills/remvu/SKILL.md'
-        before = shim.read_text()
-        shim.write_text(before + 'user edits')
+        before = shim.read_text(encoding='utf-8')
+        shim.write_text(before + 'user edits', encoding='utf-8')
         with self.assertRaisesRegex(ValueError, 'edited'):
             self.install()
-        self.assertEqual(shim.read_text(), before + 'user edits')
+        self.assertEqual(shim.read_text(encoding='utf-8'), before + 'user edits')
         with self.assertRaisesRegex(ValueError, 'edited'):
             life.uninstall(self.repo)
-        shim.write_text(before)
+        shim.write_text(before, encoding='utf-8')
         config = self.repo / '.codex/hooks.json'
-        body = json.loads(config.read_text())
+        body = json.loads(config.read_text(encoding='utf-8'))
         body['hooks']['Stop'][0]['hooks'][0]['timeout'] = 999
-        config.write_text(json.dumps(body))
+        config.write_text(json.dumps(body), encoding='utf-8')
         life.uninstall(self.repo)
-        self.assertEqual(json.loads(config.read_text())['hooks']['Stop'][0]['hooks'][0]['timeout'], 999)
+        self.assertEqual(json.loads(config.read_text(encoding='utf-8'))['hooks']['Stop'][0]['hooks'][0]['timeout'], 999)
 
     def test_recovery_snapshots_are_bounded_but_journals_retained(self):
         setup.initialize(self.repo, (), SCRIPTS)
@@ -255,20 +255,20 @@ class LifecycleTest(unittest.TestCase):
 
     def test_diagnostic_filters_receipt_strings_to_known_events(self):
         self.install()
-        manifest = json.loads((self.repo / '.remvu/adapters.json').read_text())
+        manifest = json.loads((self.repo / '.remvu/adapters.json').read_text(encoding='utf-8'))
         receipt = self.repo / '.remvu/hooks/activation-codex.json'
         receipt.parent.mkdir()
         receipt.write_text(json.dumps({'scripts': manifest['scripts_dir'], 'python': manifest['python'],
-                                       'events': ['SECRET-CANARY', 'SessionStart']}))
+                                       'events': ['SECRET-CANARY', 'SessionStart']}), encoding='utf-8')
         output = self.root / 'filtered-report.json'
         life.diagnose(self.repo, output)
-        self.assertNotIn('CANARY', output.read_text())
+        self.assertNotIn('CANARY', output.read_text(encoding='utf-8'))
 
     def test_uninstall_then_default_install_restores_platforms(self):
         self.install()
         life.uninstall(self.repo)
         self.install()
-        self.assertEqual(set(json.loads((self.repo / '.remvu/adapters.json').read_text())['platforms']), {'claude', 'codex'})
+        self.assertEqual(set(json.loads((self.repo / '.remvu/adapters.json').read_text(encoding='utf-8'))['platforms']), {'claude', 'codex'})
 
     def test_different_worktree_cwd_cannot_record_into_original_project(self):
         setup.initialize(self.repo, (), SCRIPTS)
@@ -282,17 +282,17 @@ class LifecycleTest(unittest.TestCase):
         self.assertFalse((other / '.remvu').exists())
         nested = self.repo / 'nested-worktree'
         nested.mkdir()
-        (nested / '.git').write_text('gitdir: synthetic-worktree-fixture')
+        (nested / '.git').write_text('gitdir: synthetic-worktree-fixture', encoding='utf-8')
         payload['cwd'] = str(nested)
         self.assertIn('nested repository or worktree', hooks.run_hook('codex', 'PreToolUse', payload, self.repo)['systemMessage'])
         self.assertEqual(core.load_state(self.repo)['events'], [])
         for blob in (self.repo / '.remvu').rglob('*.json'):
-            self.assertNotIn('PRIVATE-OTHER-PROJECT', blob.read_text())
+            self.assertNotIn('PRIVATE-OTHER-PROJECT', blob.read_text(encoding='utf-8'))
 
     def test_shim_records_interpreter_and_uninstall_uses_recorded_interpreter(self):
         installed = self.install()
-        manifest = json.loads((self.repo / '.remvu/adapters.json').read_text())
-        shim = (self.repo / '.agents/skills/remvu/SKILL.md').read_text()
+        manifest = json.loads((self.repo / '.remvu/adapters.json').read_text(encoding='utf-8'))
+        shim = (self.repo / '.agents/skills/remvu/SKILL.md').read_text(encoding='utf-8')
         self.assertEqual(installed['runtime_python'], manifest['python'])
         self.assertIn('Python interpreter: `' + manifest['python'] + '`', shim)
         with patch.object(setup.sys, 'executable', str(self.root / 'different-python')), \

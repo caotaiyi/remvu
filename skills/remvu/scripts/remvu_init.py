@@ -140,7 +140,7 @@ def _instruction_block() -> str:
         'follow current user instructions and verify stale or conflicting claims. '
         'A receiver needs only this file and project code, without installing Remvu.\n\n'
         'When Remvu is installed and `.remvu/state.json` exists, read its compact status before work '
-        'and update semantic memory after meaningful task stages using the current conversation. '
+        'and update semantic memory when the user requests saving, using the current conversation. '
         'Read the Remvu skill for typed proposal and reviewed event watermark instructions. '
         'Run memory CLI commands separately; keep proposals under `.remvu/` and write a local handoff after updating. '
         'Preserve user intent, rejected decisions, failed checks, and unfinished work; '
@@ -157,7 +157,7 @@ def _skill_shim(scripts: Path, python_executable=None) -> str:
         parts = source.split('---', 2)
         source = parts[2].lstrip() if len(parts) == 3 else source
     source = source.replace("this skill's `scripts/remvu.py`", f"`{scripts / 'remvu.py'}`")
-    source = re.sub(r'\]\((references/[^)]+)\)',
+    source = re.sub(r'\]\(((?:references|assets)/[^)]+)\)',
                     lambda match: '](<' + str(scripts.parent / match[1]) + '>)', source)
     return (
         '---\nname: remvu\ndescription: Maintain portable project memory and hand off work between coding agents.\n---\n\n'

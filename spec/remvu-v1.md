@@ -1,5 +1,7 @@
 # Remvu format proposal 1
 
+The default no-Python skill uses the separate [lightweight Markdown note convention](remvu-note-v1.md). The strict engine format below remains unchanged.
+
 Status: draft, implemented by the Remvu 0.2 reference tools. The format identifier is `remvu/1`; it is independent of the tool version.
 
 Remvu records the intent, decisions and verified state a coding agent needs to continue a project. A receiver needs the project code and one UTF-8 Markdown file, conventionally named `REMVU.md`. The receiver does not need Remvu, the original chat or access to the sender's `.remvu/` directory.

@@ -48,20 +48,20 @@ class AdapterTest(unittest.TestCase):
         original = {'env': {'CUSTOM': 'keep'}, 'hooks': {'Stop': [{'matcher': '', 'hooks': [
             {'type': 'command', 'command': 'echo keep'}]}]}}
         config = self.root / '.claude/settings.local.json'
-        config.write_text(json.dumps(original))
-        (self.root / 'AGENTS.md').write_text('Existing project rules.\n')
+        config.write_text(json.dumps(original), encoding='utf-8')
+        (self.root / 'AGENTS.md').write_text('Existing project rules.\n', encoding='utf-8')
         first = self.initialize()
-        saved = {p: (self.root / p).read_text() for p in first['changed']}
+        saved = {p: (self.root / p).read_text(encoding='utf-8') for p in first['changed']}
         second = self.initialize()
         self.assertEqual(second['changed'], [])
         for path, text in saved.items():
-            self.assertEqual((self.root / path).read_text(), text)
-        merged = json.loads(config.read_text())
+            self.assertEqual((self.root / path).read_text(encoding='utf-8'), text)
+        merged = json.loads(config.read_text(encoding='utf-8'))
         self.assertEqual(merged['env'], original['env'])
         self.assertEqual(merged['hooks']['Stop'][0]['hooks'][0]['command'], 'echo keep')
         self.assertEqual(len(merged['hooks']['Stop']), 2)
-        self.assertIn('Existing project rules.', (self.root / 'AGENTS.md').read_text())
-        self.assertEqual((self.root / 'AGENTS.md').read_text().count(setup.BEGIN), 1)
+        self.assertIn('Existing project rules.', (self.root / 'AGENTS.md').read_text(encoding='utf-8'))
+        self.assertEqual((self.root / 'AGENTS.md').read_text(encoding='utf-8').count(setup.BEGIN), 1)
         self.assertTrue(first['trust_required'])
         self.assertTrue(first['backups'])
         for backup in first['backups']:
@@ -73,29 +73,29 @@ class AdapterTest(unittest.TestCase):
         target = self.root / '.codex/hooks.json'
         target.write_text(json.dumps({'hooks': {'Stop': [{'matcher': '*', 'hooks': [
             {'type': 'command', 'command': 'python /old/remvu_hooks.py --platform codex --event Stop'},
-            {'type': 'command', 'command': 'echo keep'}]}]}}))
+            {'type': 'command', 'command': 'echo keep'}]}]}}), encoding='utf-8')
         self.initialize(('codex',))
-        groups = json.loads(target.read_text())['hooks']['Stop']
+        groups = json.loads(target.read_text(encoding='utf-8'))['hooks']['Stop']
         self.assertEqual(groups[0]['hooks'], [{'type': 'command', 'command': 'echo keep'}])
         self.assertEqual(len(groups), 2)
 
     def test_invalid_config_preflight_changes_nothing(self):
         (self.root / '.codex').mkdir()
         target = self.root / '.codex/hooks.json'
-        target.write_text('{broken')
+        target.write_text('{broken', encoding='utf-8')
         with self.assertRaises(ValueError):
             self.initialize()
-        self.assertEqual(target.read_text(), '{broken')
+        self.assertEqual(target.read_text(encoding='utf-8'), '{broken')
         self.assertFalse((self.root / 'CLAUDE.md').exists())
         self.assertFalse((self.root / '.remvu').exists())
 
     def test_unrelated_skill_is_not_overwritten(self):
         target = self.root / '.claude/skills/remvu/SKILL.md'
         target.parent.mkdir(parents=True)
-        target.write_text('user owned skill')
+        target.write_text('user owned skill', encoding='utf-8')
         with self.assertRaises(ValueError):
             self.initialize()
-        self.assertEqual(target.read_text(), 'user owned skill')
+        self.assertEqual(target.read_text(encoding='utf-8'), 'user owned skill')
         self.assertFalse((self.root / '.remvu').exists())
 
     def test_core_unavailable_setup_refuses_without_writes(self):
@@ -112,23 +112,23 @@ class AdapterTest(unittest.TestCase):
     def test_exact_private_ignores_and_skill_shims(self):
         self.initialize()
         self.initialize(('codex',))
-        ignored = (self.root / '.gitignore').read_text()
+        ignored = (self.root / '.gitignore').read_text(encoding='utf-8')
         for path in ('/.remvu/', '/.claude/settings.local.json', '/.codex/hooks.json',
                      '/.claude/skills/remvu/', '/.agents/skills/remvu/'):
             self.assertIn(path, ignored)
         self.assertNotIn('\n/.agents/\n', ignored)
         for platform in ('.claude', '.agents'):
-            self.assertIn(str(SCRIPTS), (self.root / platform / 'skills/remvu/SKILL.md').read_text())
+            self.assertIn(str(SCRIPTS), (self.root / platform / 'skills/remvu/SKILL.md').read_text(encoding='utf-8'))
 
     def test_path_quoting_and_exec_form(self):
         self.initialize()
         core.apply_update(self.root, {'base_revision': 0, 'entries': [
             {'kind': 'goal', 'text': '保留中文和 emoji ✅', 'basis': 'user_confirmed'}]})
         core.write_document(self.root)
-        claude = json.loads((self.root / '.claude/settings.local.json').read_text())['hooks']['Stop'][0]['hooks'][0]
+        claude = json.loads((self.root / '.claude/settings.local.json').read_text(encoding='utf-8'))['hooks']['Stop'][0]['hooks'][0]
         self.assertEqual(claude['command'], str(Path(sys.executable).resolve()))
         self.assertIn(str(self.root), claude['args'])
-        codex = json.loads((self.root / '.codex/hooks.json').read_text())['hooks']['SessionStart'][0]['hooks'][0]
+        codex = json.loads((self.root / '.codex/hooks.json').read_text(encoding='utf-8'))['hooks']['SessionStart'][0]['hooks'][0]
         self.assertEqual(shlex.split(codex['command'])[-1], str(self.root))
         encoded = codex['commandWindows'].split()[-1]
         windows = base64.b64decode(encoded).decode('utf-16le')
@@ -177,14 +177,14 @@ class AdapterTest(unittest.TestCase):
         state = self.state()
         self.assertTrue(state['pending_consolidation'])
         self.assertEqual(len(state['events']), 1)
-        attempt = json.loads((self.root / '.remvu' / state['events'][0]['blob_ref']).read_text())
+        attempt = json.loads((self.root / '.remvu' / state['events'][0]['blob_ref']).read_text(encoding='utf-8'))
         self.assertEqual(attempt['kind'], 'tool_call')
         self.assertEqual(attempt['call_id'], 'interrupted-call')
         self.assertNotIn('output', attempt)
         self.assertEqual(attempt['turn_id'], 'interrupted-turn')
         self.call('PostToolUse', tool_response={'exit_code': 0}, **fields)
         state = self.state()
-        result = json.loads((self.root / '.remvu' / state['events'][1]['blob_ref']).read_text())
+        result = json.loads((self.root / '.remvu' / state['events'][1]['blob_ref']).read_text(encoding='utf-8'))
         self.assertEqual(result['kind'], 'tool_result')
         self.assertEqual(result['call_id'], attempt['call_id'])
 
@@ -241,7 +241,7 @@ class AdapterTest(unittest.TestCase):
         subprocess.run(['git', 'init', '-q', str(self.root)], check=True)
         target = self.root / '.codex/hooks.json'
         target.parent.mkdir()
-        target.write_text('{}')
+        target.write_text('{}', encoding='utf-8')
         subprocess.run(['git', '-C', str(self.root), 'add', '.codex/hooks.json'], check=True)
         result = self.initialize(('codex',))
         self.assertTrue(any('already tracks' in warning for warning in result['warnings']))
@@ -257,7 +257,7 @@ class AdapterTest(unittest.TestCase):
         self.call('PreCompact', turn_id='turn-one')
         self.call('Interrupt', turn_id='turn-one')
         self.assertTrue(self.state()['pending_consolidation'])
-        ledger = json.loads((self.root / '.remvu/hooks/state.json').read_text())
+        ledger = json.loads((self.root / '.remvu/hooks/state.json').read_text(encoding='utf-8'))
         session = next(iter(ledger['sessions'].values()))
         self.assertEqual(session['last_boundary']['event'], 'Interrupt')
         self.assertTrue(session['last_boundary']['pending_consolidation'])
@@ -268,7 +268,7 @@ class AdapterTest(unittest.TestCase):
                   tool_input={'command': 'check', 'analysis': 'HIDDEN_INPUT'},
                   error={'message': 'test failed', 'reasoning': 'HIDDEN_RESULT'},
                   reasoning='HIDDEN_TOP', transcript_path='/do/not/read/transcript')
-        content = ''.join(path.read_text() for path in (self.root / '.remvu').rglob('*.json'))
+        content = ''.join(path.read_text(encoding='utf-8') for path in (self.root / '.remvu').rglob('*.json'))
         self.assertNotIn('HIDDEN_', content)
         self.assertNotIn('/do/not/read', content)
         self.assertIn('failed', content)
@@ -284,7 +284,7 @@ class AdapterTest(unittest.TestCase):
                       {'type': 'text', 'text': 'Visible test result', 'signature': 'PRIVATE_SIGNATURE_2'},
                       {'role': 'developer', 'content': 'PRIVATE_DEVELOPER'},
                   ]})
-        content = ''.join(path.read_text() for path in (self.root / '.remvu').rglob('*.json'))
+        content = ''.join(path.read_text(encoding='utf-8') for path in (self.root / '.remvu').rglob('*.json'))
         self.assertNotIn('PRIVATE_', content)
         self.assertIn('Visible test result', content)
 
@@ -308,10 +308,10 @@ class AdapterTest(unittest.TestCase):
         self.initialize(())
         target = self.root / '.remvu/hooks/state.json'
         target.parent.mkdir()
-        target.write_text('{broken')
+        target.write_text('{broken', encoding='utf-8')
         result = self.call('Stop')
         self.assertIn('damaged', result['systemMessage'])
-        self.assertEqual(target.read_text(), '{broken')
+        self.assertEqual(target.read_text(encoding='utf-8'), '{broken')
 
     def test_session_start_uses_summary_and_rejects_stale_memory(self):
         self.initialize(())
@@ -408,13 +408,13 @@ class AdapterTest(unittest.TestCase):
     def test_symlinked_hook_lock_is_refused_without_external_write(self):
         self.initialize(())
         outside = self.root / 'outside.txt'
-        outside.write_text('unchanged')
+        outside.write_text('unchanged', encoding='utf-8')
         directory = self.root / '.remvu/hooks'
         directory.mkdir()
         (directory / '.lock').symlink_to(outside)
         result = self.call('Stop')
         self.assertIn('symlink', result['systemMessage'])
-        self.assertEqual(outside.read_text(), 'unchanged')
+        self.assertEqual(outside.read_text(encoding='utf-8'), 'unchanged')
 
     @unittest.skipIf(os.name == 'nt', 'Symlink fixture needs POSIX permissions')
     def test_symlinked_config_destination_is_refused(self):

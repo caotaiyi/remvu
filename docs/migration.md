@@ -1,3 +1,13 @@
+# Markdown workflow and existing engine projects
+
+The default skill now saves a lightweight `remvu-note/1` Markdown note in `.remvu/notes/REMVU.md`. It uses no Python or hooks. This is separate from strict `remvu/1` engine documents and does not replace or edit `.remvu/state.json`, archived evidence, or previously generated files.
+
+Existing engine users may keep their runtime. Stop is nonblocking in the new source, but installed managed copies keep their old behavior until upgraded from reviewed source. Alternatively disable only the exact Remvu Stop handler using normal client settings. Never disable unrelated handlers or bypass trust. A Markdown save does not clear pending engine events, resolve engine conflicts or refresh code fingerprints.
+
+If moving Markdown facts into the engine, author an ordinary reviewed proposal with retained basis, excerpts and superseded decisions. Do not claim a note was validator-checked, invent hashes or promote a secondhand user claim without original supporting evidence. Missing sources stay unverified. Plain receivers can read both file types; the strict validator accepts only actual `remvu/1` metadata and sections.
+
+The earlier migration path below remains available.
+
 # Migrating from Agent Task Export
 
 Remvu is the next release of `agent-task-export`. The GitHub repository was renamed to [caotaiyi/remvu](https://github.com/caotaiyi/remvu); the old repository URL redirects, and the version 0.1 release remains available. The new format, `remvu/1`, describes ongoing project memory in one readable file. The old evidence bundle remains useful when a receiver needs indexed tool records.

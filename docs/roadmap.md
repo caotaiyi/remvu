@@ -2,8 +2,7 @@
 
 ## Individual public beta: current work
 
-Stable installation, upgrade/rollback, health and recovery commands, Windows
-literal bookkeeping, bounded reads and private diagnostics are candidate code.
+The primary experience is now an explicit Markdown save/resume skill without Python or hooks. Verify installation and native cold handoff before claiming client support, compare against ordinary HANDOFF.md and keep measured drawbacks visible. Strict engine installation, upgrade/rollback, health/recovery, Windows literal bookkeeping and private diagnostics remain optional candidate capabilities.
 Publish v0.3.0-beta.1 only after the twelve-profile [acceptance ledger](../evals/beta-matrix.json)
 passes reviewed native checks. Keep unsupported automation explicit and offer
 manual invocation where it has been verified. No volunteer study or savings

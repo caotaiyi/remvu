@@ -33,7 +33,7 @@ This is the intended quota-switch workflow; it does not require deliberately exh
 
 ![30-second replay of historical CLI trial results](docs/assets/remvu-live-replay.gif)
 
-[Source results and limits](docs/demo.md). The new workflow needs its own native validation; older engine results do not establish its reliability or token savings.
+[Source results and limits](docs/demo.md). The new ten-task CLI comparison completed, with results below; older engine trials do not certify this workflow.
 
 ## What survives the switch
 
@@ -57,6 +57,6 @@ Change models or clients, and take the project context with you. A platform can 
 
 This branch remains a **v0.3.0-beta.1 candidate**. Native desktop/VS Code and Windows acceptance are pending; a file-copy test or CLI trial cannot certify those surfaces. The published v0.2.0 engine and historical results remain available. [Compatibility](docs/compatibility.md) · [Beta report](docs/beta-validation.md) · [Feedback](.github/ISSUE_TEMPLATE/bug.yml).
 
-The comparison protocol includes a simple HANDOFF.md baseline, completed-task checks and measured usage when available. Results must report failures and setup overhead; no token or cost reduction is promised. [Evaluation](evals/README.md).
+The new ten-task comparison found the same outcomes for ordinary HANDOFF.md and Remvu: 9/10 first-attempt completions, 10/10 after one correction on the remaining task. Remvu notes were larger (34,614 versus 10,039 bytes in total). This does not establish a token, cost or speed advantage. [Full results, usage and limits](docs/product-validation.md) · [Protocol](evals/markdown-protocol.md).
 
 MIT licensed. [Contributing](CONTRIBUTING.md).

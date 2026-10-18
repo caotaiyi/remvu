@@ -1,0 +1,125 @@
+{
+  "scope": "Synthetic fixture final source only; no private notes or provider records.",
+  "outputs": [
+    {
+      "task": "config-null",
+      "arm": "remvu",
+      "source": "module.exports = function defaults(value) { return value === undefined || value === null ?'default' : value; };\n",
+      "sha256": "016c5563347ae47a3665d1e8613a3dbd106c205114abcb035423051c0dbf6401"
+    },
+    {
+      "task": "config-null",
+      "arm": "handoff",
+      "source": "module.exports = function defaults(value) { return value === undefined || value === null ? 'default' : value; };\n",
+      "sha256": "5b3d9815a9eef71f2c5e4f616cef7345a1e13a21969e0deb923ab96222dc5922"
+    },
+    {
+      "task": "labels-bom",
+      "arm": "handoff",
+      "source": "module.exports = function labels(s) { return s.replace(/^\\uFEFF/, '').split(',').map(x=>x.replace(/^[^\\S\\uFEFF]+|[^\\S\\uFEFF]+$/g, '')).filter(x=>x.length); };\n",
+      "sha256": "be1f2a8acd0fdabfce82d714bc9429c620560abeef2af0298aa812d7b3fe336f"
+    },
+    {
+      "task": "labels-bom",
+      "arm": "remvu",
+      "source": "module.exports = function labels(s) { return s.replace(/^\\uFEFF/, '').split(',').map(x=>x.replace(/^[^\\S\\uFEFF]+|[^\\S\\uFEFF]+$/g, '')).filter(x=>x.length); };\n",
+      "sha256": "be1f2a8acd0fdabfce82d714bc9429c620560abeef2af0298aa812d7b3fe336f"
+    },
+    {
+      "task": "suffix-once",
+      "arm": "handoff",
+      "source": "module.exports = function strip(s) { return (s.endsWith('.tmp') || s.endsWith('.TMP')) ? s.slice(0,-4) : s; };\n",
+      "sha256": "019ab6efce6f46600fd3edef12330eec5328a663d0ef8c98dd3e46744fc0e56f"
+    },
+    {
+      "task": "suffix-once",
+      "arm": "remvu",
+      "source": "module.exports = function strip(s) { return (s.endsWith('.tmp') || s.endsWith('.TMP')) ? s.slice(0,-4) : s; };\n",
+      "sha256": "019ab6efce6f46600fd3edef12330eec5328a663d0ef8c98dd3e46744fc0e56f"
+    },
+    {
+      "task": "ids-padding",
+      "arm": "remvu",
+      "source": "module.exports = function ids(values) { return values.map(x=>typeof x === 'string' ? x.trim() : String(x)); };\n",
+      "sha256": "d9c18795f93c2d9b30b4d34a1b72dc8928bded4c3518003aca7cdcc4a082e2ba"
+    },
+    {
+      "task": "ids-padding",
+      "arm": "handoff",
+      "source": "module.exports = function ids(values) { return values.map(x => typeof x === 'string' ? x.trim() : String(x)); };\n",
+      "sha256": "7d23380e4851a349161819d4e2abfc2fe6a7ebc1e47572f9858a680adc34755e"
+    },
+    {
+      "task": "flag-unknown",
+      "arm": "handoff",
+      "source": "module.exports = function flag(s) {\n  if (typeof s !== 'string') return null;\n  const normalized = s.trim().toLowerCase();\n  if (normalized === 'true') return true;\n  if (normalized === 'false') return false;\n  return null;\n};\n",
+      "sha256": "c8135d2a4f577bf96e5a5d815cc962966170f32dbb37fcf39da35d54e4d04bf8"
+    },
+    {
+      "task": "flag-unknown",
+      "arm": "remvu",
+      "source": "module.exports = function flag(s) {\n  if (typeof s !== 'string') return null;\n  const normalized = s.trim().toLowerCase();\n  if (normalized === 'true') return true;\n  if (normalized === 'false') return false;\n  return null;\n};\n",
+      "sha256": "c8135d2a4f577bf96e5a5d815cc962966170f32dbb37fcf39da35d54e4d04bf8"
+    },
+    {
+      "task": "records-first",
+      "arm": "remvu",
+      "source": "module.exports = function first(rows) { const seen=new Set(); return rows.filter(x=>{if(x.id==null||seen.has(x.id)) return false; seen.add(x.id); return true;}); };\n",
+      "sha256": "0bdb66ce26f73e91a6b3565f4185de24a730eb278311975890216987ceaad35c"
+    },
+    {
+      "task": "records-first",
+      "arm": "handoff",
+      "source": "module.exports = function first(rows) { const seen=new Set(); return rows.filter(x=>{if(x.id===null||x.id===undefined||seen.has(x.id)) return false; seen.add(x.id); return true;}); };\n",
+      "sha256": "24a2ffadba14ae1e73cb18600a7f9cbdb3123f881cc4930a01a35bfe194af86d"
+    },
+    {
+      "task": "paragraph-crlf",
+      "arm": "remvu",
+      "source": "module.exports = function lines(s) { return s.split(/\\r?\\n/); };\n",
+      "sha256": "f831220317f0de536b70a1a3894e3e940968f987f349e103b9b766b91a7d81c8"
+    },
+    {
+      "task": "paragraph-crlf",
+      "arm": "handoff",
+      "source": "module.exports = function lines(s) { return s.split(/\\r?\\n/); };\n",
+      "sha256": "f831220317f0de536b70a1a3894e3e940968f987f349e103b9b766b91a7d81c8"
+    },
+    {
+      "task": "redact-copy",
+      "arm": "handoff",
+      "source": "module.exports = function redact(obj) {\n  const copy = {...obj};\n  for (const key of ['token', 'password']) {\n    if (Object.prototype.hasOwnProperty.call(obj, key)) {\n      copy[key] = '[redacted]';\n    }\n  }\n  return copy;\n};\n",
+      "sha256": "f0e453fd4baec4f90a68c5c4f0dd699b108a4333cdb64d0212f1f79bfc1f9d8e"
+    },
+    {
+      "task": "redact-copy",
+      "arm": "remvu",
+      "source": "module.exports = function redact(obj) {\n  const copy = {...obj};\n  for (const key of ['token', 'password']) {\n    if (Object.prototype.hasOwnProperty.call(copy, key)) {\n      copy[key] = '[redacted]';\n    }\n  }\n  return copy;\n};\n",
+      "sha256": "a1ce18d9436ddea023c818f55c5918769d89b9d3df5321ea3dd109cc0c94cb65"
+    },
+    {
+      "task": "header-first",
+      "arm": "handoff",
+      "source": "module.exports = function header(rows) { const row=rows.find(x=>String(x.name).toLowerCase() === 'x-trace'); return row ? row.value : null; };\n",
+      "sha256": "e1aa04493a6dda5c3d52cd63dd4ba93bdcf2a03f36a4b89d83099899ff626eda"
+    },
+    {
+      "task": "header-first",
+      "arm": "remvu",
+      "source": "module.exports = function header(rows) { const row=rows.find(x=>typeof x.name === 'string' && x.name.toLowerCase() === 'x-trace'); return row ? row.value : null; };\n",
+      "sha256": "33770e70237457d986c693e719500281695fecaa1b527b05cba6ee65433a22af"
+    },
+    {
+      "task": "prefix-once",
+      "arm": "remvu",
+      "source": "module.exports = function unprefix(s) { return s.slice(0, 4).toLowerCase() === 'ref:' ? s.slice(4) : s; };\n",
+      "sha256": "d17d244ed9fd3a95fa118e5a4d32ee1cbf74488ee257ab518033eefc2c7ee471"
+    },
+    {
+      "task": "prefix-once",
+      "arm": "handoff",
+      "source": "module.exports = function unprefix(s) { return s.slice(0, 4).toLowerCase() === 'ref:' ? s.slice(4) : s; };\n",
+      "sha256": "d17d244ed9fd3a95fa118e5a4d32ee1cbf74488ee257ab518033eefc2c7ee471"
+    }
+  ]
+}
