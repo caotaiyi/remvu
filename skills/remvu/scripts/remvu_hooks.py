@@ -444,7 +444,9 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
         directory = root / '.remvu/hooks'
         if directory.is_symlink():
             return _warning('Refusing a symlinked hook state directory.')
-        with _ledger_lock(directory, timeout=1 if event in ('SessionEnd', 'Interrupt') else 5):
+        # Stay below the normal 10-second host budget, while allowing a
+        # six-writer Windows burst to finish its durable file replacements.
+        with _ledger_lock(directory, timeout=1 if event in ('SessionEnd', 'Interrupt') else 8):
             _activation_receipt(root, platform, event, locked=True)
             ledger_path = directory / 'state.json'
             if ledger_path.is_symlink():

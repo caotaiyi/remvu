@@ -391,7 +391,7 @@ class AdapterTest(unittest.TestCase):
                                          stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 child.stdin.write(json.dumps(payload)); child.stdin.close()
                 self.assertEqual(child.stdout.readline().strip(), 'ready')
-                time.sleep(1.5)  # A real blocked writer, longer than the former .75-second budget.
+                time.sleep(5.5)  # Regression: a slow Windows burst exceeded the former five-second budget.
             result = json.loads(child.stdout.read())
             error = child.stderr.read()
             self.assertEqual(child.wait(timeout=10), 0, error)
