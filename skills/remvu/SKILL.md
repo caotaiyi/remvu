@@ -18,6 +18,10 @@ Keep the project's intent, decisions and observed state usable by the next agent
 
 ## Read and update memory
 
+If compact status reports `observation_gaps_present`, run `doctor` and `repair`,
+then review the resulting pending gap evidence before generating a handoff.
+An unobserved action stays unknown even if a snapshot was recovered successfully.
+
 For setup failures or maintenance, read [references/maintenance.md](references/maintenance.md). `doctor` inspects health and observed hook executions; a receipt cannot certify host trust or a desktop/IDE surface. `repair` recovers verified local files, then requires reviewing gaps and regenerating a handoff. `upgrade --source REVIEWED_SKILL_DIRECTORY` installs reviewed source; `upgrade --rollback` returns to the previous managed runtime. `uninstall` retains private memory and shared runtimes. `diagnose --out PROJECT/.remvu/diagnostic-UNIQUE.json` writes allowlisted metadata locally; preview it, and submit only on explicit user instruction. All maintenance commands accept `--repo PROJECT`.
 
 On Windows PowerShell, use one literal invocation: `& 'C:\path\python.exe' 'C:\path\remvu.py' 'status' '--repo' 'C:\project'`. Quote every argument with single quotes, doubling embedded apostrophes. Use the same form for inline JSON; do not interpolate expressions or chain commands. Other Windows shell forms remain observable events and may need manual consolidation.

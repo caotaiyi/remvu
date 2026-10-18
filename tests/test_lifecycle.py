@@ -211,6 +211,15 @@ class LifecycleTest(unittest.TestCase):
         root = self.repo / '.remvu'
         self.assertEqual(len(list((root / 'gaps').glob('*.json'))), 1)
         self.assertIn('observation_gap', [i['code'] for i in core.check_project(self.repo)['issues']])
+        self.assertIn('OBSERVATION GAPS', core.render_document(self.repo))
+        compact = subprocess.run([sys.executable, str(SCRIPTS / 'remvu.py'), 'status', '--repo', str(self.repo)],
+                                 capture_output=True, text=True, encoding='utf-8')
+        self.assertTrue(json.loads(compact.stdout)['observation_gaps_present'])
+        context = hooks.run_hook('codex', 'SessionStart', {'session_id': 'gap-fixture'}, self.repo)
+        self.assertIn('Observation gaps remain', context['hookSpecificOutput']['additionalContext'])
+        first_stop = hooks.run_hook('codex', 'Stop', {'session_id': 'gap-fixture'}, self.repo)
+        self.assertEqual(first_stop['decision'], 'block')
+        self.assertEqual(hooks.run_hook('codex', 'Stop', {'session_id': 'gap-fixture'}, self.repo), {})
         with self.assertRaisesRegex(ValueError, 'observation gaps'):
             core.render_document(self.repo, visibility='public')
         repaired = life.repair(self.repo)

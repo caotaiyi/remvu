@@ -794,6 +794,8 @@ def _render(repo, state, visibility, include_patch, max_summary_chars):
         summary.append('STALE CODE: repository differs from the last semantic update; recheck affected claims before continuing.')
     if state['pending_consolidation']:
         summary.append('PENDING CONSOLIDATION: observable events have not been reviewed into semantic memory.')
+    if any(_safe_child(_memory(repo), 'gaps').glob('*.json')):
+        summary.append('OBSERVATION GAPS: a hook failed; run doctor and repair, then review unknown work. This memory is incomplete.')
     stale_checks = _stale_checks({'entries': selected}, snapshot)
     if stale_checks:
         summary.append('STALE CHECK EVIDENCE: ' + str(len(stale_checks))

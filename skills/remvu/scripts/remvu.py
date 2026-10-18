@@ -169,6 +169,8 @@ def main(argv=None):
             elif args.command == 'status':
                 state = core.load_state(repo)
                 result = state if args.full else compact_state(state)
+                if not args.full:
+                    result['observation_gaps_present'] = any(core._safe_child(repo / '.remvu', 'gaps').glob('*.json'))
             elif args.command == 'events':
                 if not 1 <= args.limit <= 1000:
                     raise ValueError('--limit must be between 1 and 1000')
