@@ -6,6 +6,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -355,14 +356,54 @@ class AdapterTest(unittest.TestCase):
             process.stdin.write(json.dumps(payload))
             process.stdin.close()
             processes.append(process)
-        for process in processes:
-            result = json.loads(process.stdout.read())
-            error = process.stderr.read()
-            self.assertEqual(process.wait(timeout=10), 0, error)
+        outcomes = []
+        try:
+            for process in processes:
+                result = json.loads(process.stdout.read())
+                error = process.stderr.read()
+                outcomes.append((process.wait(timeout=10), result, error))
+        finally:
+            for process in processes:
+                if process.poll() is None:
+                    process.kill()
+                process.wait(timeout=10)
+                process.stdout.close()
+                process.stderr.close()
+        for code, result, error in outcomes:
+            self.assertEqual(code, 0, error)
             self.assertEqual(result, {}, result)
-            process.stdout.close()
-            process.stderr.close()
         self.assertEqual(len(self.state()['events']), 6)
+
+    def test_contended_ledger_waits_for_a_normal_writer_and_respects_short_budget(self):
+        self.initialize(())
+        directory = self.root / '.remvu/hooks'
+        child = None
+        program = ('import sys,json;sys.path.insert(0,sys.argv[1]);import remvu_core;'
+                   'from remvu_hooks import run_hook;print("ready",flush=True);'
+                   'print(json.dumps(run_hook("codex","PostToolUse",json.load(sys.stdin),sys.argv[2])),flush=True)')
+        payload = self.payload('PostToolUse', tool_name='Write', tool_use_id='queued',
+                               tool_input={'file_path': 'app.py'}, tool_response={'type': 'create'})
+        try:
+            with hooks._ledger_lock(directory):
+                with self.assertRaisesRegex(RuntimeError, 'busy'):
+                    with hooks._ledger_lock(directory, timeout=.05):
+                        self.fail('A second writer must not take the held lock')
+                child = subprocess.Popen([sys.executable, '-c', program, str(SCRIPTS), str(self.root)],
+                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                child.stdin.write(json.dumps(payload)); child.stdin.close()
+                self.assertEqual(child.stdout.readline().strip(), 'ready')
+                time.sleep(1.5)  # A real blocked writer, longer than the former .75-second budget.
+            result = json.loads(child.stdout.read())
+            error = child.stderr.read()
+            self.assertEqual(child.wait(timeout=10), 0, error)
+            self.assertEqual(result, {})
+            self.assertEqual(len(self.state()['events']), 1)
+        finally:
+            if child is not None:
+                if child.poll() is None:
+                    child.kill()
+                child.wait(timeout=10)
+                child.stdout.close(); child.stderr.close()
 
     @unittest.skipIf(os.name == 'nt', 'Symlink fixture needs POSIX permissions')
     def test_symlinked_hook_lock_is_refused_without_external_write(self):

@@ -1,0 +1,11 @@
+{
+  "format": "remvu-beta-ci-regression/1",
+  "source_revision": "fee12d9fc7b2ae5dc6be5c01ef1189383934064e",
+  "run_url": "https://github.com/caotaiyi/remvu/actions/runs/39094755273",
+  "job": "windows-latest / Python 3.10",
+  "test": "test_parallel_hook_processes_keep_all_distinct_events",
+  "observed_failure": "The six-process burst exceeded the 0.75-second ledger wait; a hook returned a busy warning. Early assertion also left other children running during fixture cleanup.",
+  "fix": "Normal hook ledger waits use five seconds, short lifecycle events use one second. Fixtures reap all children before assertions. The six-event and no-warning assertions remain unchanged.",
+  "additional_checks": "A held-writer regression and ten repeated six-writer trials per Windows CI job.",
+  "raw_logs_published": false
+}

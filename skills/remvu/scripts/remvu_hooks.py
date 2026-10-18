@@ -69,7 +69,7 @@ def _filter_visible(value):
 
 
 @contextmanager
-def _ledger_lock(directory: Path):
+def _ledger_lock(directory: Path, timeout=5):
     """OS advisory locks release on process exit, including an interrupted hook."""
     directory.mkdir(parents=True, exist_ok=True)
     lock = directory / '.lock'
@@ -81,7 +81,7 @@ def _ledger_lock(directory: Path):
     if handle.tell() == 0:
         handle.write(b'0')
         handle.flush()
-    deadline = time.monotonic() + .75
+    deadline = time.monotonic() + timeout
     acquired = False
     try:
         while not acquired:
@@ -444,7 +444,7 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
         directory = root / '.remvu/hooks'
         if directory.is_symlink():
             return _warning('Refusing a symlinked hook state directory.')
-        with _ledger_lock(directory):
+        with _ledger_lock(directory, timeout=1 if event in ('SessionEnd', 'Interrupt') else 5):
             _activation_receipt(root, platform, event, locked=True)
             ledger_path = directory / 'state.json'
             if ledger_path.is_symlink():
