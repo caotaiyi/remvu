@@ -1,5 +1,7 @@
 # Validation report
 
+For the unreleased v0.3.0-beta.1 candidate, see the [candidate validation report](beta-validation.md). The results below describe v0.2.0 only.
+
 Date: 2026-10-17 (Asia/Singapore). Reference implementation: `0.2.0`. Open format proposal: `remvu/1`.
 
 Two real handoffs passed with fresh receivers. Local regression tests and client-hook observations are reported separately below. The public [machine-readable result](../evals/results/live-2026-10-17.json) includes native usage counters, code checks, file hashes and reviewed excerpts.

@@ -1,12 +1,21 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "remvu",
-  "version": "0.2.0",
+  "version": "0.3.0-beta.1",
   "description": "Portable project memory and evidence-backed handoffs for coding agents.",
-  "author": {"name": "caotaiyi"},
+  "author": {
+    "name": "caotaiyi"
+  },
   "repository": "https://github.com/caotaiyi/remvu",
   "license": "MIT",
-  "keywords": ["skills", "project-memory", "agent-handoff", "codex", "claude-code", "remvu"],
+  "keywords": [
+    "skills",
+    "project-memory",
+    "agent-handoff",
+    "codex",
+    "claude-code",
+    "remvu"
+  ],
   "extensions": {
     "com.openai": {
       "interface": {

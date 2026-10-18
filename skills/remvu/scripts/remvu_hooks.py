@@ -133,9 +133,17 @@ def _load_ledger(path: Path) -> dict:
     except (json.JSONDecodeError, UnicodeError) as exc:
         raise ValueError('Hook state is damaged; it was left unchanged. Semantic memory may need manual consolidation.') from exc
     if (not isinstance(data, dict) or data.get('format') != 'remvu-hooks/1'
-            or not isinstance(data.get('sessions'), dict)):
+            or not isinstance(data.get('sessions'), dict)
+            or any(not _valid_session(value) for value in data['sessions'].values())):
         raise ValueError('Unrecognized hook state; it was left unchanged.')
     return data
+
+
+def _valid_session(value):
+    return (isinstance(value, dict) and type(value.get('counter')) is int
+            and value['counter'] >= 0 and isinstance(value.get('open'), bool)
+            and isinstance(value.get('requested'), list)
+            and all(isinstance(turn, str) for turn in value['requested']))
 
 
 def _repo(payload: dict, override=None) -> Path:
@@ -166,6 +174,51 @@ def _private_file(path, repo: Path) -> bool:
             or normalized.startswith(('.remvu/', './.remvu/', root + '/.remvu/')))
 
 
+def _powershell_words(command):
+    """Accept only one literal PowerShell call, never evaluate shell syntax.
+
+    The canonical Windows invocation is & 'python.exe' 'absolute/remvu.py'
+    'status'. Single quotes escape apostrophes by doubling them. Expressions,
+    double-quoted interpolation, redirection and command chains stay evidence.
+    """
+    if not isinstance(command, str) or not command.startswith('& '):
+        return None
+    tokens, index = [], 2
+    while index < len(command):
+        while index < len(command) and command[index] in ' \t':
+            index += 1
+        if index == len(command):
+            break
+        if command[index] == "'":
+            index += 1
+            value = ''
+            while index < len(command):
+                char = command[index]
+                index += 1
+                if char == "'":
+                    if index < len(command) and command[index] == "'":
+                        value += "'"
+                        index += 1
+                    else:
+                        break
+                else:
+                    value += char
+            else:
+                return None
+            if index < len(command) and command[index] not in ' \t':
+                return None
+            tokens.append(value)
+        else:
+            match = re.match(r'[A-Za-z0-9_.:/\\-]+', command[index:])
+            if not match:
+                return None
+            tokens.append(match[0])
+            index += len(match[0])
+            if index < len(command) and command[index] not in ' \t':
+                return None
+    return tokens or None
+
+
 def _memory_only(payload: dict, repo: Path) -> bool:
     """Skip recognized bookkeeping, retaining every ambiguous tool execution."""
     args = payload.get('tool_input')
@@ -181,13 +234,30 @@ def _memory_only(payload: dict, repo: Path) -> bool:
             return all(path == root / 'REMVU.md' or root / '.remvu' in path.parents for path in resolved)
         except (OSError, RuntimeError, ValueError):
             return False
-    # Native unified exec is exposed to these hooks as Bash. Other tool names
-    # and Windows shell dialects have no established standalone-call contract.
-    if tool != 'Bash' or os.name == 'nt':
+    # Native unified exec is exposed to these hooks as Bash. Unknown tool names
+    # remain observations even if their arguments resemble bookkeeping.
+    if tool != 'Bash':
         return False
     command = args.get('command', args.get('cmd'))
     if not isinstance(command, str):
         return False
+
+    if os.name == 'nt':
+        tokens = _powershell_words(command)
+        if not tokens:
+            return False
+        installed = Path(__file__).resolve().with_name('remvu.py')
+        try:
+            if (len(tokens) < 3 or not Path(tokens[0]).is_absolute()
+                    or Path(tokens[0]).resolve() != Path(sys.executable).resolve()
+                    or not Path(tokens[1]).is_absolute()
+                    or Path(tokens[1]).parent.resolve() != installed.parent
+                    or Path(tokens[1]).resolve() != installed):
+                return False
+        except (ValueError, OSError, RuntimeError):
+            return False
+        return tokens[2] in {'status', 'entries', 'events', 'show', 'update', 'resolve-conflict',
+                             'check', 'handoff', 'share', 'withhold', 'doctor', 'diagnose'}
 
     # shlex alone loses the distinction between a quoted newline and a second
     # shell command, and leaves command substitutions inside double quotes.
@@ -259,6 +329,7 @@ def _memory_only(payload: dict, repo: Path) -> bool:
     return len(tokens) > action and tokens[action] in {
         'status', 'entries', 'events', 'show', 'update', 'resolve-conflict',
         'check', 'handoff', 'share', 'withhold', 'hook',
+        'doctor', 'diagnose',
     }
 
 
@@ -351,6 +422,8 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
         core = _core()
         state = core.load_state(root)
         if event == 'SessionStart':
+            if payload.get('permission_mode') not in {'plan', 'readOnly', 'read-only', 'readonly'}:
+                _activation_receipt(root, platform, event)
             return {'hookSpecificOutput': {'hookEventName': event, 'additionalContext': _context(root, state)}}
         if payload.get('permission_mode') in {'plan', 'readOnly', 'read-only', 'readonly'}:
             return _warning('Plan/read-only mode: memory writes and automatic flush are deferred; existing pending work remains pending.') if event == 'Stop' and state.get('pending_consolidation') else {}
@@ -358,11 +431,18 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
         if directory.is_symlink():
             return _warning('Refusing a symlinked hook state directory.')
         with _ledger_lock(directory):
+            _activation_receipt(root, platform, event, locked=True)
             ledger_path = directory / 'state.json'
             if ledger_path.is_symlink():
                 return _warning('Refusing a symlinked hook state file.')
             ledger = _load_ledger(ledger_path)
             session_key = _digest([platform, str(payload.get('session_id', 'unknown'))])
+            archived = core._safe_child(root / '.remvu', 'hooks/archive/' + session_key + '.json')
+            if session_key not in ledger['sessions'] and archived.is_file():
+                prior = core._read_json(archived)
+                if not _valid_session(prior):
+                    raise ValueError('Archived hook session is damaged; preserve it and inspect before resuming')
+                ledger['sessions'][session_key] = prior
             session = ledger['sessions'].setdefault(session_key, {'counter': 0, 'open': False, 'requested': []})
             prompt = payload.get('prompt', '')
             continuation = isinstance(prompt, str) and prompt.startswith(FLUSH_MARKER)
@@ -407,11 +487,53 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
                               'Do not repeat this flush request or start unrelated work.')
                     result = {'decision': 'block', 'reason': reason}
                 session['open'] = False
+            # Keep the active ledger bounded. Archive old sessions locally so
+            # pruning operational counters never silently deletes their history.
+            session['last_seen'] = core._now()
+            if len(ledger['sessions']) > 100:
+                oldest = sorted((k for k in ledger['sessions'] if k != session_key),
+                                key=lambda k: (ledger['sessions'][k].get('last_seen', ''), k))
+                for key in oldest[:len(ledger['sessions']) - 100]:
+                    archive = core._safe_child(root / '.remvu', 'hooks/archive')
+                    archive.mkdir(exist_ok=True)
+                    _atomic(archive / (key + '.json'), ledger['sessions'].pop(key))
             _atomic(ledger_path, ledger)
             return result
     except (ImportError, OSError, ValueError, RuntimeError, KeyError, TypeError) as exc:
+        try:
+            if (root / '.remvu/state.json').is_file() and payload.get('permission_mode') not in {'plan', 'readOnly', 'read-only', 'readonly'}:
+                import uuid
+                core = _core()
+                gap = core._safe_child(root / '.remvu', 'gaps/' + uuid.uuid4().hex + '.json')
+                core._atomic(gap, {'format': 'remvu-observation-gap/1', 'platform': platform,
+                                   'event': event, 'error_type': type(exc).__name__, 'created_at': core._now()})
+        except (ImportError, OSError, ValueError, UnboundLocalError):
+            pass  # The visible warning is still returned if even the marker cannot be written.
         return _warning(f'Hook could not finish ({type(exc).__name__}: {exc}). No semantic refresh is claimed. '
-                        'Read REMVU.md if available and repair/reinitialize the local adapter.')
+                        'Read REMVU.md if available; run doctor and repair, then review missing observations.')
+
+
+def _activation_receipt(root, platform, event, locked=False):
+    """Local execution evidence only; not proof of host trust or client surface."""
+    directory = root / '.remvu/hooks'
+    if directory.is_symlink():
+        raise ValueError('Refusing a symlinked hook directory')
+    if not locked:
+        with _ledger_lock(directory):
+            return _activation_receipt(root, platform, event, locked=True)
+    path = directory / ('activation-' + platform + '.json')
+    if path.is_symlink():
+        raise ValueError('Refusing a symlinked activation receipt')
+    scripts = str(Path(__file__).resolve().parent)
+    python = str(Path(sys.executable).resolve())
+    old = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
+    if not isinstance(old, dict) or not isinstance(old.get('events', []), list):
+        raise ValueError('Hook activation receipt is damaged; run repair')
+    events = old.get('events', []) if old.get('scripts') == scripts and old.get('python') == python else []
+    if any(not isinstance(e, str) or e not in EVENTS for e in events):
+        raise ValueError('Hook activation receipt lists invalid events; run repair')
+    _atomic(path, {'format': 'remvu-activation/1', 'scripts': scripts, 'python': python,
+                   'events': sorted(set([*events, event])), 'last_seen': _core()._now()})
 
 
 def main(argv=None) -> int:

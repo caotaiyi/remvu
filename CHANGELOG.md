@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0-beta.1 candidate (not released)
+
+- Add managed, checksum-indexed runtime installation independent of the source clone.
+- Add doctor, reviewed-source upgrade/rollback, conservative uninstall, verified snapshot/ledger repair and allowlisted local diagnostics.
+- Preserve configuration checkpoints and concurrent evidence on failed installation; retain private memory on uninstall.
+- Recognize only canonical literal PowerShell bookkeeping; retain ambiguous commands as evidence.
+- Record hook execution separately from trust and surface certification; preserve observation gaps for review.
+- Retain five recovery snapshots and archive old hook sessions without deleting evidence/journals.
+- Add package lifecycle smoke, native acceptance fixtures, twelve-profile release readiness and bilingual onboarding/feedback guides.
+
+Release remains gated on real client acceptance. Historical results and CI do not satisfy it.
+
 ## 0.2.0
 
 - Rename the project and primary skill to Remvu, with a short `remvu` invocation.

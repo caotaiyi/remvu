@@ -224,6 +224,16 @@ def _save(root, state, operation, payload):
     _atomic(_safe_child(root, 'journal/' + journal_id + '.json'), journal)
     _atomic(_safe_child(root, 'state.json'), state)
     _atomic(_safe_child(root, 'snapshots/latest.json'), state)
+    # A bounded set of committed states permits recovery if latest is damaged.
+    # Evidence and journals are retained; pruning copies never prunes history.
+    _atomic(_safe_child(root, 'snapshots/' + journal_id + '.json'), state)
+    snapshots = sorted((p for p in _safe_child(root, 'snapshots').glob('*.json')
+                        if re.fullmatch(r'[0-9a-f]{32}\.json', p.name)),
+                       key=lambda p: (p.stat().st_mtime_ns, p.name), reverse=True)
+    for old in snapshots[5:]:
+        if old.is_symlink():
+            raise ValueError('Refusing a symlinked recovery snapshot')
+        old.unlink()
 
 
 def _git(repo, *args, required=False):
@@ -765,6 +775,8 @@ def _render(repo, state, visibility, include_patch, max_summary_chars):
     snapshot = _snapshot(repo)
     if visibility == 'public' and snapshot['dirty'] and not include_patch:
         raise ValueError('public share blocked by uncommitted project changes; commit them first or explicitly request --include-patch after reviewing scope')
+    if visibility == 'public' and any(_safe_child(_memory(repo), 'gaps').glob('*.json')):
+        raise ValueError('public share blocked by observation gaps; run repair, review missing observations and consolidate memory')
     if visibility == 'public' and state['pending_consolidation']:
         raise ValueError('public share blocked by pending consolidation; review observable events and apply a semantic update first')
     unresolved = _unresolved_conflicts(_memory(repo), state)
@@ -1012,6 +1024,8 @@ def check_project(repo, document=None):
                                           'revalidate and add a new superseding check'})
             if state['pending_consolidation']:
                 issues.append({'code': 'pending_consolidation', 'message': 'observable events await semantic review'})
+            if any(_safe_child(root, 'gaps').glob('*.json')):
+                issues.append({'code': 'observation_gap', 'message': 'a hook failed; repair can index the gap but cannot reconstruct unobserved work'})
             journal_id = state.get('last_journal_id', '')
             if not re.fullmatch(r'[0-9a-f]{32}', journal_id):
                 issues.append({'code': 'invalid_journal_head', 'message': 'memory has no valid committed journal head'})

@@ -1,0 +1,127 @@
+{
+  "format": "remvu-beta-live-summary/1",
+  "date": "2026-10-18",
+  "scope": "Focused macOS CLI follow-up after stage-boundary skill guidance; no control arm",
+  "direction": "codex-claude",
+  "strict_acceptance_passed": true,
+  "code": {
+    "cases": [
+      {
+        "id": "ordinary-amount",
+        "stage": "stage1",
+        "passed": true
+      },
+      {
+        "id": "half-up-positive",
+        "stage": "invariant",
+        "passed": true
+      },
+      {
+        "id": "half-up-negative",
+        "stage": "invariant",
+        "passed": true
+      },
+      {
+        "id": "integer-type",
+        "stage": "invariant",
+        "passed": true
+      },
+      {
+        "id": "accounting-negative",
+        "stage": "next_step",
+        "passed": true
+      }
+    ],
+    "passed": 5,
+    "total": 5,
+    "all_passed": true
+  },
+  "recall": {
+    "fields": {
+      "intent": {
+        "matched_groups": 2,
+        "total_groups": 2,
+        "all_matched": true
+      },
+      "constraints": {
+        "matched_groups": 5,
+        "total_groups": 5,
+        "all_matched": true
+      },
+      "rejected_directions": {
+        "matched_groups": 1,
+        "total_groups": 1,
+        "all_matched": true
+      },
+      "next_step": {
+        "matched_groups": 2,
+        "total_groups": 2,
+        "all_matched": true
+      },
+      "known_failed_checks": {
+        "matched_groups": 1,
+        "total_groups": 1,
+        "all_matched": true
+      }
+    },
+    "matched_groups": 11,
+    "total_groups": 11,
+    "needs_context": false,
+    "all_matched": true,
+    "scoring_note": "Fixed term-group recall check; reports lexical coverage, not semantic proof."
+  },
+  "raw_transcripts_published": false,
+  "stage_boundary_recorded_as_progress": true,
+  "producer": {
+    "platform": "codex",
+    "client_version": "0.163.0-alpha.10.2",
+    "returncode": 0,
+    "elapsed_seconds": 46.861,
+    "reported_usage": [
+      {
+        "source": "turn.completed",
+        "counters": {
+          "input_tokens": 92480,
+          "cached_input_tokens": 83072,
+          "output_tokens": 1533
+        }
+      }
+    ],
+    "prompt_chars": 2742,
+    "prompt_bytes": 2758
+  },
+  "receiver": {
+    "platform": "claude",
+    "client_version": "2.1.302",
+    "returncode": 0,
+    "elapsed_seconds": 33.679,
+    "reported_usage": [
+      {
+        "source": "result",
+        "counters": {
+          "input_tokens": 22,
+          "cache_creation_input_tokens": 10499,
+          "cache_read_input_tokens": 123360,
+          "output_tokens": 5360
+        }
+      },
+      {
+        "source": "modelUsage",
+        "model": "claude-haiku-5-5",
+        "counters": {
+          "inputTokens": 22,
+          "outputTokens": 5360,
+          "cacheReadInputTokens": 123360,
+          "cacheCreationInputTokens": 10499
+        }
+      }
+    ],
+    "prompt_chars": 1209,
+    "prompt_bytes": 1209
+  },
+  "limitations": [
+    "One follow-up direction; prior failures remain unchanged.",
+    "Term-group coverage is not semantic proof or a general reliability rate.",
+    "Does not certify desktop, VS Code, native Windows or automatic lifecycle behavior."
+  ]
+}

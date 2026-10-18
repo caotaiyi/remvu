@@ -8,7 +8,9 @@ Give the next agent the project code and one `REMVU.md` file. It can read the go
 
 [中文](README.zh-CN.md) · [Format proposal](spec/remvu-v1.md) · [Compatibility](docs/compatibility.md) · [Validation report](docs/validation-report.md) · [Handoff walkthrough](docs/demo.md)
 
-Remvu v0.2.0 is a reference implementation and open format proposal. Two real CLI handoffs passed on small fixed tasks: Claude Code to Codex and Codex to Claude Code. In both cases the fresh receiver matched all 11 fixed context term groups and completed the outstanding behavior checks. [Results and limits](docs/validation-report.md).
+The main branch contains a **v0.3.0-beta.1 candidate** with managed installation, upgrade/rollback, health checks, recovery and local diagnostics. Native acceptance across macOS/Windows and terminal/desktop/VS Code is still pending. [Quick start](docs/quickstart.md) · [Beta acceptance](docs/native-acceptance.md).
+
+The published v0.2.0 remains a reference implementation and open format proposal. Its two real CLI handoffs passed small fixed tasks; those results do not certify this candidate. [Results and limits](docs/validation-report.md).
 
 ![30-second replay of the two real cross-agent handoff results](docs/assets/remvu-live-replay.gif)
 
@@ -30,10 +32,10 @@ Keep this checkout outside the target project, for example in a dedicated tools 
 
 ```bash
 git clone https://github.com/caotaiyi/remvu.git
-python3 remvu/skills/remvu/scripts/remvu.py init --repo /path/to/project --platform both
+python3 remvu/scripts/install.py --repo /path/to/project --platform both
 ```
 
-`init` merges project instructions and lifecycle hooks, adds `.remvu/` to the local ignore rules, and installs local skill shims for both clients. It preserves existing settings and refuses to overwrite an unrelated skill. Keep the cloned source at its installation path; rerun `init` after relocating it. Complete the client's hook trust/restart instructions. In Codex, review hook trust with `/hooks`.
+`install` copies the reviewed skill to a stable user directory, then merges project instructions and hooks. Existing settings and private memory are preserved. You can move the source clone afterward. On Windows use your Python 3.10+ launcher, for example `py -3.12`. Complete normal hook trust/restart; in Codex review definitions with `/hooks`. Run `doctor` afterward to distinguish configured adapters from observed execution.
 
 | Action | Claude Code | Codex |
 | --- | --- | --- |
@@ -41,8 +43,14 @@ python3 remvu/skills/remvu/scripts/remvu.py init --repo /path/to/project --platf
 | Update memory and create a local handoff | `/remvu` | `$remvu` |
 | Create a public `REMVU.md` | `/remvu share` | `$remvu share` |
 | Check memory against code | `/remvu check` | `$remvu check` |
+| Inspect health | `/remvu doctor` | `$remvu doctor` |
+| Recover local files | `/remvu repair` | `$remvu repair` |
+| Upgrade or roll back | `/remvu upgrade` | `$remvu upgrade` |
+| Remove project adapters | `/remvu uninstall` | `$remvu uninstall` |
 
 Choose `--platform claude`, `codex` or `none` when initializing for one client or using only the CLI. A plugin package is also available through `plugin.json`; its scripts require a local environment that can read the project.
+
+See [maintenance](skills/remvu/references/maintenance.md) for upgrades, rollback, uninstall and previewable diagnostics. [FAQ](docs/faq.md) covers pending memory and trust issues. Platform integration and self-hosting follow the individual beta; see the [roadmap](docs/roadmap.md).
 
 ## What moves with the project
 

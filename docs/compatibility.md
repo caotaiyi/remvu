@@ -1,5 +1,22 @@
 # Compatibility
 
+## v0.3.0-beta.1 candidate
+
+The candidate adds managed installation and maintenance. Native support is tracked independently for each entry point; no row inherits v0.2.0 certification.
+
+| System / client | Terminal | Desktop local project | VS Code official extension |
+| --- | --- | --- | --- |
+| macOS / Claude Code | Acceptance pending | Acceptance pending | Acceptance pending |
+| macOS / Codex | Acceptance pending | Acceptance pending | Acceptance pending |
+| Windows 11 x64 / Claude Code | Acceptance pending | Acceptance pending | Acceptance pending |
+| Windows 11 x64 / Codex | Acceptance pending | Acceptance pending | Acceptance pending |
+
+Manual commands are the fallback design, not an unverified compatibility claim. Automatic support additionally requires multi-turn, compaction, interruption, concurrency and bounded-repair evidence. The [acceptance guide](native-acceptance.md) and [machine-readable ledger](../evals/beta-matrix.json) define the release gate.
+
+Windows bookkeeping now recognizes only the exact installed Python/runtime in a canonical single-quoted PowerShell invocation. Other forms remain observations. Unit/CI coverage is separate from native Windows validation. Desktop tests use local coding projects; ordinary chat and cloud workspaces are excluded. Codex IDE does not currently support plugins, so use project skills/configuration instead of a plugin ZIP. See [official plugin support](https://learn.chatgpt.com/docs/plugins).
+
+## Historical v0.2.0 evidence
+
 Remvu v0.2.0 is a reference implementation of the `remvu/1` open format proposal. It declares Python 3.10+ and uses no third-party runtime Python packages. Git supplies repository identity, working-tree fingerprints and tracked patches; non-Git projects keep explicit missing Git metadata.
 
 | Capability | Current observation |

@@ -22,6 +22,12 @@ A test run does not establish a live client integration or a token-saving claim.
 
 ## Release requirements
 
+For v0.3.0-beta.1, complete the twelve-profile [native acceptance](docs/native-acceptance.md)
+and run `python3 scripts/check_beta_readiness.py --require-ready`. Keep failed or
+pending observations visible; CI does not grant native support. Test a fresh
+archive with `python3 scripts/package_smoke.py RELEASE_DIRECTORY`. Diagnostics
+and feedback must remain opt-in and synthetic/public evidence must be reviewed.
+
 Before a release, pass the checks in [the validation report](docs/validation-report.md), including real Claude Code to Codex and Codex to Claude Code handoffs. A receiver must have code and `REMVU.md` only, with no original chat or Remvu installation. Release automation must not substitute fixture tests for these observations.
 
 Build the distributable packages from a committed revision into a fresh directory outside the repository:

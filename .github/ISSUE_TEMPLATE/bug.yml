@@ -1,0 +1,25 @@
+name: Bug or setup failure
+description: Report a reproducible Remvu issue without uploading private memory.
+body:
+  - type: markdown
+    attributes:
+      value: Do not paste raw transcripts, .remvu state, hook payloads, credentials or private paths. Preview an optional diagnose report before attaching it.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Versions and entry point
+      description: Remvu version, OS/architecture, Python, Claude Code or Codex version, and terminal/desktop/VS Code. Include extension version if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps, expected result and actual result
+      description: Prefer a small synthetic project. Separate observed behavior from guesses. Mention whether hooks were reviewed normally.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnosis
+    attributes:
+      label: Optional reviewed diagnostic
+      description: Attach the allowlisted local report only after previewing it. State any recovery already attempted; keep originals private.

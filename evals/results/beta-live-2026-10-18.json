@@ -1,0 +1,241 @@
+{
+  "format": "remvu-beta-live-summary/1",
+  "date": "2026-10-18",
+  "scope": "macOS native CLI functional regression; focused run without a no-memory control; not twelve-profile acceptance",
+  "directions": [
+    {
+      "direction": "claude-codex",
+      "strict_acceptance_passed": false,
+      "code": {
+        "cases": [
+          {
+            "id": "quoted-comma",
+            "stage": "stage1",
+            "passed": true
+          },
+          {
+            "id": "case-duplicates",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "empty-fields",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "initial-bom",
+            "stage": "next_step",
+            "passed": true
+          }
+        ],
+        "passed": 4,
+        "total": 4,
+        "all_passed": true
+      },
+      "recall": {
+        "fields": {
+          "intent": {
+            "matched_groups": 2,
+            "total_groups": 2,
+            "all_matched": true
+          },
+          "constraints": {
+            "matched_groups": 5,
+            "total_groups": 5,
+            "all_matched": true
+          },
+          "rejected_directions": {
+            "matched_groups": 2,
+            "total_groups": 2,
+            "all_matched": true
+          },
+          "next_step": {
+            "matched_groups": 0,
+            "total_groups": 1,
+            "all_matched": false
+          },
+          "known_failed_checks": {
+            "matched_groups": 1,
+            "total_groups": 1,
+            "all_matched": true
+          }
+        },
+        "matched_groups": 10,
+        "total_groups": 11,
+        "needs_context": false,
+        "all_matched": false,
+        "scoring_note": "Fixed term-group recall check; reports lexical coverage, not semantic proof."
+      },
+      "producer": {
+        "platform": "claude",
+        "client_version": "2.1.302",
+        "returncode": 0,
+        "elapsed_seconds": 44.616,
+        "reported_usage": [
+          {
+            "source": "result",
+            "counters": {
+              "input_tokens": 20,
+              "cache_creation_input_tokens": 16721,
+              "cache_read_input_tokens": 136374,
+              "output_tokens": 6719
+            }
+          },
+          {
+            "source": "modelUsage",
+            "model": "claude-haiku-5-5",
+            "counters": {
+              "inputTokens": 20,
+              "outputTokens": 6719,
+              "cacheReadInputTokens": 136374,
+              "cacheCreationInputTokens": 16721
+            }
+          }
+        ],
+        "prompt_chars": 2691,
+        "prompt_bytes": 2707
+      },
+      "receiver": {
+        "platform": "codex",
+        "client_version": "0.163.0-alpha.10.2",
+        "returncode": 0,
+        "elapsed_seconds": 32.445,
+        "reported_usage": [
+          {
+            "source": "turn.completed",
+            "counters": {
+              "input_tokens": 81250,
+              "cached_input_tokens": 72704,
+              "output_tokens": 914
+            }
+          }
+        ],
+        "prompt_chars": 1209,
+        "prompt_bytes": 1209
+      }
+    },
+    {
+      "direction": "codex-claude",
+      "strict_acceptance_passed": false,
+      "code": {
+        "cases": [
+          {
+            "id": "ordinary-amount",
+            "stage": "stage1",
+            "passed": true
+          },
+          {
+            "id": "half-up-positive",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "half-up-negative",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "integer-type",
+            "stage": "invariant",
+            "passed": true
+          },
+          {
+            "id": "accounting-negative",
+            "stage": "next_step",
+            "passed": true
+          }
+        ],
+        "passed": 5,
+        "total": 5,
+        "all_passed": true
+      },
+      "recall": {
+        "fields": {
+          "intent": {
+            "matched_groups": 2,
+            "total_groups": 2,
+            "all_matched": true
+          },
+          "constraints": {
+            "matched_groups": 5,
+            "total_groups": 5,
+            "all_matched": true
+          },
+          "rejected_directions": {
+            "matched_groups": 1,
+            "total_groups": 1,
+            "all_matched": true
+          },
+          "next_step": {
+            "matched_groups": 1,
+            "total_groups": 2,
+            "all_matched": false
+          },
+          "known_failed_checks": {
+            "matched_groups": 1,
+            "total_groups": 1,
+            "all_matched": true
+          }
+        },
+        "matched_groups": 10,
+        "total_groups": 11,
+        "needs_context": false,
+        "all_matched": false,
+        "scoring_note": "Fixed term-group recall check; reports lexical coverage, not semantic proof."
+      },
+      "producer": {
+        "platform": "codex",
+        "client_version": "0.163.0-alpha.10.2",
+        "returncode": 0,
+        "elapsed_seconds": 46.822,
+        "reported_usage": [
+          {
+            "source": "turn.completed",
+            "counters": {
+              "input_tokens": 168100,
+              "cached_input_tokens": 148608,
+              "output_tokens": 2035
+            }
+          }
+        ],
+        "prompt_chars": 2742,
+        "prompt_bytes": 2758
+      },
+      "receiver": {
+        "platform": "claude",
+        "client_version": "2.1.302",
+        "returncode": 0,
+        "elapsed_seconds": 41.733,
+        "reported_usage": [
+          {
+            "source": "result",
+            "counters": {
+              "input_tokens": 20,
+              "cache_creation_input_tokens": 11931,
+              "cache_read_input_tokens": 122083,
+              "output_tokens": 5888
+            }
+          },
+          {
+            "source": "modelUsage",
+            "model": "claude-haiku-5-5",
+            "counters": {
+              "inputTokens": 20,
+              "outputTokens": 5888,
+              "cacheReadInputTokens": 122083,
+              "cacheCreationInputTokens": 11931
+            }
+          }
+        ],
+        "prompt_chars": 1209,
+        "prompt_bytes": 1209
+      }
+    }
+  ],
+  "raw_transcripts_published": false,
+  "known_issues": [
+    "Both next-step lexical recall groups missed one required group; strict acceptance failed despite all behavior checks passing.",
+    "Codex producer persisted a stage-1 delivery instruction as an active constraint; receiver reported the conflict and followed the current task. Skill guidance now distinguishes stage boundaries from durable constraints; this trial does not validate that follow-up change."
+  ]
+}

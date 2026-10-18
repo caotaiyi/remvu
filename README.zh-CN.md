@@ -8,7 +8,9 @@
 
 [English](README.md) · [格式提案](spec/remvu-v1.md) · [兼容情况](docs/compatibility.md) · [验证报告](docs/validation-report.md) · [接手演示](docs/demo.md)
 
-v0.2.0 提供参考实现，并发布 `remvu/1` 开放格式提案。两项真实 CLI 接手已通过，分别为 Claude Code 到 Codex、Codex 到 Claude Code。全新接收方均命中评分用的 11 组上下文词项，并完成剩余行为检查。[结果与限制](docs/validation-report.md)。
+主分支提供 **v0.3.0-beta.1 候选实现**，新增稳定安装、升级回滚、健康检查、恢复和本地诊断。macOS、Windows 及终端、桌面、VS Code 的真实验收尚未完成，该测试版还未发布。[快速开始](docs/quickstart.zh-CN.md) · [验收说明](docs/native-acceptance.md)。
+
+已发布的 v0.2.0 提供参考实现和 `remvu/1` 开放格式提案，其两项小型真实 CLI 接手已通过。这些历史结果不能证明新版通过验收。[结果与限制](docs/validation-report.md)。
 
 ![两项真实跨 agent 接手结果的 30 秒回放](docs/assets/remvu-live-replay.gif)
 
@@ -30,10 +32,10 @@ v0.2.0 提供参考实现，并发布 `remvu/1` 开放格式提案。两项真�
 
 ```bash
 git clone https://github.com/caotaiyi/remvu.git
-python3 remvu/skills/remvu/scripts/remvu.py init --repo /path/to/project --platform both
+python3 remvu/scripts/install.py --repo /path/to/project --platform both
 ```
 
-初始化会合并项目指令和生命周期 hooks，将 `.remvu/` 加入本地忽略规则，并安装两个客户端的项目级 skill 入口。已有设置会保留；遇到不属于 Remvu 的同名 skill 时会停止。克隆目录需要留在原位，移动后重新初始化。按照客户端提示完成 hook 信任或重启；Codex 可通过 `/hooks` 检查。
+安装器将审阅过的 skill 复制到稳定的用户目录，再合并项目指令和 hooks，保留已有设置和私人记忆，之后可以移动原来的克隆目录。Windows 用 Python 3.10+ 对应的启动命令替换 `python3`，例如 `py -3.12`。按照客户端提示完成正常的 hook 信任与重启；Codex 可通过 `/hooks` 审查。再运行 `doctor`，区分已经配置与观察到实际执行的状态。
 
 | 操作 | Claude Code | Codex |
 | --- | --- | --- |
@@ -41,8 +43,14 @@ python3 remvu/skills/remvu/scripts/remvu.py init --repo /path/to/project --platf
 | 更新记忆并生成本地交接 | `/remvu` | `$remvu` |
 | 生成公开文件 | `/remvu share` | `$remvu share` |
 | 检查记忆与代码状态 | `/remvu check` | `$remvu check` |
+| 检查健康状态 | `/remvu doctor` | `$remvu doctor` |
+| 恢复本地文件 | `/remvu repair` | `$remvu repair` |
+| 升级或回滚 | `/remvu upgrade` | `$remvu upgrade` |
+| 卸载项目适配器 | `/remvu uninstall` | `$remvu uninstall` |
 
 只使用一个客户端时，可选择 `--platform claude` 或 `codex`；只用命令行时选 `none`。仓库也提供 `plugin.json`，脚本仍需要可访问项目文件的本地环境。
+
+[维护说明](skills/remvu/references/maintenance.md)介绍升级、回滚、保留记忆卸载和本地诊断。[常见问题](docs/faq.md)包含待整理、信任和恢复问题。平台集成与开源自托管将在个人版公开测试之后推进，当前没有附带专用中转适配器或服务端；见[路线图](docs/roadmap.md)。
 
 ## 记住什么
 

@@ -192,6 +192,14 @@ def initialize(repo, platforms=('claude', 'codex'), scripts_dir=None) -> dict:
         raise ValueError('Refusing a symlinked .remvu directory.')
     if (root / '.remvu/state.json').exists():
         core.load_state(root)  # Refuse damaged state before modifying configuration.
+    previous_manifest = root / '.remvu/adapters.json'
+    if previous_manifest.exists():
+        prior = json.loads(_read(previous_manifest))
+        if prior.get('format') != 'remvu-adapters/1':
+            raise ValueError('Unrecognized adapter manifest; preserve it and inspect before initialization.')
+        platforms = tuple(dict.fromkeys([*prior.get('platforms', []), *platforms]))
+        if any(p not in EVENTS for p in platforms):
+            raise ValueError('Adapter manifest lists an unsupported platform.')
     changes: dict[Path, str] = {}
     # These exact paths remain private when reinitializing just one platform.
     ignores = ['/.remvu/', '/.claude/settings.local.json', '/.codex/hooks.json',
@@ -237,6 +245,7 @@ def initialize(repo, platforms=('claude', 'codex'), scripts_dir=None) -> dict:
     manifest = {
         'format': 'remvu-adapters/1', 'platforms': list(platforms),
         'scripts_dir': str(scripts), 'python': str(Path(sys.executable).resolve()),
+        'handlers': {p: {event: _handler(p, event, scripts, root) for event in EVENTS[p]} for p in platforms},
         'trust': 'Host review is required; Remvu never grants hook trust or changes permissions.',
         'portability': 'Local configs contain absolute installation paths. Re-run init after moving the runtime. '
                        'Public REMVU.md remains readable without this installation.',

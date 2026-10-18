@@ -30,3 +30,14 @@ jobs:
         run: python spec/validate_examples.py --require-jsonschema
       - name: Audit release packages
         run: python scripts/build_release.py --out "${{ runner.temp }}/remvu-release"
+      - name: Fresh archive lifecycle smoke
+        run: python scripts/package_smoke.py "${{ runner.temp }}/remvu-release"
+      - name: Validate beta acceptance ledger
+        run: python scripts/check_beta_readiness.py
+      - name: Retain candidate packages for native testing
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: remvu-candidate-packages
+          path: ${{ runner.temp }}/remvu-release/*
+          if-no-files-found: error

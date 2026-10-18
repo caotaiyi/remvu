@@ -1,0 +1,102 @@
+{
+  "format": "remvu-beta-acceptance/1",
+  "version": "0.3.0-beta.1",
+  "profiles": [
+    {
+      "id": "macos/claude/cli",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "macos/claude/desktop",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "macos/claude/vscode",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "macos/codex/cli",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "macos/codex/desktop",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "macos/codex/vscode",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "windows11-x64/claude/cli",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "windows11-x64/claude/desktop",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "windows11-x64/claude/vscode",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "windows11-x64/codex/cli",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "windows11-x64/codex/desktop",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    },
+    {
+      "id": "windows11-x64/codex/vscode",
+      "status": "pending",
+      "checks": {},
+      "client_versions": {},
+      "runtime_digest": null,
+      "evidence": []
+    }
+  ]
+}

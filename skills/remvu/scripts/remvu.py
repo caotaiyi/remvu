@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-VERSION = '0.2.0'
+VERSION = '0.3.0-beta.1'
 
 
 def emit(value):
@@ -20,6 +20,12 @@ def parser():
     commands = cli.add_subparsers(dest='command', required=True)
     for name, help_text in (
         ('init', 'Initialize private memory and optional host adapters'),
+        ('install', 'Copy a reviewed runtime to a stable user directory and configure this project'),
+        ('upgrade', 'Install reviewed local source, or roll back the previous managed runtime'),
+        ('uninstall', 'Remove unchanged project adapters, retaining memory and shared runtimes'),
+        ('doctor', 'Inspect memory, runtime checksums and observed hook activation'),
+        ('repair', 'Recover verified snapshots or a damaged ledger without inventing semantic notes'),
+        ('diagnose', 'Write a local allowlisted diagnostic report for user preview'),
         ('status', 'Read compact current project memory'),
         ('entries', 'Page through bounded memory-entry previews'),
         ('events', 'List recent evidence IDs without loading full output'),
@@ -36,6 +42,14 @@ def parser():
         sub.add_argument('--repo', default='.', help='Project root (default: current directory)')
         if name == 'init':
             sub.add_argument('--platform', choices=('both', 'claude', 'codex', 'none'), default='both')
+        elif name in ('install', 'upgrade'):
+            sub.add_argument('--source', help='Reviewed local skill directory; no remote code is fetched')
+            sub.add_argument('--home', help='Managed runtime directory (default: user local application data)')
+            sub.add_argument('--platform', choices=('both', 'claude', 'codex', 'none'))
+            if name == 'upgrade':
+                sub.add_argument('--rollback', action='store_true')
+        elif name == 'diagnose':
+            sub.add_argument('--out', required=True, help='New local JSON file; nothing is uploaded')
         elif name == 'status':
             sub.add_argument('--full', action='store_true')
         elif name in ('events', 'entries'):
@@ -105,6 +119,7 @@ def compact_state(state):
         'entry_count': len(entries),
         'event_count': len(state.get('events', [])),
         'issue_count': len(state.get('issues', [])),
+        'recovery_flags': sorted({str(i.get('code', 'unknown'))[:100] for i in state.get('issues', []) if isinstance(i, dict)})[:20],
         'entries': [],
     }
     for entry in active:
@@ -133,7 +148,21 @@ def main(argv=None):
             result = core.validate_document(Path(args.document).read_text(encoding='utf-8'))
         else:
             repo = Path(args.repo).expanduser().resolve()
-            if args.command == 'init':
+            if args.command in ('install', 'upgrade', 'uninstall', 'doctor', 'repair', 'diagnose'):
+                import remvu_lifecycle as lifecycle
+                if args.command in ('install', 'upgrade'):
+                    if getattr(args, 'rollback', False) and (args.source or args.home):
+                        raise ValueError('--rollback cannot be combined with --source or --home')
+                    if args.command == 'upgrade' and not args.source and not args.rollback:
+                        raise ValueError('upgrade requires --source REVIEWED_SKILL_DIRECTORY or --rollback')
+                    platforms = None if args.platform is None else ('claude', 'codex') if args.platform == 'both' else () if args.platform == 'none' else (args.platform,)
+                    result = lifecycle.install(repo, source=args.source, home=args.home, platforms=platforms,
+                                               rollback=getattr(args, 'rollback', False))
+                elif args.command == 'diagnose':
+                    result = lifecycle.diagnose(repo, args.out)
+                else:
+                    result = getattr(lifecycle, args.command)(repo)
+            elif args.command == 'init':
                 from remvu_init import initialize
                 platforms = ('claude', 'codex') if args.platform == 'both' else () if args.platform == 'none' else (args.platform,)
                 result = initialize(repo, platforms=platforms, scripts_dir=Path(__file__).parent)
@@ -203,7 +232,7 @@ def main(argv=None):
                 raise ValueError('unsupported command')
         emit(result)
         return 1 if isinstance(result, dict) and result.get('ok') is False else 0
-    except (ValueError, OSError, KeyError, TypeError, ImportError, subprocess.SubprocessError) as error:
+    except (ValueError, OSError, KeyError, TypeError, ImportError, RuntimeError, subprocess.SubprocessError) as error:
         # Error messages must not echo full proposal bodies or credentials.
         try:
             from legacy_export import scrub
