@@ -36,6 +36,6 @@ Build the distributable packages from a committed revision into a fresh director
 python3 scripts/build_release.py --out /tmp/remvu-release
 ```
 
-The default source is `HEAD`; use `--ref COMMIT` to reproduce a specific revision. The standard-library builder writes the versioned plugin ZIP, standalone skill ZIP and `SHA256SUMS`, and audits their contents. Packages contain the manifest/skills/license components they use. Tests, evaluation reports and full source remain in the repository and GitHub's source archive. Before uploading, extract each final package at a new path and verify initialization, update, sharing and checks without relying on the source checkout.
+The default source is `HEAD`; use `--ref COMMIT` to reproduce a specific revision. The standard-library builder writes the versioned plugin ZIP, standalone skill ZIP, native acceptance kit and `SHA256SUMS`, and audits their contents. Packages contain the manifest/skills/license components they use. Tests, evaluation reports and full source remain in the repository and GitHub's source archive. Before uploading, extract each final package at a new path and verify initialization, update, sharing and checks without relying on the source checkout.
 
 MIT-licensed contributions retain the project's existing license. Prose should use plain language and claims supported by evidence. The public introduction follows [Humanizer](https://github.com/blader/humanizer)'s editing rules; it is not a runtime dependency.

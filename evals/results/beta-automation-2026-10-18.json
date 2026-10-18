@@ -1,0 +1,108 @@
+{
+  "format": "remvu-beta-automated-validation/1",
+  "date": "2026-10-18",
+  "version": "0.3.0-beta.1",
+  "source_revision": "32e3dc06faa928b0bb119dfa0c415c17fecb5211",
+  "ci": {
+    "run_url": "https://github.com/caotaiyi/remvu/actions/runs/39094189585",
+    "all_jobs_passed": true,
+    "jobs": {
+      "macos-latest / Python 3.10": {
+        "discovered": 160,
+        "elapsed_seconds": 34.6,
+        "skipped": 1,
+        "passed": 159,
+        "failed": 0
+      },
+      "ubuntu-latest / Python 3.12": {
+        "discovered": 160,
+        "elapsed_seconds": 23.833,
+        "skipped": 1,
+        "passed": 159,
+        "failed": 0
+      },
+      "ubuntu-latest / Python 3.10": {
+        "discovered": 160,
+        "elapsed_seconds": 24.082,
+        "skipped": 1,
+        "passed": 159,
+        "failed": 0
+      },
+      "windows-latest / Python 3.10": {
+        "discovered": 160,
+        "elapsed_seconds": 146.314,
+        "skipped": 2,
+        "passed": 158,
+        "failed": 0
+      },
+      "windows-latest / Python 3.12": {
+        "discovered": 160,
+        "elapsed_seconds": 159.535,
+        "skipped": 2,
+        "passed": 158,
+        "failed": 0
+      },
+      "macos-latest / Python 3.12": {
+        "discovered": 160,
+        "elapsed_seconds": 30.749,
+        "skipped": 1,
+        "passed": 159,
+        "failed": 0
+      }
+    }
+  },
+  "schema_conformance_cases": 7,
+  "schema_checked": true,
+  "package_smoke": {
+    "ok": true,
+    "format": "remvu-package-smoke/1",
+    "python": "3.12.15",
+    "platform": "darwin",
+    "archive_sha256": "c52031f22ec4bf9a49dbe5e9f44d97b4a4f5ce72799031b3d0804dd23c1176c9",
+    "checks": [
+      "fresh_install",
+      "source_relocation",
+      "repeat_install",
+      "status",
+      "handoff",
+      "doctor",
+      "snapshot_recovery",
+      "truthful_pending",
+      "local_diagnostic",
+      "uninstall_preserves_memory"
+    ],
+    "native_client_acceptance": false
+  },
+  "packages": [
+    {
+      "name": "remvu-plugin-v0.3.0-beta.1.zip",
+      "sha256": "b260872e540c7e4dd88dbac5a6f11b3000dae7c5fa933f4410f33e5d6b4a71ca",
+      "bytes": 80541,
+      "archive_entries": 27
+    },
+    {
+      "name": "remvu-skill-v0.3.0-beta.1.zip",
+      "sha256": "c52031f22ec4bf9a49dbe5e9f44d97b4a4f5ce72799031b3d0804dd23c1176c9",
+      "bytes": 64241,
+      "archive_entries": 13
+    },
+    {
+      "name": "remvu-acceptance-v0.3.0-beta.1.zip",
+      "sha256": "35c98c1777939b908722fbf34b7a22294f92a01331435965f7aec11958d2d316",
+      "bytes": 145508,
+      "archive_entries": 34
+    }
+  ],
+  "ci_downloads_byte_identical_to_local_packages": true,
+  "release_readiness": {
+    "ready": false,
+    "checker_exit_code": 1,
+    "pending_profiles": 12
+  },
+  "limitations": [
+    "Hosted CI is not native Windows 11 or desktop/IDE acceptance.",
+    "Windows skips two POSIX protection fixtures; macOS/Linux skip the Windows-only path fixture.",
+    "Native regression failures and the focused follow-up are retained in separate reports.",
+    "Private raw records are not published; no token or cost savings percentage is established."
+  ]
+}

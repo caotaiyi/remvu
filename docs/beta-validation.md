@@ -36,17 +36,35 @@ Raw provider output, chat logs and private runtime directories are not published
 
 ## Automated checks
 
-The original 137-test suite passed locally on system Python 3.9.6 before the
-new lifecycle coverage. A subsequent Python 3.12.15 run passed 151 tests with
-one Windows-only path-semantics test skipped on macOS. Later changes require
-the final CI and package checks; consult the linked run and committed evidence
-before treating a count as the current candidate's result.
+Frozen candidate code: `32e3dc06faa928b0bb119dfa0c415c17fecb5211`.
+[All six CI jobs passed](https://github.com/caotaiyi/remvu/actions/runs/39094189585)
+on Linux, macOS and Windows with Python 3.10/3.12. Each job discovered 160 tests:
+macOS/Linux passed 159 and skipped the Windows-only path fixture; Windows passed
+158 and skipped two POSIX protection fixtures. Seven strict format conformance
+cases passed with JSON Schema checks.
 
-New lifecycle coverage includes source relocation, repeated install, checksum
-tampering, upgrade/rollback, failed-install preservation of concurrent events,
-conservative uninstall, cold read-only doctor, snapshot/ledger recovery,
-missing evidence, orphan-journal retention, bounded recovery copies and
-allowlisted diagnostics. Shell parsing tests do not replace native Windows hooks.
+The fresh-archive lifecycle smoke passed in every CI job and locally on Python
+3.12.15. It covers installation, source relocation, repeated installation, status,
+handoff, health, verified snapshot recovery, truthful pending state, local
+diagnostics and memory-preserving uninstall. The CI-built archives were downloaded
+and verified byte-for-byte against the local delivery and its checksums. Build
+clock and timezone differences no longer change the packages.
+
+[Machine-readable automation evidence](../evals/results/beta-automation-2026-10-18.json)
+records counts, skips, actual test times and package hashes. To reproduce the
+same assets, build with `--ref 32e3dc06faa928b0bb119dfa0c415c17fecb5211`.
+Documentation-only updates after this revision do not change the tested runtime.
+
+Lifecycle coverage also includes upgrade/rollback, edited-skill preservation,
+recorded interpreter/ownership, failed-install preservation of concurrent events,
+checksum tampering, missing evidence, orphan journals, observation gaps, worktree
+isolation and bounded Stop repair. Synthetic payloads are not native clients.
+
+If a shared runtime is damaged, preserve it and install reviewed source into a
+fresh `--home` directory, then review the new hook definitions normally. Reusing
+the same immutable cache path intentionally refuses checksum damage. Evidence
+and journals remain retained; automatic long-term evidence compaction is future
+work, with actual storage bytes available through doctor.
 
 ## Remaining release gates
 
