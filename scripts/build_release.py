@@ -7,6 +7,7 @@ the checkout. Untracked files, private memory and local caches cannot enter it.
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
@@ -16,7 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def git(*args):
-    return subprocess.check_output(['git', '-C', str(ROOT), *args])
+    # Git's ZIP DOS timestamps otherwise use the builder's local timezone.
+    return subprocess.check_output(['git', '-C', str(ROOT), *args], env={**os.environ, 'TZ': 'UTC'})
 
 
 def audit(path, skill=False, kit=False):

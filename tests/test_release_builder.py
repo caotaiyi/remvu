@@ -3,6 +3,7 @@ from contextlib import redirect_stdout
 import hashlib
 import importlib.util
 import io
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -21,7 +22,8 @@ class ReleaseBuilderTest(unittest.TestCase):
             reports = []
             for index, year in enumerate((2024, 2025)):
                 out = Path(directory) / str(index)
-                with patch.object(sys, 'argv', ['build_release', '--out', str(out)]), redirect_stdout(io.StringIO()), \
+                with patch.dict(os.environ, {'TZ': 'Pacific/Honolulu' if index else 'Asia/Singapore'}), \
+                     patch.object(sys, 'argv', ['build_release', '--out', str(out)]), redirect_stdout(io.StringIO()), \
                      patch.object(builder.zipfile.time, 'localtime', return_value=(year, 1, 2, 3, 4, 6, 1, 2, 0)):
                     builder.main()
                 reports.append({p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in out.iterdir()})
