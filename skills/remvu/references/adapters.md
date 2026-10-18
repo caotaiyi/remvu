@@ -19,6 +19,11 @@ Codex provides native turn IDs. Claude Code turns are derived from prompt bounda
 
 Local hooks and skill shims refer to an absolute runtime location. Managed installation keeps that location independent of the clone; moving a legacy direct-init runtime requires reinitialization. Upgrade and rollback select managed versions and may require reviewing changed hook definitions. Exact ignore rules keep newly generated local paths private. If Git already tracks one of those paths, initialization warns without changing the index.
 
+Initialize each separate worktree in its actual directory. A hook configured for
+one project refuses payloads reporting a working directory outside that project;
+the original project receives a gap marker, never the other project's tool body.
+Shared automatic memory across separate worktrees is not certified by this adapter.
+
 Official references:
 
 - [Codex hooks](https://learn.chatgpt.com/docs/hooks)

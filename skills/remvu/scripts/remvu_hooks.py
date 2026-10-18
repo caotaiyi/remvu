@@ -415,6 +415,18 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
         return _warning('Hook event does not match its configured handler; nothing was recorded.')
     try:
         root = _repo(payload, repo)
+        if repo is not None and payload.get('cwd') is not None:
+            cwd = payload['cwd']
+            if not isinstance(cwd, str) or not Path(cwd).is_absolute():
+                raise ValueError('Hook cwd must be an absolute project directory')
+            observed_root = Path(cwd).resolve()
+            if observed_root != root and root not in observed_root.parents:
+                raise ValueError('Hook cwd is outside the configured project. Initialize this worktree separately; no tool payload was recorded.')
+            for candidate in (observed_root, *observed_root.parents):
+                if candidate == root:
+                    break
+                if (candidate / '.git').exists():
+                    raise ValueError('Hook cwd belongs to a nested repository or worktree. Initialize it separately; no tool payload was recorded.')
         if (root / '.remvu').is_symlink():
             return _warning('Refusing a symlinked private memory directory.')
         if not (root / '.remvu/state.json').is_file():

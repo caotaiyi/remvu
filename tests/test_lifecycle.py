@@ -233,6 +233,25 @@ class LifecycleTest(unittest.TestCase):
         self.install()
         self.assertEqual(set(json.loads((self.repo / '.remvu/adapters.json').read_text())['platforms']), {'claude', 'codex'})
 
+    def test_different_worktree_cwd_cannot_record_into_original_project(self):
+        setup.initialize(self.repo, (), SCRIPTS)
+        other = self.root / 'other-worktree'
+        other.mkdir()
+        payload = {'session_id': 'other-worktree', 'cwd': str(other), 'tool_name': 'Bash',
+                   'tool_input': {'command': 'echo PRIVATE-OTHER-PROJECT'}}
+        result = hooks.run_hook('codex', 'PreToolUse', payload, self.repo)
+        self.assertIn('outside the configured project', result['systemMessage'])
+        self.assertEqual(core.load_state(self.repo)['events'], [])
+        self.assertFalse((other / '.remvu').exists())
+        nested = self.repo / 'nested-worktree'
+        nested.mkdir()
+        (nested / '.git').write_text('gitdir: synthetic-worktree-fixture')
+        payload['cwd'] = str(nested)
+        self.assertIn('nested repository or worktree', hooks.run_hook('codex', 'PreToolUse', payload, self.repo)['systemMessage'])
+        self.assertEqual(core.load_state(self.repo)['events'], [])
+        for blob in (self.repo / '.remvu').rglob('*.json'):
+            self.assertNotIn('PRIVATE-OTHER-PROJECT', blob.read_text())
+
     @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows path semantics')
     def test_windows_bookkeeping_excludes_only_canonical_installed_call(self):
         argv = [str(Path(sys.executable).resolve()), str(SCRIPTS / 'remvu.py'), 'status', '--repo', str(self.repo)]

@@ -35,6 +35,10 @@ Profiles: `claude-cli`, `codex-cli`, `claude-desktop`, `codex-desktop`,
 `claude-vscode`, `codex-vscode`. Run all six on each target system.
 
 Open `producer/` in the selected real client and paste `producer-prompt.txt`.
+Use its local working directory directly. If a desktop client creates another
+worktree, initialize Remvu there as a separate test project. A hook bound to the
+original project must not record another worktree's payload into its memory;
+mismatched directories produce a visible gap.
 Install this candidate, finish the normal project trust/hook review and note
 the actual app, CLI and extension versions. Record the installed runtime digest
 from `.runtime.json`. Do not enable permission bypass flags.
