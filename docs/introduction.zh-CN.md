@@ -2,7 +2,7 @@
 
 Claude Code 额度用完，换到 Codex 时，代码还在，但用户的偏好、试过的路线和没完成的事可能丢了。Remvu 用一份 Markdown 交接文件留下这些背景。
 
-日常只有两个动作：`save` 保存，`resume` 接着做。Claude Code 使用 `/remvu save`、`/remvu resume`，Codex 使用 `$remvu save`、`$remvu resume`。默认 skill 由当前 agent 直接读写文件，不需要 Python、hooks 或 Remvu 账号，不会在结束会话时拦住工作。
+日常只有两个动作：`save` 保存，`resume` 接着做。Claude Code 使用 `/remvu save`、`/remvu resume`，Codex 使用 `$remvu save`、`$remvu resume`。请在原 agent 仍能响应时保存；没有保存过的聊天背景不会在额度耗尽后自动恢复。默认 skill 由当前 agent 直接读写文件，不需要 Python、hooks 或 Remvu 账号，不会在结束会话时拦住工作。
 
 私有笔记保存在 `.remvu/notes/REMVU.md`。换电脑时，把代码和选定的交接文件一起带走；接手方不必安装 Remvu，直接读文件也可以。接手前仍需检查代码变化，旧的测试通过记录不能当作当前验证。
 

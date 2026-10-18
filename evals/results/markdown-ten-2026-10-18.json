@@ -1098,5 +1098,7 @@
     "conventional_global_remvu_skill_paths_present": false,
     "receiver_engine_artifacts_present": false,
     "scope": "Postrun filesystem check; no OS-enforced read isolation or hidden tool-input audit claimed."
-  }
+  },
+  "evaluated_input_revision": "a52171b9e773e3dbe6ac798287a59ed76aa9de21",
+  "postrun_change": "Only the optional engine support sentence was subsequently narrowed: Windows requires Python 3.10+. Save/resume rules, note template and task inputs are unchanged. Frozen input hashes identify the evaluated revision."
 }

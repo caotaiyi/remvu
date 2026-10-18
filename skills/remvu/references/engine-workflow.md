@@ -1,6 +1,6 @@
 # Optional Python engine
 
-This reference applies only to the optional engine. Obtain the complete reviewed skill source, including scripts/, before using it. Requires Python 3.9+ and Git. SCRIPT means its absolute scripts/remvu.py path. For managed installation, run `python3 SCRIPT install --repo PROJECT --platform both`; this optional path installs hooks and requires the normal host trust process. The default Markdown workflow does not call it.
+This reference applies only to the optional engine. Obtain the complete reviewed skill source, including scripts/, before using it. Requires Python 3.9+ on macOS/Linux, Python 3.10+ on Windows, and Git. SCRIPT means its absolute scripts/remvu.py path. For managed installation, run `python3 SCRIPT install --repo PROJECT --platform both`; this optional path installs hooks and requires the normal host trust process. The default Markdown workflow does not call it.
 
 ## Read and update memory
 

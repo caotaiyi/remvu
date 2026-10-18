@@ -1,3 +1,7 @@
+# Optional engine runtime boundary
+
+The default Markdown skill needs no Python. The managed engine supports Python 3.9+ on macOS/Linux and 3.10+ on Windows. Windows Python 3.9 repeatedly failed strict six-writer pressure tests and is explicitly unsupported; its failures are retained in the product report, with a manual experimental workflow for reproduction. It is not counted as a passed matrix combination. Native client acceptance below remains separate.
+
 # Markdown skill status
 
 The default skill now uses host file tools for explicit save/resume, with no Python runtime or hooks. This changes the setup requirement; it does not establish native compatibility by itself. Local installer and native Markdown trials are recorded separately in [the product report](product-validation.md). The earlier engine matrix below remains historical and does not certify the new path. Windows PowerShell, desktop and VS Code checks remain pending unless explicitly evidenced.

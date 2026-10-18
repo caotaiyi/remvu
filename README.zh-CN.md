@@ -1,6 +1,6 @@
 # Remvu
 
-**Claude Code 额度用完了？保存项目背景，换到 Codex 接着做。**
+**在 Claude Code 额度用完前保存背景，再到 Codex 接着做。**
 
 Remvu 是一个 Markdown skill。它把目标、约束、否决过的方案、验证结果和未完成事项写成一份交接文件，让下一个 AI 带着背景继续工作。默认用法无需 Python、hooks、Remvu 账号或后台服务。
 
@@ -20,6 +20,8 @@ Remvu 是一个 Markdown skill。它把目标、约束、否决过的方案、�
 | 新会话接着做 | `/remvu resume` | `$remvu resume` |
 
 保存文件在本地 `.remvu/notes/REMVU.md`，不会自动提交或上传。接手方读取它、检查代码是否变化，再继续你的任务。如果换了电脑，需要一起带走代码和这份文件。接手方不必安装 Remvu，直接告诉 agent“读取这个交接文件并继续”也可以。
+
+请在原 agent 仍能响应时保存。如果额度已用完且没有笔记，轻量版无法恢复此前未保存的聊天背景；接手方只能检查代码，并明确哪些背景还缺失。
 
 ## 30 秒看懂流程
 
@@ -43,7 +45,7 @@ Remvu 是一个 Markdown skill。它把目标、约束、否决过的方案、�
 
 ## 高级能力仍然保留
 
-需要严格的 `remvu/1` 格式、代码指纹、事件索引、并发更新保护或恢复时，可以启用原有 Python 引擎，需要 Python 3.9+ 和 Git。日常 save/resume 不依赖它。旧版记录、导出格式和 release 继续保留。[引擎工作流](skills/remvu/references/engine-workflow.md) · [维护说明](skills/remvu/references/maintenance.md) · [开放格式](spec/remvu-v1.md)。
+需要严格的 `remvu/1` 格式、代码指纹、事件索引、并发更新保护或恢复时，可以启用原有 Python 引擎，macOS/Linux 需要 Python 3.9+，Windows 需要 Python 3.10+，并需要 Git。日常 save/resume 不依赖它。旧版记录、导出格式和 release 继续保留。[引擎工作流](skills/remvu/references/engine-workflow.md) · [维护说明](skills/remvu/references/maintenance.md) · [开放格式](spec/remvu-v1.md)。
 
 公开分享需要单独提出请求，再筛选可公开的项目事实和证据。私有交接文件不会自动变为公开 `REMVU.md`。不导出隐藏思考链、密钥或无关聊天。
 

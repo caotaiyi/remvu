@@ -28,10 +28,16 @@ class LifecycleTest(unittest.TestCase):
         self.tmp.cleanup()
 
     def install(self, source=None):
-        # The old suite also runs on Apple's system Python 3.9. Production
-        # installation rejects it; CI and acceptance use actual Python 3.10+.
-        with patch.object(life.sys, 'version_info', (3, 12)):
-            return life.install(self.repo, source or SCRIPTS.parent, self.home)
+        return life.install(self.repo, source or SCRIPTS.parent, self.home)
+
+    def test_unsupported_windows39_refuses_before_mutation_and_offers_markdown(self):
+        with patch.object(life.sys, 'version_info', (3, 9, 6)), \
+             patch.object(life.platform, 'system', return_value='Windows'):
+            self.assertFalse(life.preflight()['python_supported'])
+            with self.assertRaisesRegex(ValueError, 'Markdown skill needs no Python'):
+                life.install(self.repo, SCRIPTS.parent, self.home)
+        self.assertFalse((self.repo / '.remvu').exists())
+        self.assertFalse(self.home.exists())
 
     def test_stable_install_source_relocation_repeat_and_uninstall(self):
         source = self.root / 'source'

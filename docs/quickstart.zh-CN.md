@@ -36,4 +36,4 @@ Claude Code 输入 `/remvu save`，Codex 输入 `$remvu save`。文件保存在�
 
 ## 可选引擎
 
-严格格式校验、内容指纹、并发保护和损坏恢复仍由可选引擎提供，需要 Python 3.9+ 和 Git。Markdown skill 不编辑旧 `.remvu/state.json`，也不能替代引擎的冲突解决或事件整理。[具体差异](../skills/remvu/references/notes.md#existing-engine-projects)。
+严格格式校验、内容指纹、并发保护和损坏恢复仍由可选引擎提供，macOS/Linux 需要 Python 3.9+，Windows 需要 Python 3.10+，并需要 Git。Markdown skill 不编辑旧 `.remvu/state.json`，也不能替代引擎的冲突解决或事件整理。[具体差异](../skills/remvu/references/notes.md#existing-engine-projects)。

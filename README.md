@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml)
 
-**Claude Code reached its limit? Save your project context and continue in Codex.**
+**Save before Claude Code hits its limit. Continue in Codex with the handoff.**
 
 Remvu is a Markdown skill for handing a project to the next coding agent. Save the goal, constraints, rejected approaches and unfinished work; let the next agent read the file alongside your code. The default workflow needs **no Python, hooks, account or background service**.
 
@@ -22,6 +22,8 @@ The installer copies project skills, leaving client settings alone. It uses Git 
 | Continue in a fresh session | `/remvu resume` | `$remvu resume` |
 
 `save` writes a private local note under `.remvu/notes/REMVU.md`. It does not commit or upload. `resume` reads the handoff, compares its recorded code state with the project and continues the requested work. The recipient can also just be told “Read this file and continue”; Remvu installation is optional on the receiving side. On another machine, take the project code and the selected note with you.
+
+Save while the original agent can still respond. If its quota is already exhausted and no note exists, the Markdown skill cannot recover that unsaved conversation; the receiver must inspect code and identify missing context.
 
 ## The handoff, in 30 seconds
 
@@ -45,7 +47,7 @@ Markdown notes use the lightweight `remvu-note/1` convention. They have no autom
 
 ## Optional engine and open format
 
-Existing Python tools remain available for `remvu/1` documents, code fingerprints, evidence indexing, revision-checked updates, privacy review and recovery. They use Python 3.9+ and Git; they are optional for save/resume. Existing memory, releases and formats are retained. [Engine workflow](skills/remvu/references/engine-workflow.md) · [Maintenance](skills/remvu/references/maintenance.md) · [Format proposal](spec/remvu-v1.md).
+Existing Python tools remain available for `remvu/1` documents, code fingerprints, evidence indexing, revision-checked updates, privacy review and recovery. They use Python 3.9+ on macOS/Linux, Python 3.10+ on Windows, and Git; they are optional for save/resume. Existing memory, releases and formats are retained. [Engine workflow](skills/remvu/references/engine-workflow.md) · [Maintenance](skills/remvu/references/maintenance.md) · [Format proposal](spec/remvu-v1.md).
 
 Public sharing is a separate, explicit request. Review selected project facts and safe inline evidence before generating a root `REMVU.md`. A local private note is never automatically made public. Hidden reasoning, secrets and unrelated conversations are excluded. [Sharing rules](skills/remvu/references/notes.md#explicit-public-share-advanced).
 

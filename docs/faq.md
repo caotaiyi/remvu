@@ -2,7 +2,7 @@
 
 **Do I need Python? / 需要 Python 吗？**
 
-No for the default Markdown skill. Save and resume use the agent's file tools. The optional strict engine needs Python 3.9+ and Git. Do not run scripts/install.py when you only want the Markdown workflow.
+No for the default Markdown skill. Save and resume use the agent's file tools. The optional strict engine needs Python 3.9+ on macOS/Linux, 3.10+ on Windows, and Git. Windows Python 3.9 failed repeated recorder stress and is unsupported by managed installation. Do not run scripts/install.py when you only want the Markdown workflow.
 
 **Will Remvu stop my session? / 会拦截结束吗？**
 

@@ -26,4 +26,4 @@ To update, preserve the old skill directories and copy a reviewed new version; t
 
 ## Optional engine
 
-The existing managed engine installation, upgrade, rollback, diagnostics and uninstall remain available with Python 3.9+ and Git. See [maintenance](../skills/remvu/references/maintenance.md). Existing engine `.remvu/state.json` files are never edited by the Markdown skill. Existing engine projects should read the migration notes in [note rules](../skills/remvu/references/notes.md#existing-engine-projects).
+The existing managed engine installation, upgrade, rollback, diagnostics and uninstall remain available with Python 3.9+ on macOS/Linux, Python 3.10+ on Windows, and Git. See [maintenance](../skills/remvu/references/maintenance.md). Existing engine `.remvu/state.json` files are never edited by the Markdown skill. Existing engine projects should read the migration notes in [note rules](../skills/remvu/references/notes.md#existing-engine-projects).

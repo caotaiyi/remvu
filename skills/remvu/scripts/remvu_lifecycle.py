@@ -39,8 +39,12 @@ def default_home():
     return Path.home() / '.local/share/remvu'
 
 
+def _python_minimum():
+    return (3, 10) if platform.system() == 'Windows' else (3, 9)
+
+
 def preflight():
-    return {'python_supported': sys.version_info >= (3, 9),
+    return {'python_supported': sys.version_info >= _python_minimum(),
             'python': platform.python_version(), 'git_available': shutil.which('git') is not None,
             'clients_found': {name: shutil.which(name) is not None for name in ('claude', 'codex', 'code')},
             'system': platform.system(), 'machine': platform.machine()}
@@ -163,8 +167,10 @@ def install(repo, source=None, home=None, platforms=None, rollback=False):
     repo = _safe(repo).resolve()
     if not repo.is_dir():
         raise ValueError('Project directory must already exist')
-    if sys.version_info < (3, 9):
-        raise ValueError('Install Python 3.9+ using the official installer, then retry')
+    if sys.version_info < _python_minimum():
+        raise ValueError('Optional engine: Windows requires Python 3.10+, macOS/Linux 3.9+. '
+                         'The default Markdown skill needs no Python; use install-skill instead. '
+                         'Windows Python 3.9 recorder stress is unsupported, not a verified configuration.')
     if not shutil.which('git'):
         raise ValueError('Install Git using the official installer, then retry')
     path = _safe(repo / '.remvu/installation.json')
