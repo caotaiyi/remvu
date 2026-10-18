@@ -40,7 +40,7 @@ def _atomic(path: Path, text: str) -> None:
             stream.write(text)
             stream.flush()
             os.fsync(stream.fileno())
-        os.replace(tmp, path)
+        _core()._replace_file(tmp, path)
     finally:
         if os.path.exists(tmp):
             os.unlink(tmp)

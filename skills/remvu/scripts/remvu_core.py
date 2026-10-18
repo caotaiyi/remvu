@@ -120,6 +120,28 @@ def _safe_child(root, relative):
     return path
 
 
+def _replace_file(source, target, timeout=0.5):
+    """Retry transient Windows sharing denials without unlinking the old file.
+
+    A reader or scanner may briefly open a destination without delete sharing.
+    Permanent permissions errors still fail; unrelated errors are never retried.
+    """
+    deadline = time.monotonic() + timeout
+    delay = .01
+    while True:
+        try:
+            os.replace(source, target)
+            return
+        except OSError as error:
+            if getattr(error, 'winerror', None) not in (5, 32, 33):
+                raise
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise
+            time.sleep(min(delay, remaining))
+            delay = min(delay * 2, .05)
+
+
 def _atomic(path, value):
     """Replace one file atomically; fsync so a crash never yields partial JSON."""
     if path.is_symlink():
@@ -136,7 +158,7 @@ def _atomic(path, value):
             stream.write(data)
             stream.flush()
             os.fsync(stream.fileno())
-        os.replace(name, path)
+        _replace_file(name, path)
         if os.name != 'nt':
             directory = os.open(path.parent, os.O_RDONLY)
             try:
