@@ -1,6 +1,6 @@
 # Lifecycle adapters
 
-`init --platform both` installs project-local Codex and Claude Code integration. Choose `codex`, `claude` or `none` when appropriate. It merges the Remvu-managed configuration with existing user settings. Inspect the installation result and follow any trust or restart instructions the client reports.
+`install --platform both` copies the reviewed runtime to stable user storage and configures project-local Codex and Claude Code integration. Choose `codex`, `claude` or `none` for a new setup. Existing adapters are retained until explicitly uninstalled. Legacy `init` remains available but refers directly to its source path. Inspect the result and follow normal client trust/restart instructions. See [maintenance](maintenance.md).
 
 | Client | Configuration | Events mapped by the reference adapter |
 | --- | --- | --- |
@@ -13,11 +13,11 @@ Startup points the current agent at a bounded handoff. Pre-tool events record at
 
 The active agent performs the semantic update from its existing context. Scripts do not make extra model requests. Stop-hook repair is bounded to one request per logical user turn; continuation prompts cannot restart the loop. If repair still fails, report the pending state and stop retrying during that turn.
 
-Bookkeeping detection is conservative: it recognizes only the exact installed runtime in a supported standalone Python or Bash invocation. Compound commands, substitutions, same-named scripts and unknown file tools stay recorded. Windows shell commands always remain evidence because their native dialect has not been verified; they may leave pending events requiring review. Native Windows automatic clean consolidation is not supported, while CLI/core and UTF-8 transport are tested separately.
+Bookkeeping detection recognizes only the exact installed runtime in a standalone supported invocation. On Windows it accepts the literal, single-quoted PowerShell form shown in the skill, including an absolute interpreter path and leading call operator. Compound commands, interpolation, other shell forms, same-named scripts and unknown file tools stay recorded. Parser/CLI coverage does not certify native Windows automatic consolidation; that remains pending real client acceptance.
 
 Codex provides native turn IDs. Claude Code turns are derived from prompt boundaries; an identical prompt delivered again during a still-open interrupted turn cannot be distinguished from a duplicate without parsing unstable transcripts. The adapter does not parse transcripts.
 
-Local hooks and skill shims refer to the absolute installed script location. Re-run initialization after moving that installation and review changed hooks again. Exact ignore rules keep newly generated local paths private. If Git already tracks one of those paths, initialization warns and preserves the index; ignore rules cannot untrack an existing file.
+Local hooks and skill shims refer to an absolute runtime location. Managed installation keeps that location independent of the clone; moving a legacy direct-init runtime requires reinitialization. Upgrade and rollback select managed versions and may require reviewing changed hook definitions. Exact ignore rules keep newly generated local paths private. If Git already tracks one of those paths, initialization warns without changing the index.
 
 Official references:
 
