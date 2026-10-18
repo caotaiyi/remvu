@@ -32,7 +32,7 @@ def audit(path, skill=False, kit=False):
                 raise ValueError('unexpected cache/session file: ' + name)
         if kit:
             for expected in ('skills/remvu/scripts/remvu.py', 'scripts/native_acceptance.py', 'scripts/package_smoke.py',
-                             'scripts/install.py', 'docs/native-acceptance.md', 'LICENSE', 'START-HERE.txt'):
+                             'scripts/install.py', 'scripts/check_beta_readiness.py', 'docs/native-acceptance.md', 'LICENSE', 'START-HERE.txt'):
                 if expected not in names:
                     raise ValueError('missing acceptance-kit component: ' + expected)
         elif skill:
@@ -88,7 +88,7 @@ def main():
         target.writestr(new, source.read('LICENSE'))
     git('archive', '--format=zip', '--output=' + str(kit), commit,
         'LICENSE', 'skills/remvu', 'scripts/install.py', 'scripts/native_acceptance.py',
-        'scripts/package_smoke.py', 'scripts/windows-preflight.ps1',
+        'scripts/package_smoke.py', 'scripts/windows-preflight.ps1', 'scripts/check_beta_readiness.py',
         'docs/native-acceptance.md', 'docs/quickstart.md', 'docs/quickstart.zh-CN.md',
         'docs/faq.md', 'evals/beta-matrix.json')
     with zipfile.ZipFile(kit, 'a', compression=zipfile.ZIP_DEFLATED) as target:
