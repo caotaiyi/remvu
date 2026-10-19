@@ -1,0 +1,222 @@
+{
+  "format": "remvu-packaged-validation/1",
+  "source_commit": "9b9745b8f2cfbe83cb5d27bdd1500ced450d50d0",
+  "source_ci": "https://github.com/caotaiyi/remvu/actions/runs/39203583763",
+  "source_jobs_passed": 8,
+  "package_ci": "https://github.com/caotaiyi/remvu/actions/runs/39203583716",
+  "package_jobs_passed": 4,
+  "packaged": {
+    "windows": {
+      "manifest": {
+        "version": "0.3.0-beta.2",
+        "source_revision": "9b9745b8f2cfbe83cb5d27bdd1500ced450d50d0",
+        "source_dirty": false,
+        "system": "Windows",
+        "machine": "AMD64",
+        "python": "3.12.10"
+      },
+      "checks": {
+        "ok": true,
+        "platform": "nt",
+        "python_on_path": false,
+        "checks": [
+          "stable_install",
+          "repeat_install",
+          "download_relocation",
+          "bundled_upgrade_and_rollback",
+          "dsh_overlay",
+          "exact_hook_callback",
+          "12_events_6_writers",
+          "private_save",
+          "reviewed_update",
+          "CAS_conflict_retained",
+          "resume",
+          "stale_code",
+          "public_share_refusal",
+          "verified_repair",
+          "uninstall_retains_memory",
+          "bundled_legacy_export_verify_import"
+        ],
+        "scope": "Packaged program checks in synthetic repositories, not native agent or Windows 11 acceptance."
+      },
+      "archive_bytes": 8650612,
+      "sha256": "301136e157260714f6d4a9f5ee01fbb63fb245430157d02b52c7d6a2831ff590"
+    },
+    "macos": {
+      "manifest": {
+        "version": "0.3.0-beta.2",
+        "source_revision": "9b9745b8f2cfbe83cb5d27bdd1500ced450d50d0",
+        "source_dirty": false,
+        "system": "Darwin",
+        "machine": "arm64",
+        "python": "3.12.10"
+      },
+      "checks": {
+        "ok": true,
+        "platform": "posix",
+        "python_on_path": false,
+        "checks": [
+          "stable_install",
+          "repeat_install",
+          "download_relocation",
+          "bundled_upgrade_and_rollback",
+          "dsh_overlay",
+          "exact_hook_callback",
+          "12_events_6_writers",
+          "private_save",
+          "reviewed_update",
+          "CAS_conflict_retained",
+          "resume",
+          "stale_code",
+          "public_share_refusal",
+          "verified_repair",
+          "uninstall_retains_memory",
+          "bundled_legacy_export_verify_import"
+        ],
+        "scope": "Packaged program checks in synthetic repositories, not native agent or Windows 11 acceptance."
+      },
+      "archive_bytes": 15266707,
+      "sha256": "e90c85907d4caabcf13384177ddd4df306a948e9c7f12d5981af6720d0f89dab"
+    },
+    "linux": {
+      "manifest": {
+        "version": "0.3.0-beta.2",
+        "source_revision": "9b9745b8f2cfbe83cb5d27bdd1500ced450d50d0",
+        "source_dirty": false,
+        "system": "Linux",
+        "machine": "x86_64",
+        "python": "3.12.15"
+      },
+      "checks": {
+        "ok": true,
+        "platform": "posix",
+        "python_on_path": false,
+        "checks": [
+          "stable_install",
+          "repeat_install",
+          "download_relocation",
+          "bundled_upgrade_and_rollback",
+          "dsh_overlay",
+          "exact_hook_callback",
+          "12_events_6_writers",
+          "private_save",
+          "reviewed_update",
+          "CAS_conflict_retained",
+          "resume",
+          "stale_code",
+          "public_share_refusal",
+          "verified_repair",
+          "uninstall_retains_memory",
+          "bundled_legacy_export_verify_import"
+        ],
+        "scope": "Packaged program checks in synthetic repositories, not native agent or Windows 11 acceptance."
+      },
+      "archive_bytes": 20665081,
+      "sha256": "5abcbe1a25049443fe03650a1a023fccfd8eb491ab5e8dca496b0a2a08098d59"
+    }
+  },
+  "windows_source_stress": [
+    {
+      "job": "windows-latest / Python 3.10",
+      "trials": 10,
+      "writers_per_trial": 6,
+      "warnings_allowed": 0,
+      "passed": true,
+      "tests_discovered": 174,
+      "skips": 5
+    },
+    {
+      "job": "windows-latest / Python 3.12",
+      "trials": 10,
+      "writers_per_trial": 6,
+      "warnings_allowed": 0,
+      "passed": true,
+      "tests_discovered": 174,
+      "skips": 5
+    }
+  ],
+  "dsh_host": {
+    "ok": true,
+    "version": "0.3.0-beta.2",
+    "tools": [
+      "remvu_save",
+      "remvu_resume",
+      "remvu_check",
+      "remvu_events",
+      "remvu_show"
+    ],
+    "dsh": "0.2.1-rc.2",
+    "platform": "linux",
+    "checks": [
+      "official_plugin_add",
+      "dump_config_layer",
+      "actual_sdk_profile_boot",
+      "five_registered_tools",
+      "clean_shutdown"
+    ],
+    "model_requests": 0,
+    "scope": "Real host boot without a model request; not GUI or model handoff acceptance."
+  },
+  "github_plugin_install": {
+    "spec": "github:caotaiyi/remvu#9b9745b8f2cfbe83cb5d27bdd1500ced450d50d0",
+    "system": "macos",
+    "official_plugin_add": true,
+    "actual_sdk_boot": true,
+    "registered_tools": 5,
+    "model_requests": 0,
+    "peer_warning_observed": true,
+    "note": "The package manager reported peer warnings; the installed pinned bundle still loaded through the actual DSH runtime. Warnings were not suppressed."
+  },
+  "local_macOS_ci_archive": {
+    "ok": true,
+    "platform": "posix",
+    "python_on_path": false,
+    "checks": [
+      "stable_install",
+      "repeat_install",
+      "download_relocation",
+      "bundled_upgrade_and_rollback",
+      "dsh_overlay",
+      "exact_hook_callback",
+      "12_events_6_writers",
+      "private_save",
+      "reviewed_update",
+      "CAS_conflict_retained",
+      "resume",
+      "stale_code",
+      "public_share_refusal",
+      "verified_repair",
+      "uninstall_retains_memory",
+      "bundled_legacy_export_verify_import"
+    ],
+    "scope": "Packaged program checks in synthetic repositories, not native agent or Windows 11 acceptance."
+  },
+  "retained_failures": [
+    {
+      "source": "4de4ea9",
+      "kind": "windows_smoke_assertion",
+      "detail": "Compared JSON-escaped path text instead of the decoded executable path; fixed in 1c2c987."
+    },
+    {
+      "source": "4de4ea9",
+      "kind": "windows_python310_ledger_contention",
+      "detail": "Six-writer stress trial 7 exceeded the unchanged eight-second ledger budget. Later pre-fix runs passed, so this was intermittent. cf0ff19 moved durable tool writes out of the ledger lock and avoided repeated activation fsyncs; both final Windows jobs passed all ten strict trials."
+    },
+    {
+      "source": "42bb512",
+      "kind": "packaged_legacy_import",
+      "detail": "Manual frozen export/verify passed, but import used source-relative lookup. ff0f2a0 fixed compiled-module loading and added a packaged export/verify/import check; 9b9745b also checked legacy Git collection with sanitized subprocess loading."
+    }
+  ],
+  "native_acceptance_complete": false,
+  "unverified": [
+    "Windows 11 native clients",
+    "Full macOS terminal/desktop/VS Code acceptance matrix",
+    "DSH model-driven handoff and GUI/Windows behavior",
+    "macOS Intel and Windows ARM64"
+  ],
+  "distribution_signing": "not_configured",
+  "extra_model_api_requests_by_normal_maintenance": 0,
+  "savings_claimed": false,
+  "release_status": "draft_candidate"
+}

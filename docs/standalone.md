@@ -4,6 +4,8 @@ Remvu v0.3.0-beta.2 packages the existing memory engine with CPython. Users inst
 
 The default distribution is an application **folder**, not one executable file to detach from its libraries. Keeping the runtime beside the executable avoids unpacking it on every hook invocation. [PyInstaller's operating modes](https://pyinstaller.org/en/stable/operating-mode.html) describe this tradeoff.
 
+The final tested candidate and retained failures are recorded in [the validation report](standalone-validation.md).
+
 ## Get the matching build
 
 The [Standalone apps and DSH workflow](https://github.com/caotaiyi/remvu/actions/workflows/standalone.yml) builds macOS, Windows x64 and Linux candidates. Read a completed run's job outcomes and download the matching artifact; GitHub can require login for CI artifacts. Each artifact includes a platform ZIP, its SHA-256 checksum, the application folder and a smoke report. Release drafts are visible only to maintainers. This page does not point users to the old v0.2.0 release as if it contained standalone apps.
