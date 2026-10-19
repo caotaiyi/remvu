@@ -27,7 +27,7 @@ class SkillInstallTest(unittest.TestCase):
             self.assertEqual(first.returncode, 0, first.stderr)
             for client in ('.claude', '.agents'):
                 target = project / client / 'skills/remvu'
-                self.assertEqual((target / 'SKILL.md').read_bytes(), (ROOT / 'skills/remvu/SKILL.md').read_bytes())
+                self.assertEqual((target / 'SKILL.md').read_bytes(), (ROOT / 'skills/remvu/assets/markdown-skill.md').read_bytes())
                 self.assertTrue((target / 'assets/note-template.md').is_file())
                 self.assertEqual(list(target.rglob('*.py')), [])
                 self.assertTrue((target / 'LICENSE').is_file())

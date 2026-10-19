@@ -34,7 +34,7 @@ class LifecycleTest(unittest.TestCase):
         with patch.object(life.sys, 'version_info', (3, 9, 6)), \
              patch.object(life.platform, 'system', return_value='Windows'):
             self.assertFalse(life.preflight()['python_supported'])
-            with self.assertRaisesRegex(ValueError, 'Markdown skill needs no Python'):
+            with self.assertRaisesRegex(ValueError, 'complete standalone app'):
                 life.install(self.repo, SCRIPTS.parent, self.home)
         self.assertFalse((self.repo / '.remvu').exists())
         self.assertFalse(self.home.exists())
@@ -70,7 +70,8 @@ class LifecycleTest(unittest.TestCase):
         source = self.root / 'changed'
         shutil.copytree(SCRIPTS.parent, source, ignore=shutil.ignore_patterns('__pycache__'))
         (source / 'SKILL.md').write_text((source / 'SKILL.md').read_text(encoding='utf-8') + '\nA revised instruction.\n', encoding='utf-8')
-        second = self.install(source)['runtime_scripts']
+        second = life.install(self.repo, source=source)['runtime_scripts']
+        self.assertTrue(Path(second).is_relative_to(self.home))
         self.assertNotEqual(first, second)
         with patch.object(life.sys, 'version_info', (3, 12)):
             self.assertEqual(life.install(self.repo, rollback=True)['runtime_scripts'], first)

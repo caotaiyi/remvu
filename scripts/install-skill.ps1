@@ -24,7 +24,7 @@ try {
         New-Item -ItemType Directory -Force -Path $parent | Out-Null
         $target = Join-Path $parent 'remvu'
         New-Item -ItemType Directory -Path $target | Out-Null
-        Copy-Item -LiteralPath (Join-Path $skill 'SKILL.md') -Destination $target
+        Copy-Item -LiteralPath (Join-Path $skill 'assets/markdown-skill.md') -Destination (Join-Path $target 'SKILL.md')
         $license = Join-Path $Source 'LICENSE'
         if (Test-Path -LiteralPath $license) { Copy-Item -LiteralPath $license -Destination $target }
         foreach ($component in @('references', 'assets', 'agents')) {

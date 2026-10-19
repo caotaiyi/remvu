@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-VERSION = '0.3.0-beta.1'
+VERSION = '0.3.0-beta.2'
 
 
 def emit(value):
@@ -26,9 +26,13 @@ def parser():
         ('doctor', 'Inspect memory, runtime checksums and observed hook activation'),
         ('repair', 'Recover verified snapshots or a damaged ledger without inventing semantic notes'),
         ('diagnose', 'Write a local allowlisted diagnostic report for user preview'),
+        ('dsh-config', 'Write a local DSH overlay pointing at this standalone app'),
+        ('save', 'Save a private handoff, optionally applying a reviewed memory proposal'),
+        ('resume', 'Read bounded memory and code freshness before continuing'),
         ('status', 'Read compact current project memory'),
         ('entries', 'Page through bounded memory-entry previews'),
         ('events', 'List recent evidence IDs without loading full output'),
+        ('record', 'Adapter: record one observable event from stdin'),
         ('show', 'Read one bounded, integrity-checked evidence event'),
         ('update', 'Apply a revision-checked memory proposal'),
         ('handoff', 'Write a private, standalone Markdown handoff'),
@@ -48,8 +52,16 @@ def parser():
             sub.add_argument('--platform', choices=('both', 'claude', 'codex', 'none'))
             if name == 'upgrade':
                 sub.add_argument('--rollback', action='store_true')
+        elif name == 'dsh-config':
+            sub.add_argument('--out', help='New overlay path; defaults to private .remvu/dsh.patch.yml')
         elif name == 'diagnose':
             sub.add_argument('--out', required=True, help='New local JSON file; nothing is uploaded')
+        elif name == 'save':
+            proposal = sub.add_mutually_exclusive_group()
+            proposal.add_argument('--proposal')
+            proposal.add_argument('--proposal-json')
+        elif name == 'resume':
+            sub.add_argument('--document')
         elif name == 'status':
             sub.add_argument('--full', action='store_true')
         elif name in ('events', 'entries'):
@@ -59,6 +71,8 @@ def parser():
         elif name == 'show':
             sub.add_argument('event_id')
             sub.add_argument('--max-chars', type=int, default=4000)
+        elif name == 'record':
+            pass
         elif name == 'update':
             proposal = sub.add_mutually_exclusive_group(required=True)
             proposal.add_argument('--proposal', help='Proposal JSON file, or - for stdin')
@@ -139,8 +153,13 @@ def main(argv=None):
     arguments = sys.argv[1:] if argv is None else list(argv)
     # Preserve the legacy parser's own help and option handling verbatim.
     if arguments and arguments[0] == 'legacy':
-        engine = Path(__file__).with_name('legacy_export.py')
-        return subprocess.call([sys.executable, str(engine), *arguments[1:]])
+        from legacy_export import main as legacy_main
+        return legacy_main(arguments[1:])
+    if arguments and arguments[0] == 'hook':
+        from remvu_hooks import main as hook_main
+        return hook_main(arguments[1:])
+    if not arguments:
+        arguments = ['--help']
     args = parser().parse_args(arguments)
     try:
         import remvu_core as core
@@ -162,15 +181,55 @@ def main(argv=None):
                     result = lifecycle.diagnose(repo, args.out)
                 else:
                     result = getattr(lifecycle, args.command)(repo)
+            elif args.command == 'dsh-config':
+                import remvu_runtime as runtime
+                if not runtime.frozen():
+                    raise ValueError('dsh-config requires the complete standalone app; a Python script is not an executable adapter.')
+                core.load_state(repo)
+                destination = Path(args.out).expanduser().absolute() if args.out else repo / '.remvu/dsh.patch.yml'
+                if destination.exists() or destination.is_symlink() or any(p.is_symlink() for p in destination.parents):
+                    raise ValueError('Overlay destination exists or contains a symlink. Preserve it and choose another filename.')
+                from remvu_init import _atomic
+                _atomic(destination, json.dumps([{'id': 'remvu', 'config': {'executable': runtime.cli_command()[0], 'project': str(repo)}}], indent=2) + '\n')
+                result = {'ok': True, 'path': str(destination), 'uploaded': False,
+                          'next_step': 'After installing dsh-remvu in your chosen profile, pass this reviewed file using --patch.'}
             elif args.command == 'init':
                 from remvu_init import initialize
                 platforms = ('claude', 'codex') if args.platform == 'both' else () if args.platform == 'none' else (args.platform,)
-                result = initialize(repo, platforms=platforms, scripts_dir=Path(__file__).parent)
+                result = initialize(repo, platforms=platforms, scripts_dir=__import__('remvu_runtime').scripts_dir())
+            elif args.command == 'save':
+                proposal = None
+                if args.proposal_json is not None:
+                    proposal = json.loads(args.proposal_json)
+                elif args.proposal:
+                    proposal = json.load(sys.stdin) if args.proposal == '-' else json.loads(Path(args.proposal).read_text(encoding='utf-8'))
+                if proposal is not None:
+                    updated = core.apply_update(repo, proposal)
+                    if updated.get('ok') is False:
+                        emit(updated)
+                        return 1
+                result = core.write_document(repo, visibility='private')
+                result['pending_consolidation'] = core.load_state(repo).get('pending_consolidation', False)
+                result['uploaded'] = False
+            elif args.command == 'resume':
+                health = core.check_project(repo, document=args.document)
+                result = {'ok': True, 'checks': health,
+                          'memory': compact_state(core.load_state(repo)) if (repo / '.remvu/state.json').is_file() else None,
+                          'instruction': 'Read issues before proceeding. Pending evidence is not consolidated; old checks do not certify current code.'}
+                if args.document:
+                    body = Path(args.document).read_text(encoding='utf-8')
+                    result['document_preview'] = body[:8000]
+                    result['document_truncated'] = len(body) > 8000
             elif args.command == 'status':
                 state = core.load_state(repo)
                 result = state if args.full else compact_state(state)
                 if not args.full:
                     result['observation_gaps_present'] = any(core._safe_child(repo / '.remvu', 'gaps').glob('*.json'))
+            elif args.command == 'record':
+                raw = sys.stdin.read(5 * 1024 * 1024 + 1)
+                if len(raw) > 5 * 1024 * 1024:
+                    raise ValueError('Adapter event exceeds 5 MiB')
+                result = core.record_event(repo, json.loads(raw))
             elif args.command == 'events':
                 if not 1 <= args.limit <= 1000:
                     raise ValueError('--limit must be between 1 and 1000')

@@ -1,0 +1,80 @@
+name: Standalone apps and DSH
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  standalone:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build-only dependencies
+        run: python -m pip install -r scripts/standalone-build-requirements.txt
+      - name: Build complete standalone application
+        run: python scripts/build_standalone.py --out "${{ runner.temp }}/remvu-standalone"
+      - name: Test with no user Python on PATH
+        shell: python
+        run: |
+          import pathlib, subprocess, sys
+          root = pathlib.Path(r'${{ runner.temp }}/remvu-standalone')
+          app = next(p for p in root.iterdir() if p.is_dir())
+          subprocess.run([sys.executable, 'scripts/standalone_smoke.py', str(app), '--report', str(root / 'smoke.json')], check=True)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: remvu-standalone-${{ runner.os }}-${{ runner.arch }}
+          path: ${{ runner.temp }}/remvu-standalone/*
+          if-no-files-found: error
+  dsh:
+    needs: standalone
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: remvu-standalone-Linux-X64
+          path: ${{ runner.temp }}/apps
+      - name: Extract reviewed application and restore executable permissions
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, zipfile
+          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'apps'
+          archive = next(root.glob('*.zip'))
+          dest = root / 'extracted'
+          with zipfile.ZipFile(archive) as z:
+              z.extractall(dest)
+              for info in z.infolist():
+                  mode = info.external_attr >> 16
+                  if mode:
+                      (dest / info.filename).chmod(mode)
+          PY
+      - name: Install pinned published DSH into an isolated test directory
+        run: npm install --prefix "${{ runner.temp }}/dsh" --ignore-scripts @deepseek-ai/dsh@0.2.1-rc.2 pnpm@11.25.0
+      - name: Add isolated package manager to test PATH
+        run: echo "${{ runner.temp }}/dsh/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: Published SDK contract checks with the bundled engine
+        run: |
+          mkdir -p "${{ runner.temp }}/dsh/plugin"
+          cp adapters/dsh/index.js adapters/dsh/package.json adapters/dsh/test.mjs "${{ runner.temp }}/dsh/plugin/"
+          node "${{ runner.temp }}/dsh/plugin/test.mjs" "${{ runner.temp }}/apps/extracted/"*/remvu
+      - name: Official plugin install and actual DSH profile boot without model requests
+        run: node scripts/dsh_host_smoke.mjs "${{ runner.temp }}/dsh/node_modules/.bin/dsh" "${{ runner.temp }}/apps/extracted/"*/remvu "${{ runner.temp }}/dsh-host.json"
+      - name: Package prebuilt JavaScript plugin
+        run: npm pack ./adapters/dsh --pack-destination "${{ runner.temp }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: remvu-dsh-plugin
+          path: |
+            ${{ runner.temp }}/dsh-remvu-*.tgz
+            ${{ runner.temp }}/dsh-host.json

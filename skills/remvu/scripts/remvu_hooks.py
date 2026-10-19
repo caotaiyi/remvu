@@ -13,6 +13,7 @@ import re
 import shlex
 import shutil
 import sys
+import remvu_runtime as runtime
 import tempfile
 import time
 
@@ -246,7 +247,13 @@ def _memory_only(payload: dict, repo: Path) -> bool:
         tokens = _powershell_words(command)
         if not tokens:
             return False
-        installed = Path(__file__).resolve().with_name('remvu.py')
+        installed = runtime.scripts_dir() / 'remvu.py'
+        if runtime.frozen() and len(tokens) >= 2:
+            try:
+                if Path(tokens[0]).is_absolute() and Path(tokens[0]).resolve() == Path(sys.executable).resolve():
+                    return tokens[1] in {'save', 'resume', 'status', 'entries', 'events', 'show', 'update', 'resolve-conflict', 'check', 'handoff', 'share', 'withhold', 'doctor', 'diagnose'}
+            except (OSError, ValueError, RuntimeError):
+                return False
         try:
             if (len(tokens) < 3 or not Path(tokens[0]).is_absolute()
                     or Path(tokens[0]).resolve() != Path(sys.executable).resolve()
@@ -256,7 +263,7 @@ def _memory_only(payload: dict, repo: Path) -> bool:
                 return False
         except (ValueError, OSError, RuntimeError):
             return False
-        return tokens[2] in {'status', 'entries', 'events', 'show', 'update', 'resolve-conflict',
+        return tokens[2] in {'save', 'resume', 'status', 'entries', 'events', 'show', 'update', 'resolve-conflict',
                              'check', 'handoff', 'share', 'withhold', 'doctor', 'diagnose'}
 
     # shlex alone loses the distinction between a quoted newline and a second
@@ -292,7 +299,7 @@ def _memory_only(payload: dict, repo: Path) -> bool:
     if not tokens:
         return False
 
-    installed = Path(__file__).resolve().with_name('remvu.py')
+    installed = runtime.scripts_dir() / 'remvu.py'
 
     def installed_script(token):
         candidate = Path(token)
@@ -320,14 +327,16 @@ def _memory_only(payload: dict, repo: Path) -> bool:
         except (OSError, RuntimeError, ValueError):
             return False
 
-    if installed_script(tokens[0]):
+    if runtime.frozen() and Path(tokens[0]).is_absolute() and Path(tokens[0]).resolve() == Path(sys.executable).resolve():
+        action = 1
+    elif installed_script(tokens[0]):
         action = 1
     elif len(tokens) >= 2 and known_python(tokens[0]) and installed_script(tokens[1]):
         action = 2
     else:
         return False
     return len(tokens) > action and tokens[action] in {
-        'status', 'entries', 'events', 'show', 'update', 'resolve-conflict',
+        'save', 'resume', 'status', 'entries', 'events', 'show', 'update', 'resolve-conflict',
         'check', 'handoff', 'share', 'withhold', 'hook',
         'doctor', 'diagnose',
     }
@@ -523,7 +532,7 @@ def _activation_receipt(root, platform, event, locked=False):
     path = directory / ('activation-' + platform + '.json')
     if path.is_symlink():
         raise ValueError('Refusing a symlinked activation receipt')
-    scripts = str(Path(__file__).resolve().parent)
+    scripts = str(runtime.scripts_dir())
     python = str(Path(sys.executable).resolve())
     old = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     if not isinstance(old, dict) or not isinstance(old.get('events', []), list):

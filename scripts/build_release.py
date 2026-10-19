@@ -98,7 +98,7 @@ def main():
         for info in source.infolist():
             if info.filename.startswith(('remvu/scripts/',)):
                 continue
-            target.writestr(info, source.read(info))
+            target.writestr(info, source.read('remvu/assets/markdown-skill.md') if info.filename == 'remvu/SKILL.md' and 'remvu/assets/markdown-skill.md' in source.namelist() else source.read(info))
     git('archive', '--format=zip', '--output=' + str(kit), commit,
         'LICENSE', 'skills/remvu', 'scripts/install.py', 'scripts/native_acceptance.py',
         'scripts/package_smoke.py', 'scripts/windows-preflight.ps1', 'scripts/check_beta_readiness.py',
@@ -117,7 +117,7 @@ def main():
         add_kit('packages/SHA256SUMS', ''.join(hashlib.sha256(path.read_bytes()).hexdigest() + '  ' + path.name + '\n' for path in (skill, markdown)))
         add_kit('START-HERE.txt',
             'Remvu ' + version + ' candidate acceptance kit / 候选验收包\n\n'
-            'Recommended / 推荐：Markdown save/resume, no Python or hooks / 无需 Python 或 hooks.\n'
+            'Notes-only fallback / 仅笔记备用路径：Markdown save/resume. For the complete no-Python app see docs/standalone.md in the repository.\n'
             'Unzip packages/remvu-markdown-v' + version + '.zip, then copy its remvu folder to\n'
             'PROJECT/.claude/skills/remvu and PROJECT/.agents/skills/remvu. Preserve existing folders first.\n'
             '解压 Markdown 包，把 remvu 文件夹分别复制到项目的 .claude/skills/ 和 .agents/skills/，保留已有版本。\n'

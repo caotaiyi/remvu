@@ -1,62 +1,50 @@
 # Remvu
 
-**在 Claude Code 额度用完前保存背景，再到 Codex 接着做。**
+Claude Code 额度快用完时保存，换到 Codex 继续做。
 
-Remvu 是一个 Markdown skill。它把目标、约束、否决过的方案、验证结果和未完成事项写成一份交接文件，让下一个 AI 带着背景继续工作。默认用法无需 Python、hooks、Remvu 账号或后台服务。
+Remvu 把项目目标、约束、被否决的方案、未完成事项和检查依据留在项目里。完整独立程序自带运行环境，**用户不用安装 Python**，自动记录、代码指纹、并发保护、损坏恢复和分享隔离均保留。
 
-[English](README.md) · [安装说明](docs/quickstart.zh-CN.md) · [实际支持范围](docs/compatibility.md)
+[English](README.md) · [安装](docs/quickstart.zh-CN.md) · [DeepSeek Harness 插件](adapters/dsh/README.md) · [验证与限制](docs/standalone.md)
 
-## 开始使用
+## 交给 agent 安装
 
-把这句话交给你的编程 agent：
+> 从 https://github.com/caotaiyi/remvu 为我的系统和架构安装完整 Remvu 独立程序候选版。校验下载包，解压整个程序文件夹，再为当前项目安装。保留已有配置与记忆，引导我完成客户端正常的 hook 信任审查。不要安装系统 Python，也不要换成仅笔记版。
 
-> 从 https://github.com/caotaiyi/remvu 安装 Markdown 版 Remvu skill 到当前项目的 Claude Code 和 Codex skill 目录。先审阅，再在 macOS 使用 scripts/install-skill.sh，Windows 使用 scripts/install-skill.ps1。保留已有 skill，不运行可选的 Python 安装器，不启用 hooks。
+v0.3.0-beta.2 仍是测试候选版。CI 生成各平台程序包；正式发布与客户端支持范围需要逐项真实验收。下载和校验方法见[独立程序说明](docs/standalone.md)。仍需 Git，macOS 分发签名和公证尚未配置。
 
-安装器使用 Git 获取源码，也可以使用本地已审阅的源码。它只复制 skill，不改客户端设置。仍需遵守客户端正常的项目信任流程；如果未发现 skill，打开新会话。
-
-| 动作 | Claude Code | Codex |
+| 日常操作 | Claude Code | Codex |
 | --- | --- | --- |
-| 离开前保存 | `/remvu save` | `$remvu save` |
-| 新会话接着做 | `/remvu resume` | `$remvu resume` |
+| 保存本地交接 | `/remvu save` | `$remvu save` |
+| 新会话接手 | `/remvu resume` | `$remvu resume` |
 
-保存文件在本地 `.remvu/notes/REMVU.md`，不会自动提交或上传。接手方读取它、检查代码是否变化，再继续你的任务。如果换了电脑，需要一起带走代码和这份文件。接手方不必安装 Remvu，直接告诉 agent“读取这个交接文件并继续”也可以。
+`save` 让当前 agent 整理已审阅的证据，生成私有 `.remvu/handoff/REMVU.md`。直接运行程序而不提交整理内容时，只导出现有状态，待整理记录仍保留。保存不会提交代码或上传文件。接收方只拿代码和交接文件也能继续，无需安装 Remvu。
 
-请在原 agent 仍能响应时保存。如果额度已用完且没有笔记，轻量版无法恢复此前未保存的聊天背景；接手方只能检查代码，并明确哪些背景还缺失。
+在原 agent 还能响应时保存。自动日志能留下操作事实，无法补出额度耗尽后未写下的理解。Stop hook 不阻塞结束，也不强迫模型再跑一轮。
 
-## 30 秒看懂流程
+## 30 秒了解交接流程
 
-1. Claude Code 中输入 `/remvu save`。
-2. 在 Codex 打开同一个项目，输入 `$remvu resume`。
-3. 确认下一步和未验证事项，继续工作。
+1. 在 Claude Code 中调用 `/remvu save`。
+2. 用 Codex 打开项目，调用 `$remvu resume`。
+3. 核对下一步、过期检查、待整理证据和冲突，继续任务。
 
-这是额度切换场景的使用流程，不需要真的用完额度。下面是旧版两个小型真实 CLI 接手试验的证据回放，不是新版本录屏，也不代表任务实际耗时。
+这是流程说明，不是完成时间保证。[早期真实接手记录](docs/validation-report.md)和[十任务仅笔记对照实验](docs/product-validation.md)均保留原始结论与限制。后者未显示比普通 HANDOFF 笔记更高的首轮准确率，也没有测量本次独立程序或证明 token 节省。
 
-![历史 CLI 接手试验的 30 秒证据回放](docs/assets/remvu-live-replay.gif)
+## DeepSeek Harness 插件
 
-[试验来源及限制](docs/demo.md)。轻量版已另做十任务 CLI 对照，结果见下文；旧版通过不能证明新入口兼容。
+`dsh-remvu` 为 DeepSeek Harness **0.2.1-rc.2** 提供五个原生工具和可观察事件记录，使用同一套独立引擎与本地记忆。插件已经写成 JavaScript，安装无需编译或执行构建脚本。[安装说明](adapters/dsh/README.md)。
 
-## 留下什么
+已通过官方插件安装流程，并在隔离的真实 SDK 配置中加载；验证过程未请求模型。真实模型接手和 GUI 验收仍待完成。当前适配本地项目，不宣称远程文件系统或云端执行兼容。
 
-每条重要信息区分用户确认、工具观察、agent 推断和待核实。被否决的方案、失败检查、未完成事项和决定的替代关系都会保留。首读摘要通常控制在 2,000 字符以内，重要细节放在后续章节。
+## 保留完整功能
 
-保存由你主动触发。Remvu 不拦截会话结束；可选记录器的 Stop 处理也已改为不阻塞。它不承诺完整转录所有操作，缺失证据会明确列出。
+记忆区分用户确认、工具观察、agent 推断和待核实内容。旧决定与被否决方向保留历史。检查结果绑定当时的代码指纹，代码变化后不能沿用旧的“通过”。并发提案需核对版本，不能静默覆盖另一方记录。
 
-轻量文件采用 `remvu-note/1` 约定。它没有自动代码指纹、并发锁或严格校验保障；接手时需要检查代码变化并重跑相关检查。保存后 agent 会回读文件，但这不能证明内容绝对完整。[具体规则](skills/remvu/references/notes.md)。
+本地记忆与详细证据留在忽略的 `.remvu/`。只有显式分享才生成公开 `REMVU.md`，公开依据需能独立阅读，未提交补丁需单独审阅。隐藏思考链、凭据和无关对话不导出。排错、恢复、升级、回滚、卸载等能力仍在，卸载保留私人记忆。
 
-## 高级能力仍然保留
+## 面向多模型平台与 API 中转站
 
-需要严格的 `remvu/1` 格式、代码指纹、事件索引、并发更新保护或恢复时，可以启用原有 Python 引擎，macOS/Linux 需要 Python 3.9+，Windows 需要 Python 3.10+，并需要 Git。日常 save/resume 不依赖它。旧版记录、导出格式和 release 继续保留。[引擎工作流](skills/remvu/references/engine-workflow.md) · [维护说明](skills/remvu/references/maintenance.md) · [开放格式](spec/remvu-v1.md)。
+换模型、换客户端，把项目背景一起带走。能观察本地项目改动和工具结果的平台，可嵌入记忆引擎或编写适配器。纯 API 转发无法完整看到项目操作，不能承诺完整记录。DSH 是已有的本地主机适配，尚无通用中转站集成或节省比例的实测结论。
 
-公开分享需要单独提出请求，再筛选可公开的项目事实和证据。私有交接文件不会自动变为公开 `REMVU.md`。不导出隐藏思考链、密钥或无关聊天。
+需要更轻的路径时，可主动选择[仅笔记备用版](skills/remvu/assets/markdown-skill.md)；开发者也可继续运行标准库 Python 源码。完整独立程序是本轮主交付。
 
-## 多模型平台与 API 中转站
-
-换模型、换客户端，把项目背景一起带走。能取得项目文件与可观察结果的平台可以采用开放格式；单纯转发 API 请求无法补齐项目操作记录。目前没有内置的中转站专用适配器。
-
-## 当前进度
-
-当前仍为 **v0.3.0-beta.1 候选版**。Windows、桌面入口和 VS Code 原生验收尚未完成；复制成功或 CLI 通过不能证明这些入口兼容。[兼容矩阵](docs/compatibility.md) · [测试报告](docs/beta-validation.md)。
-
-本轮十任务真实 CLI 对照中，普通 HANDOFF.md 与 Remvu 均首次通过 9/10，剩余任务各经一次纠正后完成。Remvu 文件更大，总计 34,614 字节，对照组为 10,039 字节。本轮没有证明完成效果、token 或费用方面的收益。[实测与限制](docs/product-validation.md) · [实验方案](evals/markdown-protocol.md)。
-
-MIT 开源协议。[参与贡献](CONTRIBUTING.md)。
+[开放格式](spec/README.md) · [兼容状态](docs/compatibility.md) · [贡献指南](CONTRIBUTING.md) · [MIT 许可](LICENSE)。继续支持 `remvu/1` 和旧证据格式导入。

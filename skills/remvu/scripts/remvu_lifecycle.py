@@ -16,6 +16,7 @@ import uuid
 
 import remvu_core as core
 import remvu_init as setup
+import remvu_runtime as runtime
 
 
 def _read(path):
@@ -45,7 +46,7 @@ def _python_minimum():
 
 def preflight():
     return {'python_supported': sys.version_info >= _python_minimum(),
-            'python': platform.python_version(), 'git_available': shutil.which('git') is not None,
+            'python': platform.python_version(), 'user_python_required': not runtime.frozen(), 'git_available': shutil.which('git') is not None,
             'clients_found': {name: shutil.which(name) is not None for name in ('claude', 'codex', 'code')},
             'system': platform.system(), 'machine': platform.machine()}
 
@@ -67,6 +68,9 @@ def _runtime_files(source):
 
 def _verify_runtime(skill):
     skill = _safe(skill)
+    app = runtime.bundle_for_scripts(skill / 'scripts')
+    if app:
+        return _verify_bundle(app)
     manifest = _read(_safe(skill / '.runtime.json'))
     if not isinstance(manifest, dict) or not isinstance(manifest.get('files'), dict) or not isinstance(manifest.get('version'), str):
         raise ValueError('Installed runtime checksum manifest is damaged; reinstall from reviewed source')
@@ -75,6 +79,53 @@ def _verify_runtime(skill):
     if manifest.get('files') != hashes:
         raise ValueError('Installed runtime differs from its recorded checksum manifest; reinstall from reviewed source')
     return manifest
+
+
+def _verify_bundle(app):
+    app = _safe(app)
+    manifest = _read(_safe(app / '.bundle.json'))
+    if manifest.get('format') != 'remvu-bundle/1' or not isinstance(manifest.get('files'), dict):
+        raise ValueError('Invalid standalone checksum manifest')
+    if manifest.get('system') != platform.system() or manifest.get('machine', '').lower() != platform.machine().lower():
+        raise ValueError('Standalone app targets another operating system or architecture')
+    hashes = {}
+    for path in sorted(app.rglob('*')):
+        if path.is_symlink():
+            raise ValueError('Standalone runtime contains a symlink')
+        if path.is_file() and path.name != '.bundle.json':
+            hashes[path.relative_to(app).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+    if hashes != manifest['files'] or runtime.executable_name() not in hashes:
+        raise ValueError('Standalone runtime checksum mismatch; reinstall a reviewed release')
+    return manifest
+
+
+def stage_bundle(source, home):
+    source, home = _safe(source), _safe(home)
+    manifest = _verify_bundle(source)
+    version = manifest.get('version', '')
+    if not re.fullmatch(r'\d+\.\d+\.\d+(?:-[a-zA-Z0-9.-]+)?', version):
+        raise ValueError('Standalone runtime has an invalid version')
+    digest = hashlib.sha256(json.dumps(manifest['files'], sort_keys=True).encode()).hexdigest()
+    releases = _safe(home / 'runtimes')
+    releases.mkdir(parents=True, exist_ok=True)
+    destination = _safe(releases / (version + '-app-' + digest[:16]))
+    if destination.exists():
+        _verify_bundle(destination)
+        return destination / '_internal/skill/scripts'
+    staging = Path(tempfile.mkdtemp(prefix='.stage-', dir=str(releases)))
+    try:
+        shutil.copytree(source, staging, dirs_exist_ok=True)
+        _verify_bundle(staging)
+        try:
+            staging.rename(destination)
+        except OSError:
+            if not destination.exists():
+                raise
+            _verify_bundle(destination)
+    finally:
+        if staging.exists():
+            shutil.rmtree(staging)
+    return destination / '_internal/skill/scripts'
 
 
 def stage_runtime(source, home):
@@ -123,9 +174,9 @@ def _initialize_runtime(repo, platforms, scripts):
     # Let the selected release own its config generation and migrations, rather
     # than installing a new skill with the currently running release's adapter code.
     selection = 'both' if set(platforms) == {'claude', 'codex'} else platforms[0] if len(platforms) == 1 else 'none'
-    process = subprocess.run([sys.executable, str(scripts / 'remvu.py'), 'init', '--repo', str(repo), '--platform', selection],
+    process = subprocess.run([*runtime.cli_command(scripts), 'init', '--repo', str(repo), '--platform', selection],
                              capture_output=True, encoding='utf-8', timeout=60,
-                             env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'})
+                             env=runtime.child_env())
     try:
         result = json.loads(process.stdout)
     except ValueError as error:
@@ -168,8 +219,8 @@ def install(repo, source=None, home=None, platforms=None, rollback=False):
     if not repo.is_dir():
         raise ValueError('Project directory must already exist')
     if sys.version_info < _python_minimum():
-        raise ValueError('Optional engine: Windows requires Python 3.10+, macOS/Linux 3.9+. '
-                         'The default Markdown skill needs no Python; use install-skill instead. '
+        raise ValueError('Source development: Windows requires Python 3.10+, macOS/Linux 3.9+. '
+                         'Use the complete standalone app with its bundled runtime. The Markdown fallback also needs no Python. '
                          'Windows Python 3.9 recorder stress is unsupported, not a verified configuration.')
     if not shutil.which('git'):
         raise ValueError('Install Git using the official installer, then retry')
@@ -191,11 +242,20 @@ def install(repo, source=None, home=None, platforms=None, rollback=False):
             scripts = _safe(previous)
             _verify_runtime(scripts.parent)
         else:
-            scripts = stage_runtime(source or Path(__file__).parent.parent, home or default_home()) / 'scripts'
+            source = Path(source) if source else (Path(sys.executable).resolve().parent if runtime.frozen() else runtime.skill_dir())
+            managed_home = home
+            if managed_home is None and old.get('scripts'):
+                prior_scripts = _safe(old['scripts'])
+                prior_root = runtime.bundle_for_scripts(prior_scripts) or prior_scripts.parent
+                if prior_root.parent.name == 'runtimes':
+                    _verify_runtime(prior_scripts.parent)
+                    managed_home = prior_root.parent.parent
+            scripts = (stage_bundle(source, managed_home or default_home()) if (source / '.bundle.json').is_file()
+                       else stage_runtime(source, managed_home or default_home()) / 'scripts')
         with _transaction(repo) as checkpoint:
             result = _initialize_runtime(repo, selected, scripts)
             current = old.get('scripts') or adapter.get('scripts_dir')
-            if current and not (_safe(current).parent / '.runtime.json').is_file():
+            if current and not ((_safe(current).parent / '.runtime.json').is_file() or runtime.bundle_for_scripts(current)):
                 current = None  # A v0.2 checkout is backed up, not a verified rollback runtime.
             previous = current if current and current != str(scripts) else old.get('previous_scripts')
             _write(path, {'format': 'remvu-installation/1', 'scripts': str(scripts),
@@ -203,6 +263,7 @@ def install(repo, source=None, home=None, platforms=None, rollback=False):
                           'platforms': list(selected), 'installed_at': core._now()})
     result.update(runtime_scripts=str(scripts), action='rollback' if rollback else 'install',
                   runtime_python=str(Path(sys.executable).resolve()),
+                  runtime_launcher=runtime.cli_command(scripts),
                   activation='awaiting_host_review', preflight=preflight(),
                   note='Checksums detect local changes; they do not authenticate the publisher. Review the source/release.')
     return result
@@ -313,7 +374,7 @@ def doctor(repo):
             if not installed or not (scripts / 'remvu.py').is_file():
                 result['ok'] = False
         result['activation'] = 'see_per_client_status'
-        if (scripts.parent / '.runtime.json').exists():
+        if (scripts.parent / '.runtime.json').exists() or runtime.bundle_for_scripts(scripts):
             try:
                 result['runtime'] = _verify_runtime(scripts.parent)['version']
             except (ValueError, OSError):

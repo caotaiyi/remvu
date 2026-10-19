@@ -47,6 +47,26 @@ class CliTest(unittest.TestCase):
         data = {'base_revision': base, 'entries': entries}
         return self.cli('update', '--repo', self.repo, '--proposal', '-', input=json.dumps(data))
 
+    def test_save_resume_use_full_engine_and_keep_unreviewed_evidence(self):
+        self.cli('record', '--repo', self.repo, input=json.dumps({'kind': 'tool_result', 'tool': 'fixture', 'output': 'Check failed.', 'result': 'failed'}))
+        saved = self.cli('save', '--repo', self.repo)
+        self.assertTrue(saved['pending_consolidation'])
+        self.assertFalse(saved['uploaded'])
+        status = self.cli('resume', '--repo', self.repo)
+        self.assertTrue(status['memory']['pending_consolidation'])
+        proposal = {'base_revision': status['memory']['revision'], 'base_event_count': 1, 'entries': [
+            {'kind': 'check', 'text': 'The check failed.', 'basis': 'observed', 'result': 'failed', 'exit_code': 1,
+             'sources': [{'type': 'tool', 'excerpt': 'Check failed.'}]}]}
+        saved = self.cli('save', '--repo', self.repo, '--proposal-json', json.dumps(proposal))
+        self.assertFalse(saved['pending_consolidation'])
+        self.assertEqual(self.cli('resume', '--repo', self.repo)['memory']['entries'][0]['result'], 'failed')
+        self.assertFalse((self.repo / 'REMVU.md').exists())
+
+    def test_adapter_record_excludes_hidden_reasoning(self):
+        result = self.cli('record', '--repo', self.repo, input=json.dumps({'kind': 'message', 'role': 'assistant', 'channel': 'analysis', 'text': 'hidden'}))
+        self.assertTrue(result['excluded'])
+        self.assertEqual(self.cli('status', '--repo', self.repo)['event_count'], 0)
+
     def test_documented_round_trip_without_receiver_installation(self):
         self.proposal([{'kind': 'constraint', 'text': 'Preserve the public API.',
                         'basis': 'user_confirmed', 'visibility': 'public',

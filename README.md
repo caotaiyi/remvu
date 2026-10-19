@@ -1,64 +1,54 @@
 # Remvu
 
-[![CI](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml)
+[![Tests](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml/badge.svg)](https://github.com/caotaiyi/remvu/actions/workflows/ci.yml) [![Standalone and DSH](https://github.com/caotaiyi/remvu/actions/workflows/standalone.yml/badge.svg)](https://github.com/caotaiyi/remvu/actions/workflows/standalone.yml)
 
-**Save before Claude Code hits its limit. Continue in Codex with the handoff.**
+Save before Claude Code hits its limit. Continue in Codex with the project background intact.
 
-Remvu is a Markdown skill for handing a project to the next coding agent. Save the goal, constraints, rejected approaches and unfinished work; let the next agent read the file alongside your code. The default workflow needs **no Python, hooks, account or background service**.
+Remvu keeps goals, constraints, rejected approaches, unfinished work and check evidence alongside your project. The complete standalone engine bundles its runtime: **users do not install Python**. Automatic observable recording, code fingerprints, concurrent updates, recovery and private sharing boundaries remain part of the engine.
 
-[中文](README.zh-CN.md) · [Quick start](docs/quickstart.md) · [What is verified](docs/compatibility.md)
+[中文](README.zh-CN.md) · [Install](docs/quickstart.md) · [DeepSeek Harness plugin](adapters/dsh/README.md) · [Evidence and limits](docs/standalone.md)
 
-## Try it
+## Try the complete app
 
-Give your coding agent this instruction:
+> Install the complete Remvu standalone candidate from https://github.com/caotaiyi/remvu for my OS and architecture. Verify its checksum, extract the entire application folder, then run its install command for this project. Preserve existing settings and memory. Walk me through the client's normal hook trust review. Do not install a system Python or substitute the notes-only fallback.
 
-> Install the Markdown Remvu skill from https://github.com/caotaiyi/remvu into this project's Claude Code and Codex skill folders. Use scripts/install-skill.sh on macOS or scripts/install-skill.ps1 on Windows after reviewing it. Preserve existing skills. Do not run the optional Python installer or enable hooks.
+The v0.3.0-beta.2 application is a test candidate. CI produces platform archives; a production release and the full native-client support matrix remain gated on actual acceptance. See [the build and installation guide](docs/standalone.md) for available artifacts, verification and exact steps. Git is still required. macOS distribution signing/notarization is not configured.
 
-The installer copies project skills, leaving client settings alone. It uses Git to fetch source; a reviewed local checkout also works offline. Ordinary client project trust still applies. Open a new session if the client has not discovered the skill. [Manual installation and removal](docs/quickstart.md).
-
-| | Claude Code | Codex |
+| Everyday action | Claude Code | Codex |
 | --- | --- | --- |
-| Save before leaving | `/remvu save` | `$remvu save` |
-| Continue in a fresh session | `/remvu resume` | `$remvu resume` |
+| Save a private handoff | `/remvu save` | `$remvu save` |
+| Continue in a new session | `/remvu resume` | `$remvu resume` |
 
-`save` writes a private local note under `.remvu/notes/REMVU.md`. It does not commit or upload. `resume` reads the handoff, compares its recorded code state with the project and continues the requested work. The recipient can also just be told “Read this file and continue”; Remvu installation is optional on the receiving side. On another machine, take the project code and the selected note with you.
+`save` asks the current agent to consolidate reviewed evidence and exports `.remvu/handoff/REMVU.md`. A direct program invocation without a proposal exports existing state and leaves pending evidence pending. It never uploads or commits. `resume` checks the saved code state before continuing. The receiver can also read the handoff alongside the code without installing Remvu.
 
-Save while the original agent can still respond. If its quota is already exhausted and no note exists, the Markdown skill cannot recover that unsaved conversation; the receiver must inspect code and identify missing context.
+Save while the original agent can still respond. Automatic logs retain observations; they cannot recover an exhausted agent's unwritten understanding. Stop hooks do not block completion or force another model turn.
 
-## The handoff, in 30 seconds
+## A handoff in 30 seconds
 
-1. In Claude Code: `/remvu save`.
-2. Open the same project in Codex: `$remvu resume`.
-3. Review the reported next step and any stale or missing evidence, then continue.
+1. In Claude Code, ask `/remvu save`.
+2. Open the project in Codex and ask `$remvu resume`.
+3. Review the next step and any stale checks, pending evidence or conflicts, then continue.
 
-This is the intended quota-switch workflow; it does not require deliberately exhausting an account. The older clip below replays two real small CLI trials. It is an evidence replay, not a screen recording or a timing claim about the new Markdown workflow.
+This describes the workflow, not a measured completion-time guarantee. [Earlier real handoff trials](docs/validation-report.md) and the [10-task notes-only comparison](docs/product-validation.md) are published with their limits. The latter found no first-pass accuracy advantage over ordinary HANDOFF notes; it does not measure the new standalone app or prove token savings.
 
-![30-second replay of historical CLI trial results](docs/assets/remvu-live-replay.gif)
+## DeepSeek Harness
 
-[Source results and limits](docs/demo.md). The new ten-task CLI comparison completed, with results below; older engine trials do not certify this workflow.
+The `dsh-remvu` bundle adds five native tools and observable event recording to DeepSeek Harness **0.2.1-rc.2**. It uses the same standalone engine and `.remvu/` state. The JavaScript package needs no compilation or install-time build script. [Install the plugin](adapters/dsh/README.md).
 
-## What survives the switch
+The plugin was installed through the official `dsh plugin add` flow and loaded in a real isolated SDK profile without a model request. Model-driven handoff and GUI acceptance are separate pending checks. Local projects only; it does not claim cloud or remote-filesystem support.
 
-Notes distinguish **user-confirmed, observed, inferred and unverified** claims. They keep rejected directions, failed checks and open work, with short sources and retained decision history. The first-read summary is usually under 2,000 characters; essential detail remains below it.
+## What stays in memory
 
-Save is explicit. Remvu does not interrupt completion or ask a Stop hook to restart the agent. The optional recorder now also leaves pending work pending without blocking. A save can still be incomplete; the agent reads it back and reports gaps rather than claiming an automatic transcript.
+Claims distinguish `user_confirmed`, `observed`, `inferred` and `unverified`. Rejected decisions and superseded history survive. Check results retain the code fingerprint they actually tested; later edits make those checks historical. Concurrent proposals cannot silently overwrite newer memory.
 
-Markdown notes use the lightweight `remvu-note/1` convention. They have no automatic content fingerprint, transaction lock or validator guarantee. The agent must inspect changed code and rerun relevant checks. [Note rules and limits](skills/remvu/references/notes.md).
-
-## Optional engine and open format
-
-Existing Python tools remain available for `remvu/1` documents, code fingerprints, evidence indexing, revision-checked updates, privacy review and recovery. They use Python 3.9+ on macOS/Linux, Python 3.10+ on Windows, and Git; they are optional for save/resume. Existing memory, releases and formats are retained. [Engine workflow](skills/remvu/references/engine-workflow.md) · [Maintenance](skills/remvu/references/maintenance.md) · [Format proposal](spec/remvu-v1.md).
-
-Public sharing is a separate, explicit request. Review selected project facts and safe inline evidence before generating a root `REMVU.md`. A local private note is never automatically made public. Hidden reasoning, secrets and unrelated conversations are excluded. [Sharing rules](skills/remvu/references/notes.md#explicit-public-share-advanced).
+Private memory and detailed evidence stay in ignored `.remvu/`. Public `REMVU.md` is generated only on an explicit share request, with public inline evidence and patch review. Hidden reasoning, credentials and unrelated conversations are excluded. `doctor`, `repair`, upgrades, rollback and uninstall remain available when needed; uninstall retains private memory.
 
 ## For multi-model platforms and API relay services
 
-Change models or clients, and take the project context with you. A platform can adopt the open format when it can access project files and observable results. API forwarding alone cannot reconstruct a project's actions. A dedicated relay adapter is not bundled.
+“换模型、换客户端，把项目背景一起带走。” A platform that can observe local project changes and tool outcomes can embed the memory engine or build an adapter. Pure API forwarding has no complete view of the project and cannot promise full operation records. The DSH adapter is a concrete local-host integration; no generic relay integration or measured savings percentage is claimed.
 
-## Status and evidence
+## Other paths and contributors
 
-This branch remains a **v0.3.0-beta.1 candidate**. Native desktop/VS Code and Windows acceptance are pending; a file-copy test or CLI trial cannot certify those surfaces. The published v0.2.0 engine and historical results remain available. [Compatibility](docs/compatibility.md) · [Beta report](docs/beta-validation.md) · [Feedback](.github/ISSUE_TEMPLATE/bug.yml).
+A [notes-only fallback](skills/remvu/assets/markdown-skill.md) remains available for users who deliberately want file-tool save/resume without recording or structured validation. Source developers can still run the standard-library Python engine. Neither path replaces the complete standalone app.
 
-The new ten-task comparison found the same outcomes for ordinary HANDOFF.md and Remvu: 9/10 first-attempt completions, 10/10 after one correction on the remaining task. Remvu notes were larger (34,614 versus 10,039 bytes in total). This does not establish a token, cost or speed advantage. [Full results, usage and limits](docs/product-validation.md) · [Protocol](evals/markdown-protocol.md).
-
-MIT licensed. [Contributing](CONTRIBUTING.md).
+[Open format](spec/README.md) · [Compatibility](docs/compatibility.md) · [Contributing](CONTRIBUTING.md) · [License](LICENSE). Existing `remvu/1` documents and legacy evidence import remain supported.

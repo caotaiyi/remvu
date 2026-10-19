@@ -1,0 +1,6 @@
+- insert:
+    - id: remvu
+      name: dsh-remvu
+      config:
+        executable: !!js process.env.REMVU_EXECUTABLE
+        project: !!js process.env.REMVU_PROJECT

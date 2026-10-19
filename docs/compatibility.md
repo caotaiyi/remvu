@@ -1,14 +1,12 @@
-# Optional engine runtime boundary
+# Standalone v0.3.0-beta.2 candidate
 
-The default Markdown skill needs no Python. The managed engine supports Python 3.9+ on macOS/Linux and 3.10+ on Windows. Windows Python 3.9 repeatedly failed strict six-writer pressure tests and is explicitly unsupported; its failures are retained in the product report, with a manual experimental workflow for reproduction. It is not counted as a passed matrix combination. The [final supported CI](https://github.com/caotaiyi/remvu/actions/runs/39138270476) passed eight combinations at b29423b. See [the product report](product-validation.md) for counts, artifacts and retained failures. Native client acceptance below remains separate.
+The primary path is now the complete app with its runtime bundled; users need no Python installation. Automatic recording, fingerprints and CAS remain enabled after normal client trust. [Standalone evidence and limitations](standalone.md) distinguish packaged checks, actual DSH host startup and pending model/native acceptance. DSH targets exactly 0.2.1-rc.2; no desktop/Web or Windows DSH certification is implied.
 
-# Markdown skill status
-
-The default skill now uses host file tools for explicit save/resume, with no Python runtime or hooks. This changes the setup requirement; it does not establish native compatibility by itself. Local installer and native Markdown trials are recorded separately in [the product report](product-validation.md). The earlier engine matrix below remains historical and does not certify the new path. Windows PowerShell, desktop and VS Code checks remain pending unless explicitly evidenced.
+The source-development engine still supports Python 3.9+ on macOS/Linux and 3.10+ on Windows. Windows source Python 3.9 failed repeated pressure tests and remains unsupported; the bundled app uses modern Python internally. Earlier [eight-job source CI](https://github.com/caotaiyi/remvu/actions/runs/39138270476) belongs to b29423b. Its results and the old notes-only comparison are historical, not certification of this new app.
 
 # Compatibility
 
-## v0.3.0-beta.1 candidate
+## Current candidate native-client gate
 
 The candidate adds managed installation and maintenance. Native support is tracked independently for each entry point; no row inherits v0.2.0 certification.
 

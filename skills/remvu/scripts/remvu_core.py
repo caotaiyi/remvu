@@ -15,6 +15,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
+import sys
 import tempfile
 import time
 import uuid
@@ -259,7 +260,11 @@ def _save(root, state, operation, payload):
 
 
 def _git(repo, *args, required=False):
-    result = subprocess.run(['git', '-C', str(repo), '--no-pager', *args], capture_output=True, timeout=60,
+    if getattr(sys, 'frozen', False):
+        from remvu_runtime import run_external
+    else:
+        run_external = subprocess.run
+    result = run_external(['git', '-C', str(repo), '--no-pager', *args], capture_output=True, timeout=60,
                             env={**os.environ, 'GIT_OPTIONAL_LOCKS': '0'})
     if result.returncode:
         if required:

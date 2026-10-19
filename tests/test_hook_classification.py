@@ -37,6 +37,17 @@ class HookClassificationTest(unittest.TestCase):
                 self.assertEqual(self.classified(self.python_call(action)), expected)
                 self.assertEqual(self.classified(shlex.join([str(self.script), action])), expected)
 
+    @unittest.skipIf(os.name == 'nt', 'POSIX literal command parsing')
+    def test_frozen_save_exclusion_preserves_mixed_real_work(self):
+        executable = self.repo / 'installed app/remvu'
+        executable.parent.mkdir()
+        executable.write_text('fixture')
+        with patch.object(hooks.runtime, 'frozen', return_value=True), patch.object(hooks.runtime, 'scripts_dir', return_value=SCRIPTS), patch.object(hooks.sys, 'executable', str(executable)):
+            self.assertTrue(self.classified(shlex.join([str(executable), 'save'])))
+            self.assertTrue(self.classified(shlex.join([str(executable), 'resume'])))
+            self.assertFalse(self.classified(shlex.join([str(executable), 'save']) + ' && change-project'))
+            self.assertFalse(self.classified(shlex.join([str(self.repo / 'other/remvu'), 'save'])))
+
     def test_standalone_inline_update_accepts_literal_shell_characters_in_json(self):
         proposal = json.dumps({'base_revision': 0, 'base_event_count': 0, 'entries': [
             {'kind': 'goal', 'basis': 'user_confirmed', 'text': 'Keep ; | && > and $(literal) `literal` as evidence.'}]})

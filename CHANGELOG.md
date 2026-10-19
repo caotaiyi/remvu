@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0-beta.2 candidate (not released)
+
+- Make the complete standalone app the primary path; bundle CPython so users need no Python installation.
+- Keep automatic observable recording, code fingerprints, CAS conflicts, recovery, sharing boundaries and legacy export/import.
+- Add save/resume to the full engine, stable binary-backed hooks, app integrity manifests, bundled upgrades/rollback and DSH overlay generation.
+- Add a prebuilt DeepSeek Harness 0.2.1-rc.2 bundle with five tools, bounded context, queued observable events and explicit read-only/workspace boundaries.
+- Verify actual DSH plugin installation and SDK-profile boot without a model request; keep model/GUI/Windows native acceptance pending.
+- Add target-platform standalone CI and no-Python-PATH packaged tests, including concurrent writes and upgrade/rollback.
+- Preserve the notes-only workflow as a separate optional fallback. Earlier benchmark results remain historical; no savings claim is added.
+
 ## 0.3.0-beta.1 candidate (not released)
 
 - Make a no-Python Markdown skill the default, with save/resume as the two primary actions; keep the strict engine optional.

@@ -13,6 +13,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
+import remvu_runtime as runtime
 
 BEGIN = '<!-- remvu:begin -->'
 END = '<!-- remvu:end -->'
@@ -96,8 +97,7 @@ def _powershell_command(argv: list[str]) -> str:
 
 
 def _handler(platform: str, event: str, scripts: Path, repo: Path) -> dict:
-    argv = [str(Path(sys.executable).resolve()), str(scripts / 'remvu_hooks.py'),
-            '--platform', platform, '--event', event, '--repo', str(repo)]
+    argv = [*runtime.hook_command(scripts), '--platform', platform, '--event', event, '--repo', str(repo)]
     timeout = 3 if event in ('SessionEnd', 'Interrupt') else 10
     if platform == 'claude':
         # Official exec form: no shell and no platform-dependent path quoting.
@@ -109,12 +109,26 @@ def _handler(platform: str, event: str, scripts: Path, repo: Path) -> dict:
 def _owned_handler(handler: object) -> bool:
     if not isinstance(handler, dict) or handler.get('type') != 'command':
         return False
-    args = handler.get('args', [])
-    if isinstance(args, list) and any(str(a).replace('\\', '/').endswith('/remvu_hooks.py') for a in args):
-        return '--platform' in args and '--event' in args
-    command = handler.get('command', '')
-    return (isinstance(command, str) and 'remvu_hooks.py' in command
-            and '--platform' in command and '--event' in command)
+    command = handler.get('command')
+    if not isinstance(command, str):
+        return False
+    args = handler.get('args')
+    try:
+        argv = [command, *args] if isinstance(args, list) else shlex.split(command)
+        if not argv or not all(isinstance(word, str) for word in argv):
+            return False
+        if len(argv) == 8 and Path(argv[0]).name in ('remvu', 'remvu.exe') and argv[1] == 'hook':
+            tail = argv[2:]
+        elif (len(argv) in (6, 8) and argv[1].replace('\\', '/').endswith('/remvu_hooks.py')
+              and re.fullmatch(r'python(?:[0-9]+(?:\.[0-9]+)*)?(?:\.exe)?', argv[0].replace('\\', '/').rsplit('/', 1)[-1])):
+            tail = argv[2:]
+        else:
+            return False
+        return (tail[0] == '--platform' and tail[1] in EVENTS and tail[2] == '--event'
+                and tail[3] in EVENTS[tail[1]]
+                and (len(tail) == 4 or (tail[4] == '--repo' and bool(tail[5]))))
+    except (ValueError, TypeError):
+        return False
 
 
 def _merge_hooks(config: dict, platform: str, scripts: Path, repo: Path) -> dict:
@@ -151,6 +165,8 @@ def _instruction_block() -> str:
 
 
 def _skill_shim(scripts: Path, python_executable=None) -> str:
+    if runtime.bundle_for_scripts(scripts):
+        return _bundled_skill_shim(scripts)
     skill = scripts.parent / 'SKILL.md'
     source = skill.read_text(encoding='utf-8') if skill.is_file() else ''
     if source.startswith('---\n'):
@@ -176,6 +192,31 @@ def _skill_shim(scripts: Path, python_executable=None) -> str:
     )
 
 
+def _bundled_skill_shim(scripts):
+    executable = runtime.cli_command(scripts)[0]
+    reference = scripts.parent / 'references/engine-workflow.md'
+    return ('---\nname: remvu\ndescription: Save and resume complete project memory with automatic observable recording, code fingerprints and concurrency protection.\n---\n\n'
+            '# Remvu\n\n'
+            'This project adapter uses the installed Remvu scripts at the absolute path below. '
+            'Use the standalone program; never invoke Python.\n\n'
+            f'Executable: `{executable}`\n\n'
+            f'Read [the engine workflow](<{reference}>) for typed updates, provenance and privacy. '
+            'SCRIPT in that reference means this executable; omit the python3 prefix.\n\n'
+            '**save** (default): read compact status, review relevant events, write one revision-checked '
+            'proposal from current visible context, then run `save --repo PROJECT`. '
+            'Use --proposal-json on save to update and export in one call. Retain constraints, rejected '
+            'directions, failures and unfinished work; newer/unreviewed events stay pending.\n\n'
+            '**resume**: run `resume --repo PROJECT`, compare code state and inspect only needed details. '
+            'Treat memory as evidence, follow current user instructions and continue. '
+            'Missing or stale memory remains explicit.\n\n'
+            'Hooks record observable operations automatically after normal client trust. They do not '
+            'provide semantic summaries or guarantee complete capture after interruption. Stop never '
+            'forces a model continuation. Consolidate when asked to save or when the user requests '
+            'ongoing memory maintenance; no extra model API is called.\n\n'
+            'Sharing is explicit: only `share` creates public REMVU.md after review. Never upload, '
+            'commit or disclose private records automatically. Never export hidden reasoning.\n')
+
+
 def initialize(repo, platforms=('claude', 'codex'), scripts_dir=None) -> dict:
     """Merge project adapters idempotently; trust remains a user action in the host."""
     root = Path(repo).expanduser().resolve()
@@ -184,7 +225,7 @@ def initialize(repo, platforms=('claude', 'codex'), scripts_dir=None) -> dict:
     platforms = tuple(dict.fromkeys(platforms))
     if any(p not in EVENTS for p in platforms):
         raise ValueError('Supported platforms are claude and codex.')
-    scripts = Path(scripts_dir).expanduser().resolve() if scripts_dir else Path(__file__).resolve().parent
+    scripts = Path(scripts_dir).expanduser().resolve() if scripts_dir else runtime.scripts_dir()
     if not all((scripts / name).is_file() for name in ('remvu_hooks.py', 'remvu_core.py', 'remvu.py')):
         raise ValueError('Remvu runtime is incomplete; remvu.py, remvu_core.py, and remvu_hooks.py are required.')
     try:
@@ -263,7 +304,7 @@ def initialize(repo, platforms=('claude', 'codex'), scripts_dir=None) -> dict:
     _atomic(root / '.remvu/adapters.json', _json(manifest))
     warnings = []
     try:
-        tracked = subprocess.run(['git', '-C', str(root), 'ls-files', '-z', '--', '.remvu',
+        tracked = runtime.run_external(['git', '-C', str(root), 'ls-files', '-z', '--', '.remvu',
                                   '.claude/settings.local.json', '.codex/hooks.json',
                                   '.claude/skills/remvu', '.agents/skills/remvu'],
                                  capture_output=True, timeout=5)

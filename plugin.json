@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "remvu",
-  "version": "0.3.0-beta.1",
-  "description": "Save project context and resume in another coding agent. No Python required for the Markdown workflow.",
+  "version": "0.3.0-beta.2",
+  "description": "Portable project memory with a standalone engine, observable recording and save/resume.",
   "author": {
     "name": "caotaiyi"
   },
@@ -21,7 +21,7 @@
       "interface": {
         "displayName": "Remvu",
         "shortDescription": "Portable project memory",
-        "longDescription": "Use save and resume to carry project goals, constraints, rejected approaches and unfinished work between Claude Code and Codex. The default Markdown skill needs no Python, hooks or Remvu account. Optional Python tools provide strict validation and observable event recording. Hidden reasoning is excluded; see the compatibility report for verified clients.",
+        "longDescription": "Carry project intent, constraints, rejected approaches and unfinished work between coding agents. The complete standalone engine bundles its runtime and preserves observable recording, code fingerprints, concurrent updates and private sharing boundaries. Save and resume are the everyday actions. Hidden reasoning is excluded; see platform-specific validation evidence.",
         "developerName": "caotaiyi",
         "category": "Productivity",
         "capabilities": [],
