@@ -44,7 +44,7 @@ def smoke(app):
         assert run(executable, 'install', '--home', str(home))['runtime_launcher'] == installed['runtime_launcher']
         downloaded.rename(root / 'moved download')
         overlay = run(stable, 'dsh-config')
-        assert str(stable) in Path(overlay['path']).read_text()
+        assert json.loads(Path(overlay['path']).read_text())[0]['config']['executable'] == str(stable)
         replacement = root / 'reviewed replacement'
         shutil.copytree(app, replacement)
         notice = replacement / 'NOTICE.txt'
