@@ -1091,6 +1091,9 @@ def check_project(repo, document=None):
 
 
 def _legacy_module():
+    if getattr(sys, 'frozen', False):
+        import legacy_export
+        return legacy_export
     path = Path(__file__).resolve().parent / 'legacy_export.py'
     if not path.is_file():
         path = Path(__file__).resolve().parents[2] / 'agent-task-export/scripts/task_export.py'

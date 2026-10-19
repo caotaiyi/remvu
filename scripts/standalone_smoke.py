@@ -100,10 +100,20 @@ def smoke(app):
         assert run(stable, 'uninstall')['memory_retained']
         assert (repo / '.remvu/state.json').read_bytes() == before
         assert run(stable, 'uninstall')['ok']
+        fixture_root = Path(__file__).resolve().parents[1]
+        legacy_bundle = root / 'legacy evidence'
+        for args in (['export', '--source', str(fixture_root / 'examples/session.jsonl'),
+                       '--task', str(fixture_root / 'examples/task.json'), '--out', str(legacy_bundle)],
+                     ['verify', str(legacy_bundle)]):
+            process = subprocess.run([str(stable), 'legacy', *args], env=env, capture_output=True, encoding='utf-8', timeout=60)
+            assert process.returncode == 0, (args, process.stdout, process.stderr)
+        assert run(stable, 'import-legacy', str(legacy_bundle))['ok']
+        imported = run(stable, 'status')
+        assert any(e['basis'] == 'unverified' for e in imported['entries'])
         return {'ok': True, 'platform': os.name, 'python_on_path': False,
                 'checks': ['stable_install', 'repeat_install', 'download_relocation', 'bundled_upgrade_and_rollback', 'dsh_overlay', 'exact_hook_callback', '12_events_6_writers',
                            'private_save', 'reviewed_update', 'CAS_conflict_retained', 'resume', 'stale_code',
-                           'public_share_refusal', 'verified_repair', 'uninstall_retains_memory'],
+                           'public_share_refusal', 'verified_repair', 'uninstall_retains_memory', 'bundled_legacy_export_verify_import'],
                 'scope': 'Packaged program checks in synthetic repositories, not native agent or Windows 11 acceptance.'}
 
 
