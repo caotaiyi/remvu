@@ -5,7 +5,7 @@ description: Legacy v0.1 indexed evidence-bundle exporter. Use when explicitly r
 
 # Agent task export
 
-Create a local evidence bundle another agent can read cheaply. Use `scripts/task_export.py`; it needs Python 3.10+ and no dependencies, network or model API.
+Create a local evidence bundle another agent can read cheaply. With the complete Remvu app installed, use its reviewed stable executable followed by `legacy` for the commands below; omit the `python3 SCRIPT` prefix. This path needs no user Python. For source development without that app, `scripts/task_export.py` needs Python 3.10+ and no additional dependencies, network or model API.
 
 ## Export
 

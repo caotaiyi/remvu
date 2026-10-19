@@ -144,7 +144,11 @@ def json_write(path, value):
 
 
 def git_run(repo, *args):
-    result = subprocess.run(['git', '-C', str(repo), '--no-pager', *args], capture_output=True,
+    if getattr(sys, 'frozen', False):
+        from remvu_runtime import run_external
+    else:
+        run_external = subprocess.run
+    result = run_external(['git', '-C', str(repo), '--no-pager', *args], capture_output=True,
                             timeout=60, check=True)
     return result.stdout.decode('utf-8', errors='replace')
 

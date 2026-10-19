@@ -103,7 +103,7 @@ def smoke(app):
         fixture_root = Path(__file__).resolve().parents[1]
         legacy_bundle = root / 'legacy evidence'
         for args in (['export', '--source', str(fixture_root / 'examples/session.jsonl'),
-                       '--task', str(fixture_root / 'examples/task.json'), '--out', str(legacy_bundle)],
+                       '--task', str(fixture_root / 'examples/task.json'), '--repo', str(repo), '--out', str(legacy_bundle)],
                      ['verify', str(legacy_bundle)]):
             process = subprocess.run([str(stable), 'legacy', *args], env=env, capture_output=True, encoding='utf-8', timeout=60)
             assert process.returncode == 0, (args, process.stdout, process.stderr)
