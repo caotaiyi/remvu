@@ -341,6 +341,21 @@ class AdapterTest(unittest.TestCase):
         self.assertEqual(self.call('Stop', turn_id='turn-one'), {})
         self.assertFalse(self.state()['pending_consolidation'])
 
+    def test_tool_persistence_does_not_hold_the_session_ledger_lock(self):
+        self.initialize(())
+        import remvu_core
+        from unittest.mock import patch
+        original = remvu_core.record_event
+        def save_after_unlock(repo, event):
+            with hooks._ledger_lock(self.root / '.remvu/hooks', timeout=.05):
+                pass
+            return original(repo, event)
+        payload = self.payload('PostToolUse', tool_name='Write', tool_use_id='released-ledger',
+                               tool_input={'file_path': 'app.py'}, tool_response={'type': 'create'})
+        with patch.object(remvu_core, 'record_event', side_effect=save_after_unlock):
+            self.assertEqual(hooks.run_hook('codex', 'PostToolUse', payload, self.root), {})
+        self.assertEqual(len(self.state()['events']), 1)
+
     def test_parallel_hook_processes_keep_all_distinct_events(self):
         self.initialize(())
         processes = []

@@ -443,7 +443,7 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
         if not (root / '.remvu/state.json').is_file():
             return _warning('No initialized local memory exists. Read REMVU.md if available; run Remvu init to enable this adapter.')
         core = _core()
-        state = core.load_state(root)
+        state = core.load_state(root) if event in ('SessionStart', 'Stop') else None
         if event == 'SessionStart':
             if payload.get('permission_mode') not in {'plan', 'readOnly', 'read-only', 'readonly'}:
                 _activation_receipt(root, platform, event)
@@ -484,7 +484,11 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
                 # Codex may deliver a Stop continuation as a new prompt/turn.
                 session['continuation_turn'] = turn
             record = None if _memory_only(payload, root) else _observable(platform, event, payload, turn)
-            if record:
+            # Tool events need the ledger only to resolve their turn identity.
+            # Do durable core/blob/snapshot writes after releasing that lock;
+            # otherwise six writers queue behind every fsync on Windows.
+            record_after_unlock = record if event in ('PreToolUse', 'PostToolUse', 'PostToolUseFailure') else None
+            if record and record_after_unlock is None:
                 core.record_event(root, record)
             if event in ('PreCompact', 'Interrupt', 'SessionEnd'):
                 session['last_boundary'] = {'event': event, 'turn': turn,
@@ -506,7 +510,9 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
                     archive.mkdir(exist_ok=True)
                     _atomic(archive / (key + '.json'), ledger['sessions'].pop(key))
             _atomic(ledger_path, ledger)
-            return result
+        if record_after_unlock:
+            core.record_event(root, record_after_unlock)
+        return result
     except (ImportError, OSError, ValueError, RuntimeError, KeyError, TypeError) as exc:
         try:
             if (root / '.remvu/state.json').is_file() and payload.get('permission_mode') not in {'plan', 'readOnly', 'read-only', 'readonly'}:
@@ -540,8 +546,10 @@ def _activation_receipt(root, platform, event, locked=False):
     events = old.get('events', []) if old.get('scripts') == scripts and old.get('python') == python else []
     if any(not isinstance(e, str) or e not in EVENTS for e in events):
         raise ValueError('Hook activation receipt lists invalid events; run repair')
+    if event in events:
+        return  # Activation is an observed event-type set, not a per-call heartbeat.
     _atomic(path, {'format': 'remvu-activation/1', 'scripts': scripts, 'python': python,
-                   'events': sorted(set([*events, event])), 'last_seen': _core()._now()})
+                   'events': sorted(set([*events, event])), 'last_new_event_at': _core()._now()})
 
 
 def main(argv=None) -> int:
