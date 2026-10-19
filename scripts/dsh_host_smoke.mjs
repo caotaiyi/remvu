@@ -18,7 +18,7 @@ function command(bin, args) {
 }
 command(executable, ['init', '--repo', project, '--platform', 'none'])
 command(dsh, ['--profile', 'remvu-smoke', '--from-default-profile', 'sdk', '--dump-config'])
-command(dsh, ['plugin', '--profile', 'remvu-smoke', 'add', join(repoRoot, 'adapters/dsh')])
+command(dsh, ['plugin', '--profile', 'remvu-smoke', 'add', repoRoot])
 const dumped = command(dsh, ['--profile', 'remvu-smoke', '--dump-config'])
 assert(dumped.includes('dsh-remvu'))
 const resultFile = join(root, 'host-result.json'), probe = join(root, 'probe.mjs'), patch = join(root, 'probe.patch.yml')

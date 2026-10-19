@@ -71,7 +71,7 @@ jobs:
       - name: Official plugin install and actual DSH profile boot without model requests
         run: node scripts/dsh_host_smoke.mjs "${{ runner.temp }}/dsh/node_modules/.bin/dsh" "${{ runner.temp }}/apps/extracted/"*/remvu "${{ runner.temp }}/dsh-host.json"
       - name: Package prebuilt JavaScript plugin
-        run: npm pack ./adapters/dsh --pack-destination "${{ runner.temp }}"
+        run: npm pack . --pack-destination "${{ runner.temp }}"
       - uses: actions/upload-artifact@v4
         with:
           name: remvu-dsh-plugin

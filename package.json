@@ -1,0 +1,40 @@
+{
+  "name": "dsh-remvu",
+  "version": "0.3.0-beta.2",
+  "description": "Local portable project memory with the standalone Remvu engine",
+  "type": "module",
+  "main": "adapters/dsh/index.js",
+  "files": [
+    "adapters/dsh/index.js",
+    "adapters/dsh/cordis.patch.yml",
+    "adapters/dsh/README.md",
+    "adapters/dsh/LICENSE",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caotaiyi/remvu.git"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "remvu",
+    "agent-memory"
+  ],
+  "engines": {
+    "node": ">=22",
+    "dsh": "0.2.1-rc.2"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./adapters/dsh/cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.1-rc.2",
+    "@deepseek-ai/schemastery": "~3.18.5"
+  }
+}

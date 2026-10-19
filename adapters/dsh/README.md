@@ -14,11 +14,13 @@ Have your agent perform these steps using reviewed downloads and a reviewed Remv
    REMVU install --repo PROJECT --platform none
    ```
 
-2. In an existing DSH profile, add the prebuilt plugin from the checkout's **adapters/dsh** directory:
+2. In an existing DSH profile, add a reviewed pinned repository commit:
 
    ```sh
-   dsh plugin --profile YOUR_PROFILE add /absolute/path/to/remvu/adapters/dsh
+   dsh plugin --profile YOUR_PROFILE add github:caotaiyi/remvu#REVIEWED_COMMIT_SHA
    ```
+
+   Replace REVIEWED_COMMIT_SHA with the full tested source commit. The repository root declares the installable DSH bundle and ships JavaScript; no build script is run. For offline/local use, replace the GitHub spec with the absolute reviewed checkout path, or its adapters/dsh directory.
 
    For a fresh Web profile, create it **once before adding the plugin** with `dsh --profile remvu --from-default-profile web --dump-config`. Do not use `--from-default-profile` to reset an existing user profile. Then use `remvu` as `YOUR_PROFILE`.
 
