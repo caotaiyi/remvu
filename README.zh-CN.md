@@ -6,11 +6,13 @@ Remvu 把项目目标、约束、被否决的方案、未完成事项和检查�
 
 [English](README.md) · [安装](docs/quickstart.zh-CN.md) · [DeepSeek Harness 插件](adapters/dsh/README.md) · [验证与限制](docs/standalone.md)
 
+默认安装没有钩子。需要时再单独开启自动记录；代码指纹、并发保护和恢复仍可使用。接手先读短摘要，详细证据按需展开，不在每轮重复整理。
+
 ## 交给 agent 安装
 
-> 从 https://github.com/caotaiyi/remvu 为我的系统和架构安装完整 Remvu 独立程序候选版。校验下载包，解压整个程序文件夹，再为当前项目安装。保留已有配置与记忆，引导我完成客户端正常的 hook 信任审查。不要安装系统 Python，也不要换成仅笔记版。
+> 从 https://github.com/caotaiyi/remvu 为我的系统和架构安装完整 Remvu 独立程序候选版。校验下载包，解压整个程序文件夹，再为当前项目安装。保留已有配置与记忆，默认只安装保存和接手，不启用钩子。只有我要求自动记录时再开启，并一次说明需要我完成的客户端信任步骤。不要安装系统 Python，也不要换成仅笔记版。
 
-v0.3.0-beta.2 仍是测试候选版。CI 生成各平台程序包；正式发布与客户端支持范围需要逐项真实验收。下载和校验方法见[独立程序说明](docs/standalone.md)。仍需 Git，macOS 分发签名和公证尚未配置。
+v0.3.0-beta.3 仍是测试候选版。CI 生成各平台程序包；正式发布与客户端支持范围需要逐项真实验收。下载和校验方法见[独立程序说明](docs/standalone.md)。仍需 Git，macOS 分发签名和公证尚未配置。
 
 | 日常操作 | Claude Code | Codex |
 | --- | --- | --- |

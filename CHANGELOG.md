@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0-beta.3 candidate
+
+- Default new installs to complete save/resume skills with no hooks. Add explicit recording on/off, preserving memory, foreign hooks and prior upgrade preferences.
+- Opt-in recording uses four Claude events and three Codex events, without Stop, pre-tool, compaction or end hooks.
+- Reduce resume memory previews to a 2,400-character component budget. Keep omitted-entry counts, provenance and full retrieval paths; detailed checks remain explicit.
+- Make DSH capture/context opt-in and inject once per session/compaction window, including one failure notice at most. Defer advanced tool schemas.
+- Consolidate on requested save, not automatically after ordinary observations. No measured token-savings claim.
+
 ## 0.3.0-beta.2 candidate (not released)
 
 - Make the complete standalone app the primary path; bundle CPython so users need no Python installation.

@@ -28,7 +28,7 @@ class LifecycleTest(unittest.TestCase):
         self.tmp.cleanup()
 
     def install(self, source=None):
-        return life.install(self.repo, source or SCRIPTS.parent, self.home)
+        return life.install(self.repo, source or SCRIPTS.parent, self.home, recording=True)
 
     def test_unsupported_windows39_refuses_before_mutation_and_offers_markdown(self):
         with patch.object(life.sys, 'version_info', (3, 9, 6)), \
@@ -82,7 +82,7 @@ class LifecycleTest(unittest.TestCase):
                 life.install(self.repo, rollback=True)
 
     def test_failed_install_restores_configs_without_discarding_concurrent_events(self):
-        setup.initialize(self.repo, ('claude',), SCRIPTS)
+        setup.initialize(self.repo, ('claude',), SCRIPTS, recording=True, minimal=False)
         config = self.repo / '.claude/settings.local.json'
         before = config.read_bytes()
         original = life._initialize_runtime
@@ -213,10 +213,10 @@ class LifecycleTest(unittest.TestCase):
         shim.write_text(before, encoding='utf-8')
         config = self.repo / '.codex/hooks.json'
         body = json.loads(config.read_text(encoding='utf-8'))
-        body['hooks']['Stop'][0]['hooks'][0]['timeout'] = 999
+        body['hooks']['PostToolUse'][0]['hooks'][0]['timeout'] = 999
         config.write_text(json.dumps(body), encoding='utf-8')
         life.uninstall(self.repo)
-        self.assertEqual(json.loads(config.read_text(encoding='utf-8'))['hooks']['Stop'][0]['hooks'][0]['timeout'], 999)
+        self.assertEqual(json.loads(config.read_text(encoding='utf-8'))['hooks']['PostToolUse'][0]['hooks'][0]['timeout'], 999)
 
     def test_recovery_snapshots_are_bounded_but_journals_retained(self):
         setup.initialize(self.repo, (), SCRIPTS)

@@ -26,7 +26,7 @@ class AdapterTest(unittest.TestCase):
         self.tmp.cleanup()
 
     def initialize(self, platforms=('claude', 'codex')):
-        return setup.initialize(self.root, platforms, SCRIPTS)
+        return setup.initialize(self.root, platforms, SCRIPTS, recording=True, minimal=False)
 
     def payload(self, event, **fields):
         return {'session_id': 'session-one', 'cwd': str(self.root), 'permission_mode': 'default',

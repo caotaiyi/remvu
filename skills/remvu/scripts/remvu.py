@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-VERSION = '0.3.0-beta.2'
+VERSION = '0.3.0-beta.3'
 
 
 def emit(value):
@@ -19,7 +19,8 @@ def parser():
     cli.add_argument('--version', action='version', version='Remvu ' + VERSION)
     commands = cli.add_subparsers(dest='command', required=True)
     for name, help_text in (
-        ('init', 'Initialize private memory and optional host adapters'),
+        ('init', 'Initialize save/resume skills; recording is opt-in'),
+        ('recording', 'Explicitly enable or disable project observation hooks'),
         ('install', 'Copy a reviewed runtime to a stable user directory and configure this project'),
         ('upgrade', 'Install reviewed local source, or roll back the previous managed runtime'),
         ('uninstall', 'Remove unchanged project adapters, retaining memory and shared runtimes'),
@@ -44,15 +45,21 @@ def parser():
     ):
         sub = commands.add_parser(name, help=help_text)
         sub.add_argument('--repo', default='.', help='Project root (default: current directory)')
-        if name == 'init':
+        if name == 'recording':
+            sub.add_argument('mode', choices=('on', 'off'))
+            sub.add_argument('--platform', choices=('both', 'claude', 'codex'), default='both')
+        elif name == 'init':
             sub.add_argument('--platform', choices=('both', 'claude', 'codex', 'none'), default='both')
+            sub.add_argument('--recording', choices=('on', 'off'), default=None)
         elif name in ('install', 'upgrade'):
+            sub.add_argument('--recording', choices=('on', 'off'), default=None)
             sub.add_argument('--source', help='Reviewed local skill directory; no remote code is fetched')
             sub.add_argument('--home', help='Managed runtime directory (default: user local application data)')
             sub.add_argument('--platform', choices=('both', 'claude', 'codex', 'none'))
             if name == 'upgrade':
                 sub.add_argument('--rollback', action='store_true')
         elif name == 'dsh-config':
+            sub.add_argument('--recording', choices=('on', 'off'), default='off')
             sub.add_argument('--out', help='New overlay path; defaults to private .remvu/dsh.patch.yml')
         elif name == 'diagnose':
             sub.add_argument('--out', required=True, help='New local JSON file; nothing is uploaded')
@@ -62,6 +69,7 @@ def parser():
             proposal.add_argument('--proposal-json')
         elif name == 'resume':
             sub.add_argument('--document')
+            sub.add_argument('--details', action='store_true', help='Explicitly request the larger status and full issue details')
         elif name == 'status':
             sub.add_argument('--full', action='store_true')
         elif name in ('events', 'entries'):
@@ -121,7 +129,7 @@ def bounded_page(entries, offset, limit):
     return result
 
 
-def compact_state(state):
+def compact_state(state, max_chars=7400):
     entries = state.get('entries', [])
     active = [e for e in entries if not e.get('superseded_by')]
     result = {
@@ -138,7 +146,7 @@ def compact_state(state):
     }
     for entry in active:
         preview = entry_preview(entry)
-        if len(json.dumps({**result, 'entries': result['entries'] + [preview]}, ensure_ascii=False, indent=2)) > 7400:
+        if len(json.dumps({**result, 'entries': result['entries'] + [preview]}, ensure_ascii=False, indent=2)) > max_chars - 300:
             break
         result['entries'].append(preview)
     result['omitted_active_entries'] = len(active) - len(result['entries'])
@@ -176,7 +184,8 @@ def main(argv=None):
                         raise ValueError('upgrade requires --source REVIEWED_SKILL_DIRECTORY or --rollback')
                     platforms = None if args.platform is None else ('claude', 'codex') if args.platform == 'both' else () if args.platform == 'none' else (args.platform,)
                     result = lifecycle.install(repo, source=args.source, home=args.home, platforms=platforms,
-                                               rollback=getattr(args, 'rollback', False))
+                                               rollback=getattr(args, 'rollback', False),
+                                               recording=None if args.recording is None else args.recording == 'on')
                 elif args.command == 'diagnose':
                     result = lifecycle.diagnose(repo, args.out)
                 else:
@@ -190,13 +199,14 @@ def main(argv=None):
                 if destination.exists() or destination.is_symlink() or any(p.is_symlink() for p in destination.parents):
                     raise ValueError('Overlay destination exists or contains a symlink. Preserve it and choose another filename.')
                 from remvu_init import _atomic
-                _atomic(destination, json.dumps([{'id': 'remvu', 'config': {'executable': runtime.cli_command()[0], 'project': str(repo)}}], indent=2) + '\n')
+                _atomic(destination, json.dumps([{'id': 'remvu', 'config': {'executable': runtime.cli_command()[0], 'project': str(repo), 'recording': args.recording == 'on'}}], indent=2) + '\n')
                 result = {'ok': True, 'path': str(destination), 'uploaded': False,
                           'next_step': 'After installing dsh-remvu in your chosen profile, pass this reviewed file using --patch.'}
-            elif args.command == 'init':
+            elif args.command in ('init', 'recording'):
                 from remvu_init import initialize
                 platforms = ('claude', 'codex') if args.platform == 'both' else () if args.platform == 'none' else (args.platform,)
-                result = initialize(repo, platforms=platforms, scripts_dir=__import__('remvu_runtime').scripts_dir())
+                result = initialize(repo, platforms=platforms, scripts_dir=__import__('remvu_runtime').scripts_dir(),
+                                    recording=args.mode == 'on' if args.command == 'recording' else None if args.recording is None else args.recording == 'on', minimal=True)
             elif args.command == 'save':
                 proposal = None
                 if args.proposal_json is not None:
@@ -213,13 +223,19 @@ def main(argv=None):
                 result['uploaded'] = False
             elif args.command == 'resume':
                 health = core.check_project(repo, document=args.document)
-                result = {'ok': True, 'checks': health,
-                          'memory': compact_state(core.load_state(repo)) if (repo / '.remvu/state.json').is_file() else None,
+                checks = health if args.details else {
+                    'ok': health.get('ok', False), 'issue_count': len(health.get('issues', [])),
+                    'issue_codes': sorted({i['code'] for i in health.get('issues', [])}),
+                    'next_read': 'check returns full evidence and code-state details.'}
+                result = {'ok': True, 'checks': checks,
+                          'memory': compact_state(core.load_state(repo), max_chars=7400 if args.details else 2400) if (repo / '.remvu/state.json').is_file() else None,
                           'instruction': 'Read issues before proceeding. Pending evidence is not consolidated; old checks do not certify current code.'}
                 if args.document:
                     body = Path(args.document).read_text(encoding='utf-8')
-                    result['document_preview'] = body[:8000]
-                    result['document_truncated'] = len(body) > 8000
+                    budget = 8000 if args.details else 2400
+                    result['document_preview'] = body[:budget]
+                    result['document_truncated'] = len(body) > budget
+                    result['document_next_read'] = 'Read the named file directly for omitted constraints/history; this preview is not a complete handoff.'
             elif args.command == 'status':
                 state = core.load_state(repo)
                 result = state if args.full else compact_state(state)

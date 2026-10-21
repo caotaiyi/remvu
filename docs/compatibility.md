@@ -1,6 +1,6 @@
-# Standalone v0.3.0-beta.2 candidate
+# Standalone v0.3.0-beta.3 candidate
 
-The primary path is now the complete app with its runtime bundled; users need no Python installation. Automatic recording, fingerprints and CAS remain enabled after normal client trust. [Standalone evidence and limitations](standalone.md) distinguish packaged checks, actual DSH host startup and pending model/native acceptance. DSH targets exactly 0.2.1-rc.2; no desktop/Web or Windows DSH certification is implied.
+The primary path is now the complete app with its runtime bundled; users need no Python installation. Fresh installations expose save/resume without installing hooks. Fingerprints, CAS and recovery remain available. Automatic recording is opt-in; existing installations preserve their recording preference. [Standalone evidence and limitations](standalone.md) distinguish packaged checks, actual DSH host startup and pending model/native acceptance. DSH targets exactly 0.2.1-rc.2; no desktop/Web or Windows DSH certification is implied.
 
 The source-development engine still supports Python 3.9+ on macOS/Linux and 3.10+ on Windows. Windows source Python 3.9 failed repeated pressure tests and remains unsupported; the bundled app uses modern Python internally. Earlier [eight-job source CI](https://github.com/caotaiyi/remvu/actions/runs/39138270476) belongs to b29423b. Its results and the old notes-only comparison are historical, not certification of this new app.
 
@@ -49,10 +49,10 @@ Reference fingerprints follow Git's declared text/line-ending policy. Authorized
 
 ## Client configuration
 
-Codex uses `.codex/hooks.json` with `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `Stop`, `PreCompact`, `Interrupt` and `SessionEnd`. Review client trust through `/hooks`. Claude Code uses `.claude/settings.local.json` with `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `Stop`, `PreCompact` and `SessionEnd`. Existing configuration is preserved when Remvu adds its managed entries.
+Fresh installs add project skills and no hooks. Explicit `recording on` installs three Codex events (`SessionStart`, `UserPromptSubmit`, `PostToolUse`) or four Claude Code events (the same three plus `PostToolUseFailure`). Review client hook trust when enabling recording. No Stop handler is installed in this profile. `recording off` removes only recognized managed handlers, preserving unrelated configuration and private memory.
 
-The event list describes the adapter mapping. Live startup, prompt, call, result, Stop and session-end observations do not establish that every lifecycle event was exercised in a native client. Compaction and interruption have synthetic tests but were not invoked in the native smoke checks.
+Older installations can contain a larger event mapping; historical observations above describe those older adapters. They do not certify this candidate's reduced profile. Native compaction, interruption and multi-round acceptance remain pending.
 
-The project skill is invoked as `$remvu` in Codex and `/remvu` in Claude Code. Local skill shims refer to the installed source; retain its path or reinitialize and review hook trust after relocation. Ignore rules cannot remove private files already tracked by Git; initialization reports those paths for review without changing the index.
+The project skill is invoked as `$remvu` in Codex and `/remvu` in Claude Code. Managed installations use a stable runtime location. Ignore rules cannot remove private files already tracked by Git; initialization reports those paths for review without changing the index.
 
 Official references: [Codex hooks](https://learn.chatgpt.com/docs/hooks), [Codex skills](https://learn.chatgpt.com/docs/build-skills), [Claude Code hooks](https://code.claude.com/docs/en/hooks).

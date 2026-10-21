@@ -2,9 +2,9 @@
 
 Give the agent this instruction:
 
-> Install the complete standalone Remvu app from https://github.com/caotaiyi/remvu for my system and architecture. Verify the archive checksum, keep its application folder intact and run its install command for this project. Preserve existing skills, hooks and private memory. Guide me through normal client hook trust. Do not install Python or switch to the notes-only fallback.
+> Install the complete standalone Remvu app from https://github.com/caotaiyi/remvu for my system and architecture. Verify the archive checksum, keep its application folder intact and run its install command for this project. Preserve existing skills, hooks and private memory. Keep automatic recording off. Explain client hook trust only if I explicitly enable it. Do not install Python or switch to the notes-only fallback.
 
-The v0.3.0-beta.2 builds are test candidates. Check [artifact availability and verification](standalone.md) first. Git remains required. Users download the bundled runtime; Python is a build/source-development dependency only.
+The v0.3.0-beta.3 builds are test candidates. Check [artifact availability and verification](standalone.md) first. Git remains required. Users download the bundled runtime; Python is a build/source-development dependency only.
 
 From a reviewed extracted application on macOS:
 
@@ -18,7 +18,7 @@ On Windows PowerShell:
 & 'C:\path\remvu-app\remvu.exe' 'install' '--repo' 'C:\project' '--platform' 'both'
 ```
 
-Installation verifies and copies the app to a stable user location, merges the project skill/configuration and backs up existing state. Moving the extracted download afterwards does not affect installed adapters. Follow the normal client's project/hook trust review and open a fresh session. `doctor` distinguishes configured adapters from observed callbacks; a receipt alone cannot certify trust.
+Installation verifies and copies the app to a stable user location, merges the project skill/configuration and backs up existing state. Moving the extracted download afterwards does not affect installed adapters. Fresh installation creates no hook config. Project skill discovery can require a new session. To enable recording later, ask the agent to run `recording on --repo PROJECT`; only that choice requires hook review. `recording off --repo PROJECT` removes unchanged owned callbacks while preserving skills, memory and other hooks. Existing installs keep their previous mode through upgrade. `doctor` distinguishes configured adapters from observed callbacks; a receipt alone cannot certify trust.
 
 Use `/remvu save` and `/remvu resume` in Claude Code, `$remvu save` and `$remvu resume` in Codex. Save stays local under `.remvu/handoff/REMVU.md`; only explicit sharing produces a public file. Save while the original agent can still respond. Unreviewed evidence stays pending and failed checks stay failed.
 

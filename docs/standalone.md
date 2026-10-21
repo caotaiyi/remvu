@@ -1,6 +1,6 @@
 # Complete standalone candidate
 
-Remvu v0.3.0-beta.2 packages the existing memory engine with CPython. Users install no Python. Git remains required. Storage, automatic observable recording, code fingerprints, revision checks, private export, reviewed public sharing, recovery and legacy export/import retain their engine behavior.
+Remvu v0.3.0-beta.3 packages the existing memory engine with CPython. Users install no Python. Git remains required. Storage, opt-in observable recording, code fingerprints, revision checks, private export, reviewed public sharing, recovery and legacy export/import retain their engine behavior.
 
 The default distribution is an application **folder**, not one executable file to detach from its libraries. Keeping the runtime beside the executable avoids unpacking it on every hook invocation. [PyInstaller's operating modes](https://pyinstaller.org/en/stable/operating-mode.html) describe this tradeoff.
 
@@ -20,7 +20,7 @@ Extract the entire folder. macOS archives retain executable permissions when ext
 
 See [quick start](quickstart.md) or [中文快速开始](quickstart.zh-CN.md). Run the program's `install --repo PROJECT --platform both`; it verifies and copies the full app into a stable user directory. Generated project skills and hooks name that stable executable. They never pass a `.py` file to the bundled executable as if it were an interpreter.
 
-The result includes `runtime_launcher`, an argument list naming the stable executable. Use it for maintenance and DSH overlay generation. Installation preserves other config, retains private checkpoints and distinguishes configured from observed hook activation. Clients still require normal trust review.
+The result includes `runtime_launcher`, an argument list naming the stable executable. Use it for maintenance and DSH overlay generation. Installation preserves other config, retains private checkpoints and distinguishes configured from observed hook activation. Fresh save/resume installs need no hook trust review. Only explicitly enabling recording requires the normal client hook trust process.
 
 Use `save` and `resume` day to day. Maintenance and explicit sharing remain available through the agent or the full CLI. For source development, Python 3.9+ is supported on macOS/Linux and 3.10+ on Windows. The standalone build uses Python 3.12, so the user's installed Python version is irrelevant.
 

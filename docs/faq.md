@@ -6,7 +6,7 @@ No. The complete standalone app bundles its runtime and retains recording, finge
 
 **Will Remvu stop my session? / 会拦截结束吗？**
 
-The default skill installs no hooks. The optional recorder's Stop handler is now quiet and nonblocking. Old installed copies retain old code: update the runtime or disable the exact Remvu Stop handler through normal client settings. Unreviewed work stays pending until explicitly consolidated.
+The default skill installs no hooks. Enabling the current recorder installs no Stop handler. Existing opt-in installations keep their recording preference on upgrade; use `recording off` to remove recognized managed handlers while retaining skills and memory. Unreviewed work stays pending until explicitly consolidated.
 
 **Is Markdown as reliable as the engine? / 轻量版有哪些限制？**
 

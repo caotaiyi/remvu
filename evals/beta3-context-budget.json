@@ -1,0 +1,12 @@
+{
+  "format": "remvu-context-budget-fixture/1",
+  "fixture_entries": 45,
+  "default_resume_characters": 2667,
+  "detailed_resume_characters": 8101,
+  "default_resume_utf8_bytes": 2667,
+  "detailed_resume_utf8_bytes": 8101,
+  "all_entries_retained": true,
+  "default_omitted_entries": 41,
+  "tokens_measured": false,
+  "note": "Synthetic CLI response sizes only. Not native model usage, accuracy or a token/cost savings estimate."
+}

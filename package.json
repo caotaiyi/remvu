@@ -1,6 +1,6 @@
 {
   "name": "dsh-remvu",
-  "version": "0.3.0-beta.2",
+  "version": "0.3.0-beta.3",
   "description": "Local portable project memory with the standalone Remvu engine",
   "type": "module",
   "main": "adapters/dsh/index.js",

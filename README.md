@@ -4,15 +4,17 @@
 
 Save before Claude Code hits its limit. Continue in Codex with the project background intact.
 
-Remvu keeps goals, constraints, rejected approaches, unfinished work and check evidence alongside your project. The complete standalone engine bundles its runtime: **users do not install Python**. Automatic observable recording, code fingerprints, concurrent updates, recovery and private sharing boundaries remain part of the engine.
+Remvu keeps goals, constraints, rejected approaches, unfinished work and check evidence alongside your project. The complete standalone engine bundles its runtime: **users do not install Python**. Opt-in observable recording, code fingerprints, concurrent updates, recovery and private sharing boundaries remain part of the engine.
 
 [中文](README.zh-CN.md) · [Install](docs/quickstart.md) · [DeepSeek Harness plugin](adapters/dsh/README.md) · [Evidence and limits](docs/standalone.md)
 
+Fresh installations create no hooks. Recording is a separate choice; fingerprints, CAS protection and recovery stay available in manual mode. Resume reads a short preview; details are fetched only when needed.
+
 ## Try the complete app
 
-> Install the complete Remvu standalone candidate from https://github.com/caotaiyi/remvu for my OS and architecture. Verify its checksum, extract the entire application folder, then run its install command for this project. Preserve existing settings and memory. Walk me through the client's normal hook trust review. Do not install a system Python or substitute the notes-only fallback.
+> Install the complete Remvu standalone candidate from https://github.com/caotaiyi/remvu for my OS and architecture. Verify its checksum, extract the entire application folder, then run its install command for this project. Preserve existing settings and memory. Install save/resume without hooks. Enable recording only if I ask; explain any required client trust once. Do not install a system Python or substitute the notes-only fallback.
 
-The v0.3.0-beta.2 application is a test candidate. CI produces platform archives; a production release and the full native-client support matrix remain gated on actual acceptance. See [the build and installation guide](docs/standalone.md) for available artifacts, verification and exact steps. Git is still required. macOS distribution signing/notarization is not configured.
+The v0.3.0-beta.3 application is a test candidate. CI produces platform archives; a production release and the full native-client support matrix remain gated on actual acceptance. See [the build and installation guide](docs/standalone.md) for available artifacts, verification and exact steps. Git is still required. macOS distribution signing/notarization is not configured.
 
 | Everyday action | Claude Code | Codex |
 | --- | --- | --- |

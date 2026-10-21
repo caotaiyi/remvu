@@ -13,7 +13,7 @@ PROFILES = {f'{system}/{client}/{surface}' for system in ('macos', 'windows11-x6
 
 
 def readiness(matrix, root=ROOT):
-    if matrix.get('format') != 'remvu-beta-acceptance/1' or matrix.get('version') != '0.3.0-beta.2':
+    if matrix.get('format') != 'remvu-beta-acceptance/1' or matrix.get('version') != '0.3.0-beta.3':
         raise ValueError('Unrecognized beta acceptance ledger')
     rows = matrix.get('profiles', [])
     if len(rows) != 12 or {r['id'] for r in rows} != PROFILES:

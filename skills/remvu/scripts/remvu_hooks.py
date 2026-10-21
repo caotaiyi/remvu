@@ -370,12 +370,12 @@ def _context(root: Path, state: dict) -> str:
         # Deliver only the first-read section; detailed history remains on disk.
         entry = document.partition('\n## Start Here\n')[2].split('\n## ', 1)[0].strip()
         text += 'Recheck current code before reusing recorded checks. '
-        room = 8000 - len(text) - 220
+        room = 2400 - len(text) - 220
         if len(entry) <= room:
             text += '\n\n' + entry
         else:
-            text += f'The entry summary exceeds the hook budget. Read {source.relative_to(root)} before work; '
-            text += 'important constraints were not selectively omitted from a shortened summary.'
+            text += 'The full entry exceeds this startup budget. Use resume for bounded previews, then retrieve relevant constraints before acting; '
+            text += 'the complete handoff remains on disk and has not been shortened.'
         text += f'\nFull memory: {source.relative_to(root)}.'
     else:
         text += 'Read compact state with the Remvu status command, then retrieve relevant entries and event evidence as needed.'
@@ -484,6 +484,11 @@ def run_hook(platform: str, event: str, payload: dict, repo=None) -> dict:
                 # Codex may deliver a Stop continuation as a new prompt/turn.
                 session['continuation_turn'] = turn
             record = None if _memory_only(payload, root) else _observable(platform, event, payload, turn)
+            if event in ('PostToolUse', 'PostToolUseFailure'):
+                adapter_path = root / '.remvu/adapters.json'
+                adapter = core._read_json(adapter_path) if adapter_path.is_file() else {}
+                if adapter.get('recording_profile') == 'minimal':
+                    session['open'] = False  # Next prompt opens a turn without needing a Stop hook.
             # Tool events need the ledger only to resolve their turn identity.
             # Do durable core/blob/snapshot writes after releasing that lock;
             # otherwise six writers queue behind every fsync on Windows.

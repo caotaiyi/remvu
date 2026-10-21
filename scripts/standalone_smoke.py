@@ -42,6 +42,9 @@ def smoke(app):
         stable = Path(installed['runtime_launcher'][0])
         assert stable != executable and stable.is_file()
         assert run(executable, 'install', '--home', str(home))['runtime_launcher'] == installed['runtime_launcher']
+        assert not (repo / '.claude/settings.local.json').exists()
+        assert not (repo / '.codex/hooks.json').exists()
+        run(stable, 'recording', 'on')
         downloaded.rename(root / 'moved download')
         overlay = run(stable, 'dsh-config')
         assert json.loads(Path(overlay['path']).read_text())[0]['config']['executable'] == str(stable)

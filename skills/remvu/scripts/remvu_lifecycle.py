@@ -170,11 +170,11 @@ def _project_paths(repo):
         '.remvu/installation.json', '.remvu/state.json', '.remvu/snapshots/latest.json')]
 
 
-def _initialize_runtime(repo, platforms, scripts):
+def _initialize_runtime(repo, platforms, scripts, recording=False):
     # Let the selected release own its config generation and migrations, rather
     # than installing a new skill with the currently running release's adapter code.
     selection = 'both' if set(platforms) == {'claude', 'codex'} else platforms[0] if len(platforms) == 1 else 'none'
-    process = subprocess.run([*runtime.cli_command(scripts), 'init', '--repo', str(repo), '--platform', selection],
+    process = subprocess.run([*runtime.cli_command(scripts), 'init', '--repo', str(repo), '--platform', selection, '--recording', 'on' if recording else 'off'],
                              capture_output=True, encoding='utf-8', timeout=60,
                              env=runtime.child_env())
     try:
@@ -214,7 +214,7 @@ def _transaction(repo):
         raise
 
 
-def install(repo, source=None, home=None, platforms=None, rollback=False):
+def install(repo, source=None, home=None, platforms=None, rollback=False, recording=None):
     repo = _safe(repo).resolve()
     if not repo.is_dir():
         raise ValueError('Project directory must already exist')
@@ -231,6 +231,7 @@ def install(repo, source=None, home=None, platforms=None, rollback=False):
     selected = tuple(platforms if platforms is not None else adapter.get('platforms', ('claude', 'codex')))
     if platforms is None and adapter.get('uninstalled_at'):
         selected = ('claude', 'codex')
+    recording = adapter.get('recording', bool(adapter.get('platforms'))) if recording is None else recording
     # Same advisory project lock as the core. Initialize takes that lock itself,
     # so use a separate lifecycle lock to serialize project configuration changes.
     from remvu_hooks import _ledger_lock
@@ -253,7 +254,7 @@ def install(repo, source=None, home=None, platforms=None, rollback=False):
             scripts = (stage_bundle(source, managed_home or default_home()) if (source / '.bundle.json').is_file()
                        else stage_runtime(source, managed_home or default_home()) / 'scripts')
         with _transaction(repo) as checkpoint:
-            result = _initialize_runtime(repo, selected, scripts)
+            result = _initialize_runtime(repo, selected, scripts, recording=recording)
             current = old.get('scripts') or adapter.get('scripts_dir')
             if current and not ((_safe(current).parent / '.runtime.json').is_file() or runtime.bundle_for_scripts(current)):
                 current = None  # A v0.2 checkout is backed up, not a verified rollback runtime.
@@ -264,7 +265,7 @@ def install(repo, source=None, home=None, platforms=None, rollback=False):
     result.update(runtime_scripts=str(scripts), action='rollback' if rollback else 'install',
                   runtime_python=str(Path(sys.executable).resolve()),
                   runtime_launcher=runtime.cli_command(scripts),
-                  activation='awaiting_host_review', preflight=preflight(),
+                  activation='awaiting_host_review' if recording else 'manual_ready', preflight=preflight(),
                   note='Checksums detect local changes; they do not authenticate the publisher. Review the source/release.')
     return result
 
@@ -295,7 +296,7 @@ def uninstall(repo):
             if config_path.exists():
                 config = setup._read_config(config_path)
                 expected = list(manifest.get('handlers', {}).get(client, {}).values())
-                if not expected:
+                if not expected and manifest.get('recording', True):
                     expected = [setup._handler(client, event, scripts, repo) for event in setup.EVENTS[client]]
                 for event, groups in config.get('hooks', {}).items():
                     kept = []
@@ -353,9 +354,12 @@ def doctor(repo):
                 config = setup._read_config(config_path)
                 installed = all(any(manifest.get('handlers', {}).get(client, {}).get(event, setup._handler(client, event, scripts, repo)) == h
                                     for group in config.get('hooks', {}).get(event, []) for h in group['hooks'])
-                                for event in setup.EVENTS[client])
+                                for event in manifest.get('handlers', {}).get(client, {}) or (setup.EVENTS[client] if manifest.get('recording', True) else ()))
             except (ValueError, OSError):
                 installed = False
+            if not manifest.get('recording', True):
+                shim = repo / ('.claude/skills/remvu/SKILL.md' if client == 'claude' else '.agents/skills/remvu/SKILL.md')
+                installed = shim.is_file() and hashlib.sha256(shim.read_bytes()).hexdigest() == manifest.get('skill_shims', {}).get(client)
             observed = []
             receipt = repo / '.remvu/hooks' / ('activation-' + client + '.json')
             if receipt.is_file():
@@ -369,7 +373,8 @@ def doctor(repo):
             result['adapters'].append({'client': client, 'configured': installed,
                                        'runtime_available': (scripts / 'remvu.py').is_file(),
                                        'observed_events': observed,
-                                       'activation': 'hook_execution_observed' if installed and observed else 'awaiting_host_review',
+                                       'recording': manifest.get('recording', True),
+                                       'activation': 'manual_ready' if installed and not manifest.get('recording', True) else 'hook_execution_observed' if installed and observed else 'awaiting_host_review',
                                        'scope': 'Local receipt is not a trust attestation or desktop/IDE certification.'})
             if not installed or not (scripts / 'remvu.py').is_file():
                 result['ok'] = False

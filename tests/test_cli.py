@@ -47,6 +47,44 @@ class CliTest(unittest.TestCase):
         data = {'base_revision': base, 'entries': entries}
         return self.cli('update', '--repo', self.repo, '--proposal', '-', input=json.dumps(data))
 
+    def test_default_install_has_skills_without_hooks_and_recording_is_reversible(self):
+        fresh = self.root / 'manual-project'
+        fresh.mkdir()
+        installed = self.cli('install', '--repo', fresh, '--home', (self.root / 'managed').resolve())
+        self.assertFalse(installed['recording'])
+        self.assertFalse(installed['trust_required'])
+        self.assertEqual(installed['activation'], 'manual_ready')
+        self.assertTrue((fresh / '.agents/skills/remvu/SKILL.md').is_file())
+        self.assertFalse((fresh / '.codex/hooks.json').exists())
+        self.assertFalse((fresh / '.claude/settings.local.json').exists())
+        before = (fresh / '.remvu/state.json').read_bytes()
+        enabled = self.cli('recording', 'on', '--repo', fresh)
+        self.assertTrue(enabled['trust_required'])
+        config = json.loads((fresh / '.claude/settings.local.json').read_text())
+        active = {event for event, groups in config['hooks'].items() if groups}
+        self.assertEqual(active, {'SessionStart', 'UserPromptSubmit', 'PostToolUse', 'PostToolUseFailure'})
+        config['hooks']['Stop'] = [{'hooks': [{'type': 'command', 'command': 'echo keep-user-hook'}]}]
+        (fresh / '.claude/settings.local.json').write_text(json.dumps(config))
+        disabled = self.cli('recording', 'off', '--repo', fresh)
+        self.assertFalse(disabled['recording'])
+        self.assertEqual(before, (fresh / '.remvu/state.json').read_bytes())
+        self.assertTrue((fresh / '.agents/skills/remvu/SKILL.md').is_file())
+        remaining = json.loads((fresh / '.claude/settings.local.json').read_text())
+        self.assertEqual([h['command'] for groups in remaining['hooks'].values() for g in groups for h in g['hooks']], ['echo keep-user-hook'])
+        self.assertTrue(all(a['activation'] == 'manual_ready' for a in self.cli('doctor', '--repo', fresh, ok=False)['adapters']))
+
+    def test_resume_budget_is_bounded_without_deleting_constraints(self):
+        self.proposal([{'id': 'keep-' + str(i), 'kind': 'constraint', 'text': 'Constraint ' + str(i) + ' X' * 180,
+                        'basis': 'user_confirmed'} for i in range(45)])
+        compact = self.cli('resume', '--repo', self.repo)
+        self.assertLess(len(json.dumps(compact, ensure_ascii=False, indent=2)), 3400)
+        self.assertGreater(compact['memory']['omitted_active_entries'], 0)
+        full = self.cli('status', '--repo', self.repo, '--full')
+        self.assertEqual(len(full['entries']), 45)
+        self.assertTrue(self.cli('show', 'keep-44', '--repo', self.repo)['entry']['text'].startswith('Constraint 44'))
+        details = self.cli('resume', '--details', '--repo', self.repo)
+        self.assertGreater(len(details['memory']['entries']), len(compact['memory']['entries']))
+
     def test_save_resume_use_full_engine_and_keep_unreviewed_evidence(self):
         self.cli('record', '--repo', self.repo, input=json.dumps({'kind': 'tool_result', 'tool': 'fixture', 'output': 'Check failed.', 'result': 'failed'}))
         saved = self.cli('save', '--repo', self.repo)
